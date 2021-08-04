@@ -10,6 +10,7 @@ Once you clone the project, open the solution in [Visual Studio Code](https://co
 
 - In the **API** folder, copy `local.settings.example.json` to `local.settings.json`
 - Press **F5** to launch both the client application and the Functions API app
+- Update client to .NET 5 as described in https://docs.microsoft.com/en-us/aspnet/core/migration/31-to-50
 
 _Note: If you're using the Azure Functions CLI tools, refer to [the documentation](https://docs.microsoft.com/azure/azure-functions/functions-run-local?tabs=windows%2Ccsharp%2Cbash) on how to enable CORS._
 
