@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'Client/**'
+      - 'Api/**'
+      - 'Shared/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
@@ -11,6 +15,7 @@ on:
     paths:
       - 'Client/**'
       - 'Api/**'
+      - 'Shared/**'
 
 jobs:
   build_and_deploy_job:
