@@ -15,5 +15,9 @@ namespace BlazorApp.Shared
         {
             return UserRoles.Contains(role);
         }
+        public string GetUserKey()
+        {
+            return $"{IdentityProvider}-{UserId}";
+        }
     }
 }
