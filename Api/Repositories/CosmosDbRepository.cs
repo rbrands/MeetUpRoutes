@@ -57,6 +57,14 @@ namespace BlazorApp.Api.Repositories
             }
             try
             {
+                if (String.IsNullOrEmpty(_cosmosDbDatabase))
+                {
+                    throw new ApplicationException("Missing config COSMOS_DB_DATABASE");
+                }
+                if (String.IsNullOrEmpty(_cosmosDbContainer))
+                {
+                    throw new ApplicationException("Missing config COSMOS_DB_CONTAINER");
+                }
                 ItemResponse<T> item = await _cosmosClient.GetDatabase(_cosmosDbDatabase)
                                                           .GetContainer(_cosmosDbContainer)
                                                           .ReadItemAsync<T>(id, partitionKey);

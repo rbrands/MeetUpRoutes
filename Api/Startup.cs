@@ -35,8 +35,8 @@ namespace BlazorApp.Api
                            .AddEnvironmentVariables()
                            .Build();
 
-            CosmosClient cosmosClient = new CosmosClient(config["COSMOS_DB_CONNECTION_STRING"]);
             builder.Services.AddSingleton(config);
+            CosmosClient cosmosClient = new CosmosClient(config["COSMOS_DB_CONNECTION_STRING"]);
             builder.Services.AddSingleton(cosmosClient);
             builder.Services.AddSingleton<CosmosDBRepository<UserContactInfo>>();
         }
