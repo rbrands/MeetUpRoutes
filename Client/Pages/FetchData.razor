@@ -1,6 +1,9 @@
 @page "/fetchdata"
-@using BlazorApp.Shared 
+@attribute [Authorize]
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
 @inject HttpClient Http
+@inject BackendApiRepository Api
 
 <h1>Weather forecast</h1>
 
@@ -12,6 +15,18 @@
 }
 else
 {
+    <div>
+        <p>Identity Provider: @user.Principal.IdentityProvider</p>
+        <p>User Id: @user.Principal.UserId</p>
+        <p>User Details: @user.Principal.UserDetails</p>
+        <p>
+            Roles:
+            @foreach (string role in user.Principal.UserRoles)
+            {
+                @role<text>, </text>
+            }
+        </p>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -37,16 +52,18 @@ else
 
 @code {
     private WeatherForecast[] forecasts;
+    private User user;
 
     protected override async Task OnInitializedAsync()
     {
-      try
-      {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("/api/WeatherForecast");
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine(ex.ToString());
-      }
+        try
+        {
+            user = await Api.GetUser();
+            forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("/api/WeatherForecast");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
     }
 }

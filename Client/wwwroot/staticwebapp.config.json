@@ -1,0 +1,20 @@
+{
+  "routes": [
+    {
+      "route": "/api/GetClientPrincipal",
+      "allowedRoles": [ "authenticated" ]
+    },
+    {
+      "route": "/api/GetUser",
+      "allowedRoles": [ "authenticated" ]
+    },
+    {
+      "route": "/api/*",
+      "allowedRoles": [ "authenticated" ]
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "index.html",
+    "exclude": [ "/images/*.{png,jpg,gif}", "/css/*" ]
+  }
+}
