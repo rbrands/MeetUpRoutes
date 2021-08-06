@@ -15,9 +15,16 @@
 else
 {
     <div>
-        <p>@user.Principal.IdentityProvider</p>
-        <p>@user.Principal.UserId</p>
-        <p>@user.Principal.UserDetails</p>
+        <p>Identity Provider: @user.Principal.IdentityProvider</p>
+        <p>User Id: @user.Principal.UserId</p>
+        <p>User Details: @user.Principal.UserDetails</p>
+        <p>
+            Roles: 
+                @foreach(string role in user.Principal.UserRoles)
+                {
+                    @role<text>, </text>
+                }
+        </p>
     </div>
     <table class="table">
         <thead>
