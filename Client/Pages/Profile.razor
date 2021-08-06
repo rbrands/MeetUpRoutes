@@ -1,0 +1,23 @@
+﻿@page "/profile"
+@using BlazorApp.Client.Utils;
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<h1>Dein Benutzer-Profil</h1>
+<AuthorizeView>
+    <Authorized>
+        <div>Und los gehts</div>
+    </Authorized>
+    <NotAuthorized>
+        <p>
+            Bitte anmelden, um dein Benutzerprofil zu bearbeiten.
+            <a href="/LoginProviders">Anmelden</a>
+        </p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+}
