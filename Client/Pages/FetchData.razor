@@ -1,4 +1,5 @@
 @page "/fetchdata"
+@attribute [Authorize]
 @using BlazorApp.Shared
 @using BlazorApp.Client.Utils
 @inject HttpClient Http
@@ -19,11 +20,11 @@ else
         <p>User Id: @user.Principal.UserId</p>
         <p>User Details: @user.Principal.UserDetails</p>
         <p>
-            Roles: 
-                @foreach(string role in user.Principal.UserRoles)
-                {
-                    @role<text>, </text>
-                }
+            Roles:
+            @foreach (string role in user.Principal.UserRoles)
+            {
+                @role<text>, </text>
+            }
         </p>
     </div>
     <table class="table">
