@@ -1,0 +1,16 @@
+{
+  "routes": [
+    {
+      "route": "/api/GetClientPrincipal",
+      "allowedRoles": [ "authenticated" ]
+    },
+    {
+      "route": "/api/GetUser",
+      "allowedRoles": [ "authenticated" ]
+    },
+    {
+      "route": "/api/*",
+      "allowedRoles": [ "xadmin" ]
+    }
+  ]
+}
