@@ -1,11 +1,11 @@
 ﻿@page "/profile"
 @using BlazorApp.Client.Utils;
 @using BlazorApp.Shared
+@inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
 <h1>Dein Benutzer-Profil</h1>
-<h1>Mandanten-Einstellungen</h1>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 <AuthorizeView>
     <Authorized>
