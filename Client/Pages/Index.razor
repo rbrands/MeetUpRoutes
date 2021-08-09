@@ -1,7 +1,69 @@
 ﻿@page "/"
+@page "/{TrackKey}"
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
 
-<h1>Hi, Hello, world!</h1>
 
-Welcome to your new app.
+<h1>Auswahl des Clubs</h1>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+@if (!AppStateStore.TenantsAlreadyRead)
+{
+    <p><em>Einstellungen werden gelesen...</em></p>
+}
+else if (String.IsNullOrEmpty(TrackKey))
+{
+    @foreach (TenantSettings tenant in AppStateStore.Tenants)
+    {
+        if (tenant.TracksEnabled)
+        { 
+            <p>
+                <a href="/@tenant.TrackKey" class="btn btn-primary">@tenant.TenantName</a>
+            </p>
+        }
+    }
+}
+else
+{
+    <p>@TrackKey</p>
+}
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    [Parameter]
+    public string TrackKey { get; set; }
+    private NotificationMessage _notificationMessage;
+ 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Read all tenant settings
+            AppStateStore.Tenants = await Api.GetTenants();
+            AppStateStore.TenantsAlreadyRead = true;
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
+        }
+        if (!String.IsNullOrEmpty(TrackKey) )
+        {
+            // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found 
+            foreach (TenantSettings tenant in AppStateStore.Tenants)
+            {
+                if (tenant.TracksEnabled && !String.IsNullOrEmpty(tenant.TrackKey) && tenant.TrackKey.Equals(TrackKey))
+                {
+                    AppStateStore.Tenant = tenant;
+                    break;
+                }
+            }
+            if (null == AppStateStore.Tenant)
+            {
+                TrackKey = null;
+            }
+        }
+    }
+
+
+
+}

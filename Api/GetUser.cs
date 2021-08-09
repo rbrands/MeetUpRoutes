@@ -37,10 +37,13 @@ namespace BlazorApp.Api
             _logger.LogInformation($"GetUser for user {clientPrincipal.UserDetails}");
             User user = new User();
             user.Principal = clientPrincipal;
-            // Read UserDetails by assembling key            
-            string key = clientPrincipal.GetUserKey();
-            _logger.LogInformation($"GetUserDetails for user {key}");
-            user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
+            // Read UserDetails by assembling key
+            if (clientPrincipal.IsUserAuthenticated())
+            { 
+                string key = clientPrincipal.GetUserKey();
+                _logger.LogInformation($"GetUserDetails for user {key}");
+                user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
+            }
 
             return new OkObjectResult(user);
         }

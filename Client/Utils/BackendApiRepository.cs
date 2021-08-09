@@ -33,10 +33,23 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<ClientPrincipal>($"/api/GetClientPrincipal");
         }
+        public async Task<IEnumerable<TenantSettings>> GetTenants()
+        {
+            return await _http.GetFromJsonAsync<IEnumerable<TenantSettings>>($"/api/GetTenantSettings");
+        }
         public async Task<User> GetUser()
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<User>($"/api/GetUser");
         }
+
+        public async Task<UserContactInfo> WriteUser(UserContactInfo user)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<UserContactInfo>($"/api/WriteUser", user);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<UserContactInfo>();
+        }
+
     }
 }

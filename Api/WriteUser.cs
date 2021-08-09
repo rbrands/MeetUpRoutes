@@ -37,6 +37,11 @@ namespace BlazorApp.Api
         {
             ClientPrincipal clientPrincipal = UserDetails.GetClientPrincipal(req);
             _logger.LogInformation($"WriteUser for {clientPrincipal.UserDetails}");
+            if (!clientPrincipal.IsUserAuthenticated())
+            {
+                _logger.LogError($"User {clientPrincipal.UserDetails} is only a testuser and not authenticated");
+                return new BadRequestErrorMessageResult($"User not authenticated.");
+            }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             UserContactInfo userInfo = JsonConvert.DeserializeObject<UserContactInfo>(requestBody);

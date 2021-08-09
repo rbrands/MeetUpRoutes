@@ -13,7 +13,11 @@ namespace BlazorApp.Client.Utils
     public class AppState
     {
 
+        public IEnumerable<TenantSettings> Tenants { get; set; } = new List<TenantSettings>();
+        public Boolean TenantsAlreadyRead { get; set; } = false;
+        public TenantSettings Tenant { get; set; }
         public string TrackKey { get; set; }
+        public User CurrentUser { get; set; }
 
         public event Action OnChange;
         public bool NotificationSubscriptionRequested { get; set; } = false;
