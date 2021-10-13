@@ -43,6 +43,10 @@
                 throw new ApplicationException("Bitte anmelden, um die Benutzerdaten zu ändern.");
             }
             _userContactInfo = AppStateStore.CurrentUser.ContactInfo;
+            if (null == _userContactInfo)
+            {
+                _userContactInfo = new UserContactInfo();
+            }
         }
         catch (Exception ex)
         {
