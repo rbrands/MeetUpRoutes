@@ -19,5 +19,6 @@ namespace BlazorApp.Shared
         public string UserName { get; set; }
         [JsonProperty(PropertyName = "userMail", NullValueHandling = NullValueHandling.Ignore), Display(Name = "E-Mail", Prompt = "Mail"), MaxLength(120, ErrorMessage = "Bitte eine gültige Mail-Adresse angeben."), Required(ErrorMessage = "Bitte Mail-Adresse eingeben.")]
         public string UserMail { get; set; }
+        public Boolean UserIsLocked { get; set; } = false;
     }
 }

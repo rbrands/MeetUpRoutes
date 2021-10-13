@@ -4,6 +4,8 @@
 @using BlazorApp.Client.Utils
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
 
 
 <h1>Auswahl des Clubs</h1>
@@ -12,14 +14,14 @@
 {
     <p><em>Einstellungen werden gelesen...</em></p>
 }
-else if (String.IsNullOrEmpty(TrackKey))
+else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
 {
     @foreach (TenantSettings tenant in AppStateStore.Tenants)
     {
         if (tenant.TracksEnabled)
-        { 
+        {
             <p>
-                <a href="/@tenant.TrackKey" class="btn btn-primary">@tenant.TenantName</a>
+                <button class="btn btn-primary" @onclick="@(() => ShowRoutes(tenant.TrackKey))" >@tenant.TenantName</button>
             </p>
         }
     }
@@ -27,15 +29,20 @@ else if (String.IsNullOrEmpty(TrackKey))
 else
 {
     <p>@TrackKey</p>
+    <p>AppStateStore.TrackKey = @AppStateStore.TrackKey</p>
 }
 
 @code {
     [Parameter]
     public string TrackKey { get; set; }
     private NotificationMessage _notificationMessage;
- 
+
     protected override async Task OnInitializedAsync()
     {
+        if (!String.IsNullOrEmpty(TrackKey))
+        {
+            AppStateStore.TrackKey = TrackKey;
+        }
         try
         {
             // Read all tenant settings
@@ -46,14 +53,15 @@ else
         {
             _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
         }
-        if (!String.IsNullOrEmpty(TrackKey) )
+        if (!String.IsNullOrEmpty(TrackKey))
         {
-            // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found 
+            // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found
             foreach (TenantSettings tenant in AppStateStore.Tenants)
             {
-                if (tenant.TracksEnabled && !String.IsNullOrEmpty(tenant.TrackKey) && tenant.TrackKey.Equals(TrackKey))
+                if (tenant.TracksEnabled && !String.IsNullOrEmpty(tenant.TrackKey) && String.Compare(tenant.TrackKey, TrackKey) == 0)
                 {
                     AppStateStore.Tenant = tenant;
+                    AppStateStore.TrackKey = tenant.TrackKey;
                     break;
                 }
             }
@@ -63,7 +71,10 @@ else
             }
         }
     }
-
-
+    protected void ShowRoutes(string trackKey)
+    {
+        AppStateStore.TrackKey = trackKey;
+        NavigationManager.NavigateTo($"/{trackKey}");
+    }
 
 }

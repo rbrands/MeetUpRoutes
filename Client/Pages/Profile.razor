@@ -7,19 +7,60 @@
 
 <h1>Dein Benutzer-Profil</h1>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
-<AuthorizeView>
-    <Authorized>
-        <div>Und los gehts</div>
-    </Authorized>
-    <NotAuthorized>
-        <p>
-            Bitte anmelden, um dein Benutzerprofil zu bearbeiten.
-            <a href="/LoginProviders">Anmelden</a>
-        </p>
-    </NotAuthorized>
-</AuthorizeView>
+<p>
+    TrackKey = @AppStateStore.TrackKey
+</p>
+<EditForm Model="@_userContactInfo">
+    <DataAnnotationsValidator />
+
+    <ValidationSummary />
+    <button type="submit" id="BtnSave" class="btn btn-primary">Einstellungen speichern ...</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
 
 @code {
     private NotificationMessage _notificationMessage;
-    
+    private UserContactInfo _userContactInfo = new UserContactInfo();
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AppStateStore.TenantsAlreadyRead)
+        {
+            try
+            {
+                AppStateStore.Tenants = await Api.GetTenants();
+                AppStateStore.TenantsAlreadyRead = true;
+            }
+            catch (Exception ex)
+            {
+                _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
+            }
+        }
+        try
+        {
+            AppStateStore.CurrentUser = await Api.GetUser();
+            if (!AppStateStore.CurrentUser.Principal.IsUserAuthenticated())
+            {
+                throw new ApplicationException("Bitte anmelden, um die Benutzerdaten zu ändern.");
+            }
+            _userContactInfo = AppStateStore.CurrentUser.ContactInfo;
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Benutzerdaten können nicht gelesen werden: {ex.Message}");
+        }
+
+
+    }
+    protected void OnCancel()
+    {
+        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+        {
+            NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
 }

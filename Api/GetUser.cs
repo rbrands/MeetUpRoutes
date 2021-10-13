@@ -31,10 +31,10 @@ namespace BlazorApp.Api
 
         [FunctionName(nameof(GetUser))]
         public  async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "GetUser")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetUser")] HttpRequest req)
         {
             ClientPrincipal clientPrincipal = Utils.UserDetails.GetClientPrincipal(req);
-            _logger.LogInformation($"GetUser for user {clientPrincipal.UserDetails}");
+            _logger.LogInformation($"GetUser for user {clientPrincipal.UserDetails} with IdentityProvider {clientPrincipal.IdentityProvider}");
             User user = new User();
             user.Principal = clientPrincipal;
             // Read UserDetails by assembling key
