@@ -1,4 +1,5 @@
 ﻿@page "/profile"
+@attribute [Authorize]
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
@@ -10,9 +11,58 @@
 <p>
     TrackKey = @AppStateStore.TrackKey
 </p>
-<EditForm Model="@_userContactInfo">
+<EditForm Model="@_userContactInfo" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
 
+    <div class="form-group">
+        <label for="title">Name</label>
+        <InputText id="userName" aria-describedby="userNameHelp" class="form-control" @bind-Value="_userContactInfo.UserName" placeholder="Dein Name" title="Name" />
+        <small id="userNameHelp" class="form-text text-muted">
+            Bitte hier den vollständigen Namen eingeben.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="title">Namenskürzel</label>
+        <InputText id="nickName" aria-describedby="nickNameHelp" class="form-control" @bind-Value="_userContactInfo.UserNickName" placeholder="Namenskürzel" title="Namenskürzel" />
+        <small id="nickNameHelp" class="form-text text-muted">
+            Bitte hier deinen Namen oder Namenskürzel angeben, wie er als Autor von Touren und Kommentraren angezeigt werden soll.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="mail">Mail</label>
+        <InputText id="mail" aria-describedby="mailHelp" class="form-control" @bind-Value="_userContactInfo.UserMail" placeholder="Dein Mail-Adresse" title="Mail" />
+        <small id="mailHelp" class="form-text text-muted">
+            Bitte hier deine E-Mail-Adresse eingeben.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="mail">Registrierungs-Code</label>
+        <InputText id="regCode" aria-describedby="regCodeHelp" class="form-control" @bind-Value="_userContactInfo.RegistrationCode" placeholder="Registrierungs-Code" title="Registrierungscode" />
+        <small id="regCodeHelp" class="form-text text-muted">
+            Wenn du einen Registrierungscode erhalten hast, bitte hier eingeben. Dann wirst du sofort frei geschaltet.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label>Status</label>
+        <ul>
+            @if (_userContactInfo.IsConfirmed)
+            {
+                <li>Dein Account ist bestätigt.</li>
+            }
+            @if (_userContactInfo.IsAuthor)
+            {
+                <li>Dein Account hat Autorenberechtigung.</li>
+            }
+            @if (_userContactInfo.IsReviewer)
+            {
+                <li>Dein Account hat Review-Berechtigung.</li>
+            }
+        </ul>
+    </div>
     <ValidationSummary />
     <button type="submit" id="BtnSave" class="btn btn-primary">Einstellungen speichern ...</button>
     <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
@@ -23,6 +73,11 @@
     private UserContactInfo _userContactInfo = new UserContactInfo();
     protected override async Task OnInitializedAsync()
     {
+        if (null == AppStateStore.TrackKey)
+        {
+            // Ensure a tenant is selected!
+            NavigationManager.NavigateTo("/");
+        }
         if (!AppStateStore.TenantsAlreadyRead)
         {
             try
@@ -66,5 +121,21 @@
             NavigationManager.NavigateTo("/");
         }
     }
+
+    private async Task OnSave()
+    {
+        _notificationMessage.Hide();
+
+        try
+        {
+            await Api.WriteUser(_userContactInfo);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
 
 }

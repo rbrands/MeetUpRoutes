@@ -42,10 +42,21 @@ namespace BlazorApp.Api
                 _logger.LogError($"User {clientPrincipal.UserDetails} is only a testuser and not authenticated");
                 return new BadRequestErrorMessageResult($"User not authenticated.");
             }
+            string tenant = req.Headers[Constants.HEADER_TENANT];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             UserContactInfo userInfo = JsonConvert.DeserializeObject<UserContactInfo>(requestBody);
-            userInfo.LogicalKey = clientPrincipal.GetUserKey();
+            userInfo.LogicalKey = tenant + "-" + clientPrincipal.GetUserKey();
+            userInfo.Tenant = tenant;
+            // Check if there are already UserContactInfo stored in database to ensure that the user doesn't overwrite his permissions on his own 
+            UserContactInfo userInfoAlreadyStored = await _cosmosRepository.GetItemByKey(userInfo.LogicalKey);
+            if (null != userInfoAlreadyStored)
+            {
+                userInfo.IsConfirmed = userInfoAlreadyStored.IsConfirmed;
+                userInfo.IsAuthor = userInfoAlreadyStored.IsAuthor;
+                userInfo.IsReviewer = userInfoAlreadyStored.IsReviewer;
+            }
+
             UserContactInfo updatedUserInfo = await _cosmosRepository.UpsertItem(userInfo);
 
             return new OkObjectResult(updatedUserInfo);

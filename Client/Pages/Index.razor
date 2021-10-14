@@ -16,12 +16,15 @@
 }
 else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
 {
+    <p>
+        Zunächst musst du einen Club auswählen, um die Strecken zu sehen.
+    </p>
     @foreach (TenantSettings tenant in AppStateStore.Tenants)
     {
         if (tenant.TracksEnabled)
         {
             <p>
-                <button class="btn btn-primary" @onclick="@(() => ShowRoutes(tenant.TrackKey))" >@tenant.TenantName</button>
+                <button class="btn btn-primary" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
             </p>
         }
     }
@@ -32,10 +35,36 @@ else
     <p>AppStateStore.TrackKey = @AppStateStore.TrackKey</p>
 }
 
+@if (null != AppStateStore.TrackKey)
+{ 
+    <hr class="my-4" />
+    <h2>Anmeldung</h2>
+    <AuthorizeView>
+        <Authorized>
+            <p>
+                Du bist angemeldet.
+                @if (!_userInfo.IsConfirmed)
+                {
+                    <text>
+                        Aber dein Account wurde noch nicht bestätigt. Gib bitte deine Profil-Daten ein zusammen mit dem Registrierungscode, den du erhalten hast.
+                    </text>
+            }
+            </p>
+        </Authorized>
+        <NotAuthorized>
+            <p>
+                Um Touren zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten.
+                <a href="/LoginProviders">Anmelden</a>
+            </p>
+        </NotAuthorized>
+    </AuthorizeView>
+}
+
 @code {
     [Parameter]
     public string TrackKey { get; set; }
     private NotificationMessage _notificationMessage;
+    private UserContactInfo _userInfo = new UserContactInfo();
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,12 +91,20 @@ else
                 {
                     AppStateStore.Tenant = tenant;
                     AppStateStore.TrackKey = tenant.TrackKey;
+                    _notificationMessage.Hide();
                     break;
                 }
             }
             if (null == AppStateStore.Tenant)
             {
                 TrackKey = null;
+                AppStateStore.TrackKey = null;
+                _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
+            }
+            else
+            {
+                AppStateStore.CurrentUser = await Api.GetUser();
+                _userInfo = AppStateStore.CurrentUser.ContactInfo;
             }
         }
     }

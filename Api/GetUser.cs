@@ -35,12 +35,13 @@ namespace BlazorApp.Api
         {
             ClientPrincipal clientPrincipal = Utils.UserDetails.GetClientPrincipal(req);
             _logger.LogInformation($"GetUser for user {clientPrincipal.UserDetails} with IdentityProvider {clientPrincipal.IdentityProvider}");
+            string tenant = req.Headers[Constants.HEADER_TENANT];
             User user = new User();
             user.Principal = clientPrincipal;
             // Read UserDetails by assembling key
             if (clientPrincipal.IsUserAuthenticated())
             { 
-                string key = clientPrincipal.GetUserKey();
+                string key = tenant + "-" + clientPrincipal.GetUserKey();
                 _logger.LogInformation($"GetUserDetails for user {key}");
                 user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
             }
