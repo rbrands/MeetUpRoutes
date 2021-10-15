@@ -112,6 +112,10 @@ else
         {
             AppStateStore.CurrentUser = await Api.GetUser();
             _userInfo = AppStateStore.CurrentUser.ContactInfo;
+            if (null == _userInfo)
+            {
+                _userInfo = new UserContactInfo();
+            }
         }
     }
     protected void ShowRoutes(string trackKey)
