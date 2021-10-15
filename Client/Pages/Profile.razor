@@ -1,23 +1,159 @@
 ﻿@page "/profile"
-@using BlazorApp.Client.Utils;
-@using BlazorApp.Shared
+@attribute [Authorize]
 @using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
 <h1>Dein Benutzer-Profil</h1>
-<AuthorizeView>
-    <Authorized>
-        <div>Und los gehts</div>
-    </Authorized>
-    <NotAuthorized>
-        <p>
-            Bitte anmelden, um dein Benutzerprofil zu bearbeiten.
-            <a href="/LoginProviders">Anmelden</a>
-        </p>
-    </NotAuthorized>
-</AuthorizeView>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+<p>
+    TrackKey = @AppStateStore.TrackKey
+</p>
+<EditForm Model="@_userContactInfo" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="title">Name</label>
+        <InputText id="userName" aria-describedby="userNameHelp" class="form-control" @bind-Value="_userContactInfo.UserName" placeholder="Dein Name" title="Name" />
+        <small id="userNameHelp" class="form-text text-muted">
+            Bitte hier den vollständigen Namen eingeben.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="title">Namenskürzel</label>
+        <InputText id="nickName" aria-describedby="nickNameHelp" class="form-control" @bind-Value="_userContactInfo.UserNickName" placeholder="Namenskürzel" title="Namenskürzel" />
+        <small id="nickNameHelp" class="form-text text-muted">
+            Bitte hier deinen Namen oder Namenskürzel angeben, wie er als Autor von Touren und Kommentraren angezeigt werden soll.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="mail">Mail</label>
+        <InputText id="mail" aria-describedby="mailHelp" class="form-control" @bind-Value="_userContactInfo.UserMail" placeholder="Dein Mail-Adresse" title="Mail" />
+        <small id="mailHelp" class="form-text text-muted">
+            Bitte hier deine E-Mail-Adresse eingeben.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="mail">Schlüsselwort</label>
+        <InputText id="regCode" aria-describedby="regCodeHelp" class="form-control" @bind-Value="_userContactInfo.RegistrationCode" placeholder="Registrierungs-Code" title="Registrierungscode" />
+        <small id="regCodeHelp" class="form-text text-muted">
+            Wenn du das Schlüsselwort für den MeetUpPlanner kennst, kannst du ihn hier eingeben. Dann wirst du sofort frei geschaltet.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <h3>Dein Status</h3>
+        <ul>
+            <li>
+                @if (_userContactInfo.IsConfirmed)
+                {
+                    <text>Dein Account ist bestätigt.</text>
+                }
+                else
+                {
+                    <text>Dein Account ist noch nicht bestätigt. Gebe das Schlüsselwort ein, sofern bekannt oder bitte die Administratoren um Freigabe.</text>
+                }
+            </li>
+            <li>
+                @if (_userContactInfo.IsAuthor)
+                {
+                    <text>Dein Account hat Autorenberechtigung.</text>
+                }
+                else
+                {
+                    <text>Du hast noch keine Autorenberechtigung, d.h. du kannst noch keine Touren erstellen.</text>
+                }
+            </li>
+            @if (_userContactInfo.IsReviewer)
+            {
+                <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autorenberechtigung haben, sehen und freigeben.</li>
+            }
+            <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
+                <Authorized Context="authorizeContext">
+                    <li>Du bist Administrator für diesen Club.</li>
+                </Authorized>
+            </AuthorizeView>
+        </ul>
+    </div>
+    <ValidationSummary />
+    <button type="submit" id="BtnSave" class="btn btn-primary">Einstellungen speichern ...</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
 
 @code {
+    private NotificationMessage _notificationMessage;
+    private UserContactInfo _userContactInfo = new UserContactInfo();
+    protected override async Task OnInitializedAsync()
+    {
+        if (null == AppStateStore.TrackKey)
+        {
+            // Ensure a tenant is selected!
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+        if (!AppStateStore.TenantsAlreadyRead)
+        {
+            try
+            {
+                AppStateStore.Tenants = await Api.GetTenants();
+                AppStateStore.TenantsAlreadyRead = true;
+            }
+            catch (Exception ex)
+            {
+                _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
+            }
+        }
+        try
+        {
+            AppStateStore.CurrentUser = await Api.GetUser();
+            if (!AppStateStore.CurrentUser.Principal.IsUserAuthenticated())
+            {
+                throw new ApplicationException("Bitte anmelden, um die Benutzerdaten zu ändern.");
+            }
+            _userContactInfo = AppStateStore.CurrentUser.ContactInfo;
+            if (null == _userContactInfo)
+            {
+                _userContactInfo = new UserContactInfo();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Benutzerdaten können nicht gelesen werden: {ex.Message}");
+        }
+
+
+    }
+    protected void OnCancel()
+    {
+        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+        {
+            NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private async Task OnSave()
+    {
+        _notificationMessage.Hide();
+
+        try
+        {
+            await Api.WriteUser(_userContactInfo);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
 
 }

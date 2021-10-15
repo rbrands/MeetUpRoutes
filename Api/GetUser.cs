@@ -19,28 +19,36 @@ namespace BlazorApp.Api
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
         private CosmosDBRepository<UserContactInfo> _cosmosRepository;
+        private ServerSettingsRepository _serverSettingsRepository;
+
         public GetUser(ILogger<GetUser> logger,
                        IConfiguration config,
+                       ServerSettingsRepository serverSettingsRepository,
                        CosmosDBRepository<UserContactInfo> cosmosRepository
         )
         {
             _logger = logger;
             _config = config;
+            _serverSettingsRepository = serverSettingsRepository;
             _cosmosRepository = cosmosRepository;
         }
 
         [FunctionName(nameof(GetUser))]
         public  async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "GetUser")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetUser")] HttpRequest req)
         {
             ClientPrincipal clientPrincipal = Utils.UserDetails.GetClientPrincipal(req);
-            _logger.LogInformation($"GetUser for user {clientPrincipal.UserDetails}");
+            _logger.LogInformation($"GetUser for user {clientPrincipal.UserDetails} with IdentityProvider {clientPrincipal.IdentityProvider}");
+            string tenant = req.Headers[Constants.HEADER_TENANT];
             User user = new User();
             user.Principal = clientPrincipal;
-            // Read UserDetails by assembling key            
-            string key = clientPrincipal.GetUserKey();
-            _logger.LogInformation($"GetUserDetails for user {key}");
-            user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
+            // Read UserDetails by assembling key
+            if (clientPrincipal.IsUserAuthenticated())
+            { 
+                string key = tenant + "-" + clientPrincipal.GetUserKey();
+                _logger.LogInformation($"GetUserDetails for user {key}");
+                user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
+            }
 
             return new OkObjectResult(user);
         }

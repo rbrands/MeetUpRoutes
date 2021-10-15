@@ -15,6 +15,10 @@ namespace BlazorApp.Shared
         {
             return UserRoles.Contains(role);
         }
+        public bool IsUserAuthenticated()
+        {
+            return String.Compare(IdentityProvider, "devtest") != 0;
+        }
         public string GetUserKey()
         {
             return $"{IdentityProvider}-{UserId}";

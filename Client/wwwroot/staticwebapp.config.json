@@ -1,12 +1,16 @@
 {
   "routes": [
     {
+      "route": "/api/GetTenantSettings",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetClientPrincipal",
-      "allowedRoles": [ "authenticated" ]
+      "allowedRoles": [ "anonymous" ]
     },
     {
       "route": "/api/GetUser",
-      "allowedRoles": [ "authenticated" ]
+      "allowedRoles": [ "anonymous" ]
     },
     {
       "route": "/api/*",

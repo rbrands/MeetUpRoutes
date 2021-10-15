@@ -1,7 +1,122 @@
 ﻿@page "/"
+@page "/{TrackKey}"
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
 
-<h1>Hi, Hello, world!</h1>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<h1>Auswahl des Clubs</h1>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+@if (!AppStateStore.TenantsAlreadyRead)
+{
+    <p><em>Einstellungen werden gelesen...</em></p>
+}
+else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
+{
+    <p>
+        Zunächst musst du einen Club auswählen, um die Strecken zu sehen.
+    </p>
+    <div calss="container">
+        @foreach (TenantSettings tenant in AppStateStore.Tenants)
+        {
+            if (tenant.TracksEnabled)
+            {
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <button type="button" class="btn btn-lg btn-block btn-outline-info btn-social" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+else
+{
+    <p>@TrackKey</p>
+    <p>AppStateStore.TrackKey = @AppStateStore.TrackKey</p>
+}
+
+@if (null != AppStateStore.TrackKey)
+{ 
+    <hr class="my-4" />
+    <h2>Anmeldung</h2>
+    <AuthorizeView>
+        <Authorized>
+            <p>
+                Du bist angemeldet.
+                @if (null != _userInfo && !_userInfo.IsConfirmed)
+                {
+                    <text>
+                        Aber dein Account wurde noch nicht bestätigt. Gib bitte deine Profil-Daten ein zusammen mit dem Registrierungscode, den du erhalten hast.
+                    </text>
+            }
+            </p>
+        </Authorized>
+        <NotAuthorized>
+            <p>
+                Um Touren zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten.
+                <a href="/LoginProviders">Anmelden</a>
+            </p>
+        </NotAuthorized>
+    </AuthorizeView>
+}
+
+@code {
+    [Parameter]
+    public string TrackKey { get; set; }
+    private NotificationMessage _notificationMessage;
+    private UserContactInfo _userInfo = new UserContactInfo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!String.IsNullOrEmpty(TrackKey))
+        {
+            AppStateStore.TrackKey = TrackKey;
+        }
+        try
+        {
+            // Read all tenant settings
+            AppStateStore.Tenants = await Api.GetTenants();
+            AppStateStore.TenantsAlreadyRead = true;
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
+        }
+        if (!String.IsNullOrEmpty(TrackKey))
+        {
+            // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found
+            foreach (TenantSettings tenant in AppStateStore.Tenants)
+            {
+                if (tenant.TracksEnabled && !String.IsNullOrEmpty(tenant.TrackKey) && String.Compare(tenant.TrackKey, TrackKey) == 0)
+                {
+                    AppStateStore.Tenant = tenant;
+                    AppStateStore.TrackKey = tenant.TrackKey;
+                    _notificationMessage.Hide();
+                    break;
+                }
+            }
+            if (null == AppStateStore.Tenant)
+            {
+                TrackKey = null;
+                AppStateStore.TrackKey = null;
+                _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
+            }
+            else
+            {
+                AppStateStore.CurrentUser = await Api.GetUser();
+                _userInfo = AppStateStore.CurrentUser.ContactInfo;
+                StateHasChanged();
+            }
+        }
+    }
+    protected void ShowRoutes(string trackKey)
+    {
+        AppStateStore.TrackKey = trackKey;
+        NavigationManager.NavigateTo($"/{trackKey}");
+    }
+
+}
