@@ -73,6 +73,11 @@
             {
                 <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autorenberechtigung haben, sehen und freigeben.</li>
             }
+            <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
+                <Authorized Context="authorizeContext">
+                    <li>Du bist Administrator für diesen Club.</li>
+                </Authorized>
+            </AuthorizeView>
         </ul>
     </div>
     <ValidationSummary />

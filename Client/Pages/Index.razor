@@ -19,15 +19,19 @@ else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
     <p>
         Zunächst musst du einen Club auswählen, um die Strecken zu sehen.
     </p>
-    @foreach (TenantSettings tenant in AppStateStore.Tenants)
-    {
-        if (tenant.TracksEnabled)
+    <div calss="container">
+        @foreach (TenantSettings tenant in AppStateStore.Tenants)
         {
-            <p>
-                <button class="btn btn-primary" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
-            </p>
+            if (tenant.TracksEnabled)
+            {
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <button type="button" class="btn btn-lg btn-block btn-outline-info btn-social" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
+                    </div>
+                </div>
+            }
         }
-    }
+    </div>
 }
 else
 {
@@ -105,6 +109,7 @@ else
             {
                 AppStateStore.CurrentUser = await Api.GetUser();
                 _userInfo = AppStateStore.CurrentUser.ContactInfo;
+                StateHasChanged();
             }
         }
     }

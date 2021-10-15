@@ -1,4 +1,9 @@
 ﻿@page "/LoginProviders"
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject NavigationManager NavigationManager
+
 
 @{
     var providers = new Dictionary<string, string>
@@ -9,6 +14,8 @@
         { "github", "GitHub" },
         { "twitter", "Twitter" }
     };
+    string trackKey = AppStateStore.TrackKey;
+    string redirectUrl = $"{NavigationManager.BaseUri}/{trackKey}";
 }
 
 <h1>Anmelden</h1>
@@ -18,7 +25,7 @@
     {
         <div class="row">
             <div class="col-sm-12 col-md-9 col-lg-6">
-                <a class="btn btn-block btn-lg btn-social btn-@(provider.Key.Equals("aad") ? "microsoft" : provider.Key)" href="/.auth/login/@provider.Key">
+                <a class="btn btn-block btn-lg btn-social btn-@(provider.Key.Equals("aad") ? "microsoft" : provider.Key)" href="/.auth/login/@provider.Key?post_login_redirect_uri=@redirectUrl">
                     <span class="fa fa-@(provider.Key.Equals("aad") ? "windows" : provider.Key)"></span> Anmelden mit @provider.Value
                 </a>
             </div>
