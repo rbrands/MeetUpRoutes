@@ -22,7 +22,7 @@ else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
     <div calss="container">
         @foreach (TenantSettings tenant in AppStateStore.Tenants)
         {
-            if (tenant.TracksEnabled)
+            if (tenant.TracksEnabled && tenant.TrackKey.CompareTo("demo") != 0)
             {
                 <div class="row">
                     <div class="col-sm-12 col-md-6 col-lg-4">
@@ -88,6 +88,7 @@ else
         }
         if (!String.IsNullOrEmpty(TrackKey))
         {
+            Boolean validTrackKey = false;
             // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found
             foreach (TenantSettings tenant in AppStateStore.Tenants)
             {
@@ -96,10 +97,11 @@ else
                     AppStateStore.Tenant = tenant;
                     AppStateStore.TrackKey = tenant.TrackKey;
                     _notificationMessage.Hide();
+                    validTrackKey = true;
                     break;
                 }
             }
-            if (null == AppStateStore.Tenant)
+            if (!validTrackKey)
             {
                 TrackKey = null;
                 AppStateStore.TrackKey = null;
