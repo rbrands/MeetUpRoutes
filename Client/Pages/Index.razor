@@ -107,12 +107,11 @@ else
                 AppStateStore.TrackKey = null;
                 _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
             }
-            else
-            {
-                AppStateStore.CurrentUser = await Api.GetUser();
-                _userInfo = AppStateStore.CurrentUser.ContactInfo;
-                StateHasChanged();
-            }
+        }
+        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+        {
+            AppStateStore.CurrentUser = await Api.GetUser();
+            _userInfo = AppStateStore.CurrentUser.ContactInfo;
         }
     }
     protected void ShowRoutes(string trackKey)
