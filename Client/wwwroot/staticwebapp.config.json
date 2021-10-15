@@ -6,11 +6,11 @@
     },
     {
       "route": "/api/GetClientPrincipal",
-      "allowedRoles": [ "authenticated" ]
+      "allowedRoles": [ "anonymous" ]
     },
     {
       "route": "/api/GetUser",
-      "allowedRoles": [ "authenticated" ]
+      "allowedRoles": [ "anonymous" ]
     },
     {
       "route": "/api/*",
