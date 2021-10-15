@@ -22,5 +22,12 @@ namespace BlazorApp.Client.Utils
         public event Action OnChange;
         public bool NotificationSubscriptionRequested { get; set; } = false;
         public void NotifyStateChanged() => OnChange?.Invoke();
+
+        public AppState()
+        {
+            Tenant = new TenantSettings();
+            Tenant.Tenant = "Demo";
+            Tenant.AdminRole = "Demo";
+        }
     }
 }
