@@ -31,7 +31,7 @@ namespace BlazorApp.Api
         {
             _logger.LogInformation("GetTenantSettings");
 
-            IEnumerable<TenantSettings> tenantSettings = (await _cosmosRepository.GetItems()).OrderBy(t => t.TenantKey);
+            IEnumerable<TenantSettings> tenantSettings = (await _cosmosRepository.GetItems(t => t.TracksEnabled == true)).OrderBy(t => t.TenantKey);
 
             return new OkObjectResult(tenantSettings);
         }

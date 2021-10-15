@@ -39,27 +39,39 @@
     </div>
 
     <div class="form-group">
-        <label for="mail">Registrierungs-Code</label>
+        <label for="mail">Schlüsselwort</label>
         <InputText id="regCode" aria-describedby="regCodeHelp" class="form-control" @bind-Value="_userContactInfo.RegistrationCode" placeholder="Registrierungs-Code" title="Registrierungscode" />
         <small id="regCodeHelp" class="form-text text-muted">
-            Wenn du einen Registrierungscode erhalten hast, bitte hier eingeben. Dann wirst du sofort frei geschaltet.
+            Wenn du das Schlüsselwort für den MeetUpPlanner kennst, kannst du ihn hier eingeben. Dann wirst du sofort frei geschaltet.
         </small>
     </div>
 
     <div class="form-group">
-        <label>Status</label>
+        <h3>Dein Status</h3>
         <ul>
-            @if (_userContactInfo.IsConfirmed)
-            {
-                <li>Dein Account ist bestätigt.</li>
-            }
-            @if (_userContactInfo.IsAuthor)
-            {
-                <li>Dein Account hat Autorenberechtigung.</li>
-            }
+            <li>
+                @if (_userContactInfo.IsConfirmed)
+                {
+                    <text>Dein Account ist bestätigt.</text>
+                }
+                else
+                {
+                    <text>Dein Account ist noch nicht bestätigt. Gebe das Schlüsselwort ein, sofern bekannt oder bitte die Administratoren um Freigabe.</text>
+                }
+            </li>
+            <li>
+                @if (_userContactInfo.IsAuthor)
+                {
+                    <text>Dein Account hat Autorenberechtigung.</text>
+                }
+                else
+                {
+                    <text>Du hast noch keine Autorenberechtigung, d.h. du kannst noch keine Touren erstellen.</text>
+                }
+            </li>
             @if (_userContactInfo.IsReviewer)
             {
-                <li>Dein Account hat Review-Berechtigung.</li>
+                <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autorenberechtigung haben, sehen und freigeben.</li>
             }
         </ul>
     </div>

@@ -23,6 +23,7 @@ namespace BlazorApp.Shared
         public string UserMail { get; set; }
         [JsonProperty(PropertyName = "registrationCode", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Registration-Code", Prompt = "Registration-Code"), MaxLength(254, ErrorMessage = "Registrierungs-Code zu lang.")]
         public string RegistrationCode { get; set; }
+        public DateTime LastModified { get; set; }
         public Boolean IsConfirmed { get; set; } = false;
         public Boolean IsAuthor { get; set; } = false;
         public Boolean IsReviewer { get; set; } = false;

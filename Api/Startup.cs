@@ -40,6 +40,7 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton(cosmosClient);
             builder.Services.AddSingleton<CosmosDBRepository<TenantSettings>>();
             builder.Services.AddSingleton<CosmosDBRepository<UserContactInfo>>();
+            builder.Services.AddSingleton(new ServerSettingsRepository(config, cosmosClient));
         }
     }
 }

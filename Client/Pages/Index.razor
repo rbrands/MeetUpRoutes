@@ -43,7 +43,7 @@ else
         <Authorized>
             <p>
                 Du bist angemeldet.
-                @if (!_userInfo.IsConfirmed)
+                @if (null != _userInfo && !_userInfo.IsConfirmed)
                 {
                     <text>
                         Aber dein Account wurde noch nicht bestätigt. Gib bitte deine Profil-Daten ein zusammen mit dem Registrierungscode, den du erhalten hast.

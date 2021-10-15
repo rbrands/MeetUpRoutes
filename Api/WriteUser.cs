@@ -19,11 +19,15 @@ namespace BlazorApp.Api
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<UserContactInfo> _cosmosRepository;
+        private ServerSettingsRepository _serverSettingsRepository;
+
 
         public WriteUser(ILogger<WriteUser> logger,
+                         ServerSettingsRepository serverSettingsRepository,
                          CosmosDBRepository<UserContactInfo> cosmosRepository)
         {
             _logger = logger;
+            _serverSettingsRepository = serverSettingsRepository;
             _cosmosRepository = cosmosRepository;
         }
 
@@ -43,6 +47,11 @@ namespace BlazorApp.Api
                 return new BadRequestErrorMessageResult($"User not authenticated.");
             }
             string tenant = req.Headers[Constants.HEADER_TENANT];
+            if (String.IsNullOrWhiteSpace(tenant))
+            {
+                tenant = null;
+            }
+            ServerSettings serverSettings = await _serverSettingsRepository.GetServerSettings(tenant);
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             UserContactInfo userInfo = JsonConvert.DeserializeObject<UserContactInfo>(requestBody);
@@ -55,6 +64,13 @@ namespace BlazorApp.Api
                 userInfo.IsConfirmed = userInfoAlreadyStored.IsConfirmed;
                 userInfo.IsAuthor = userInfoAlreadyStored.IsAuthor;
                 userInfo.IsReviewer = userInfoAlreadyStored.IsReviewer;
+            }
+            // Update last modified
+            userInfo.LastModified = DateTime.UtcNow;
+            // Check registration code
+            if (!userInfo.IsConfirmed && !String.IsNullOrEmpty(userInfo.RegistrationCode))
+            {
+                userInfo.IsConfirmed = serverSettings.IsUser(userInfo.RegistrationCode);
             }
 
             UserContactInfo updatedUserInfo = await _cosmosRepository.UpsertItem(userInfo);
