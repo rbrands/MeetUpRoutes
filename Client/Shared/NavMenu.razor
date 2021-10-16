@@ -28,7 +28,7 @@
                 </li>
             </Authorized>
         </AuthorizeView>
-        <AuthorizeView Roles="@_adminRoles">
+        <AuthorizeView Roles="admin,tenantadmin">
             <Authorized>
                 <li class="nav-item px-3">
                     <NavLink class="nav-link" href="members">
@@ -49,12 +49,7 @@
     private bool collapseNavMenu = true;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-    private string _adminRoles;
 
-    protected override void OnInitialized()
-    {
-        _adminRoles = $"{AppStateStore.Tenant.AdminRole}";
-    }
 
     private void ToggleNavMenu()
     {
