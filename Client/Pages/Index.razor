@@ -7,61 +7,70 @@
 @inject NavigationManager NavigationManager
 
 
-
-<h1>Auswahl des Clubs</h1>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
-@if (!AppStateStore.TenantsAlreadyRead)
-{
-    <p><em>Einstellungen werden gelesen...</em></p>
-}
-else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
-{
-    <p>
-        Zunächst musst du einen Club auswählen, um die Strecken zu sehen.
-    </p>
-    <div calss="container">
-        @foreach (TenantSettings tenant in AppStateStore.Tenants)
-        {
-            if (tenant.TracksEnabled)
+
+<div class="jumbotron">
+    <h3>Tourenverwaltung @AppStateStore.Tenant.TenantName</h3>
+    @if (!AppStateStore.TenantsAlreadyRead)
+    {
+        <p><em>Einstellungen werden gelesen...</em></p>
+    }
+    else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
+    {
+        <p>
+            Zunächst musst du einen Club auswählen, um die Strecken zu sehen.
+        </p>
+        <p class="container">
+            @foreach (TenantSettings tenant in AppStateStore.Tenants)
             {
-                <div class="row">
-                    <div class="col-sm-12 col-md-6 col-lg-4">
-                        <button type="button" class="btn btn-lg btn-block btn-outline-info btn-social" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
+                if (tenant.TracksEnabled && tenant.TrackKey.CompareTo("demo") != 0)
+                {
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-4">
+                            <button type="button" class="btn btn-lg btn-block btn-outline-info btn-social" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
+                        </div>
                     </div>
-                </div>
+                }
             }
-        }
-    </div>
-}
-else
-{
-    <p>@TrackKey</p>
-    <p>AppStateStore.TrackKey = @AppStateStore.TrackKey</p>
-}
+        </p>
+    }
+
+    <p>
+        Hier kannst du Touren suchen, für Ausfahrten auswählen oder auch neue Touren erstellen und mit anderen teilen. Bei den Touren wird unterschieden:
+        <ul>
+            <li>Öffentliche Touren, d.h. sichtbar ohne hier angemeldet zu sein.</li>
+            <li>
+                Touren nur für Mitglieder, d.h. sichtbar nur, wenn du hier angemeldet bist und dein Account freigeschaltet wurde. Die Freischaltung erfolgt über das gleiche Schlüsselwort,
+                das du für den MeetUpPlanner verwendest.
+            </li>
+        </ul>
+    </p>
+</div>
 
 @if (null != AppStateStore.TrackKey)
-{ 
-    <hr class="my-4" />
-    <h2>Anmeldung</h2>
-    <AuthorizeView>
-        <Authorized>
-            <p>
-                Du bist angemeldet.
-                @if (null != _userInfo && !_userInfo.IsConfirmed)
-                {
-                    <text>
-                        Aber dein Account wurde noch nicht bestätigt. Gib bitte deine Profil-Daten ein zusammen mit dem Registrierungscode, den du erhalten hast.
-                    </text>
-            }
-            </p>
-        </Authorized>
-        <NotAuthorized>
-            <p>
-                Um Touren zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten.
-                <a href="/LoginProviders">Anmelden</a>
-            </p>
-        </NotAuthorized>
-    </AuthorizeView>
+{
+    <div class="jumbotron">
+        <h3>Anmeldung</h3>
+        <AuthorizeView>
+            <Authorized>
+                <p>
+                    Du bist angemeldet.
+                    @if (null != _userInfo && !_userInfo.IsConfirmed)
+                    {
+                        <text>
+                            Aber dein Account wurde noch nicht bestätigt. Gib bitte deine <a href="/profile">Profil-Daten</a> ein, zusammen mit dem Schlüsselwort, das du auch für den MeetUpPlanner kennst.
+                        </text>
+                    }
+                </p>
+            </Authorized>
+            <NotAuthorized>
+                <p>
+                    Um Touren zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten.
+                    <a href="/LoginProviders">Anmelden</a>
+                </p>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
 }
 
 @code {
@@ -88,35 +97,54 @@ else
         }
         if (!String.IsNullOrEmpty(TrackKey))
         {
-            // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found
-            foreach (TenantSettings tenant in AppStateStore.Tenants)
-            {
-                if (tenant.TracksEnabled && !String.IsNullOrEmpty(tenant.TrackKey) && String.Compare(tenant.TrackKey, TrackKey) == 0)
-                {
-                    AppStateStore.Tenant = tenant;
-                    AppStateStore.TrackKey = tenant.TrackKey;
-                    _notificationMessage.Hide();
-                    break;
-                }
-            }
-            if (null == AppStateStore.Tenant)
+            Boolean validTrackKey = SetTenant(TrackKey);
+            if (!validTrackKey)
             {
                 TrackKey = null;
                 AppStateStore.TrackKey = null;
                 _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
             }
-            else
+        }
+        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+        {
+            AppStateStore.CurrentUser = await Api.GetUser();
+            _userInfo = AppStateStore.CurrentUser.ContactInfo;
+            if (null == _userInfo)
             {
-                AppStateStore.CurrentUser = await Api.GetUser();
-                _userInfo = AppStateStore.CurrentUser.ContactInfo;
-                StateHasChanged();
+                _userInfo = new UserContactInfo();
             }
         }
     }
     protected void ShowRoutes(string trackKey)
     {
         AppStateStore.TrackKey = trackKey;
+        SetTenant(trackKey);
         NavigationManager.NavigateTo($"/{trackKey}");
     }
 
+    private Boolean SetTenant(string trackKey)
+    {
+        Boolean validTrackKey = false;
+        if (!String.IsNullOrEmpty(trackKey))
+        {
+            // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found
+            foreach (TenantSettings tenant in AppStateStore.Tenants)
+            {
+                if (tenant.TracksEnabled && !String.IsNullOrEmpty(tenant.TrackKey) && String.Compare(tenant.TrackKey, trackKey) == 0)
+                {
+                    AppStateStore.Tenant = tenant;
+                    AppStateStore.TrackKey = tenant.TrackKey;
+                    _notificationMessage.Hide();
+                    validTrackKey = true;
+                    break;
+                }
+            }
+            if (!validTrackKey)
+            {
+                AppStateStore.TrackKey = null;
+                _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
+            }
+        }
+        return validTrackKey;
+    }
 }
