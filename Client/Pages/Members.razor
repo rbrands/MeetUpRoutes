@@ -1,0 +1,35 @@
+﻿@page "/members"
+@attribute [Authorize(Roles = "admin,tenantadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+<h3>Benutzerverwaltung</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
+<AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
+    <Authorized>
+        Autorisiert
+    </Authorized>
+    <NotAuthorized>
+        Du bist für diesen Club nicht berechtigt, die Mitglieder zu verwalten.
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    private NotificationMessage _notificationMessage;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Daten können nicht gelesen werden: {ex.Message}");
+        }
+    }
+
+}
