@@ -34,13 +34,13 @@
         <label for="mail">Mail</label>
         <InputText id="mail" aria-describedby="mailHelp" class="form-control" @bind-Value="_userContactInfo.UserMail" placeholder="Dein Mail-Adresse" title="Mail" />
         <small id="mailHelp" class="form-text text-muted">
-            Bitte hier deine E-Mail-Adresse eingeben.
+            Bitte hier deine E-Mail-Adresse eingeben. Diese wird nicht öffentlich geteilt, sondern wird nur benötigt, falls es Rückfragen zu deinen Touren gibt.
         </small>
     </div>
 
     <div class="form-group">
         <label for="mail">Schlüsselwort</label>
-        <InputText id="regCode" aria-describedby="regCodeHelp" class="form-control" @bind-Value="_userContactInfo.RegistrationCode" placeholder="Registrierungs-Code" title="Registrierungscode" />
+        <InputText id="regCode" aria-describedby="regCodeHelp" class="form-control" @bind-Value="_userContactInfo.RegistrationCode" placeholder="Schlüsselwort" title="Schlüsselwort" />
         <small id="regCodeHelp" class="form-text text-muted">
             Wenn du das Schlüsselwort für den MeetUpPlanner kennst, kannst du ihn hier eingeben. Dann wirst du sofort frei geschaltet.
         </small>

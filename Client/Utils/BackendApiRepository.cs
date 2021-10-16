@@ -43,6 +43,12 @@ namespace BlazorApp.Client.Utils
             return await _http.GetFromJsonAsync<User>($"/api/GetUser");
         }
 
+        public async Task<string> GetFunctionsVersion()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetStringAsync($"/api/GetVersion");
+        }
+
         public async Task<UserContactInfo> WriteUser(UserContactInfo user)
         {
             this.PrepareHttpClient();
