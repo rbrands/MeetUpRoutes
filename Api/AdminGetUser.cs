@@ -38,13 +38,13 @@ namespace BlazorApp.Api
 
         [FunctionName("AdminGetUser")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AdminGetUser/{key}")] HttpRequest req, string key)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AdminGetUser/{id}")] HttpRequest req, string id)
         {
             try
             {
                 TenantSettings tenantSettings = await UserDetails.AssertTenantAdminAccess(req, _tenantRepository);
 
-                UserContactInfo userInfo = await _cosmosRepository.GetItemByKey(key);
+                UserContactInfo userInfo = await _cosmosRepository.GetItemByKey(id);
 
                 return new OkObjectResult(userInfo);
             }
