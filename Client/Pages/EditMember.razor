@@ -1,4 +1,4 @@
-﻿@page "/editmember/{Key}"
+﻿@page "/editmember/{Id}"
 @attribute [Authorize(Roles = "admin,tenantadmin")]
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
@@ -66,7 +66,7 @@
 
 @code {
     [Parameter]
-    public string Key { get; set; }
+    public string Id { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -77,7 +77,7 @@
     {
         try
         {
-            _userContactInfo = await Api.AdminGetUser(Key);
+            _userContactInfo = await Api.AdminGetUser(Id);
         }
         catch (Exception ex)
         {
