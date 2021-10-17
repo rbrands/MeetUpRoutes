@@ -38,7 +38,7 @@ namespace BlazorApp.Api
 
         [FunctionName("AdminGetUser")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AdminGetUser/{logicalKey}")] HttpRequest req, string key)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AdminGetUser/{key}")] HttpRequest req, string key)
         {
             try
             {
