@@ -60,7 +60,7 @@ namespace BlazorApp.Api.Utils
                 throw new UnauthorizedAccessException($"Tenant in header {Constants.HEADER_TENANT} empty.");
             }
             TenantSettings tenantSettings = await tenantRepository.GetTenantSettings(tenant);
-            if (null == tenant)
+            if (null == tenantSettings)
             {
                 throw new UnauthorizedAccessException($"Tenant with key {tenant} not found.");
             }

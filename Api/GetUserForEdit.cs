@@ -15,14 +15,14 @@ using BlazorApp.Api.Utils;
 
 namespace BlazorApp.Api
 {
-    public class AdminGetUser
+    public class GetUserForEdit
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
         private CosmosDBRepository<UserContactInfo> _cosmosRepository;
         private TenantSettingsRepository _tenantRepository;
         private ServerSettingsRepository _serverSettingsRepository;
-        public AdminGetUser(ILogger<AdminGetUser> logger,
+        public GetUserForEdit(ILogger<GetUserForEdit> logger,
                         IConfiguration config,
                         ServerSettingsRepository serverSettingsRepository,
                         TenantSettingsRepository tenantRepository,
@@ -36,9 +36,9 @@ namespace BlazorApp.Api
             _tenantRepository = tenantRepository;
         }
 
-        [FunctionName("AdminGetUser")]
+        [FunctionName(nameof(GetUserForEdit))]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "AdminGetUser/{id}")] HttpRequest req, string id)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetUserForEdit/{id}")] HttpRequest req, string id)
         {
             try
             {

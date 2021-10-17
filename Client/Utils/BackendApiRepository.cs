@@ -42,10 +42,10 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<User>($"/api/GetUser");
         }
-        public async Task<UserContactInfo> AdminGetUser(string key)
+        public async Task<UserContactInfo> GetUserForEdit(string key)
         {
             this.PrepareHttpClient();
-            return await _http.GetFromJsonAsync<UserContactInfo>($"/api/AdminGetUser/{key}");
+            return await _http.GetFromJsonAsync<UserContactInfo>($"/api/GetUserForEdit/{key}");
         }
         public async Task<UserContactInfo> AdminWriteUser(UserContactInfo userContactInfo)
         {

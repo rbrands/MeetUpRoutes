@@ -77,7 +77,7 @@
     {
         try
         {
-            _userContactInfo = await Api.AdminGetUser(Id);
+            _userContactInfo = await Api.GetUserForEdit(Id);
         }
         catch (Exception ex)
         {
