@@ -25,7 +25,7 @@
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {
-      "route": "/api/AdminWriteUser",
+      "route": "/api/WriteUserAfterEdit",
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {

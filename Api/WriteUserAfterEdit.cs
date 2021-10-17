@@ -14,14 +14,14 @@ using BlazorApp.Api.Utils;
 
 namespace BlazorApp.Api
 {
-    public class AdminWriteUser
+    public class WriteUserAfterEdit
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<UserContactInfo> _cosmosRepository;
         private TenantSettingsRepository _tenantSettingsRepository;
         private ServerSettingsRepository _serverSettingsRepository;
 
-        public AdminWriteUser(ILogger<WriteUser> logger,
+        public WriteUserAfterEdit(ILogger<WriteUser> logger,
                          ServerSettingsRepository serverSettingsRepository,
                          TenantSettingsRepository tenantSettingsRepository,
                          CosmosDBRepository<UserContactInfo> cosmosRepository)
@@ -32,12 +32,12 @@ namespace BlazorApp.Api
             _cosmosRepository = cosmosRepository;
         }
 
-        [FunctionName("AdminWriteUser")]
+        [FunctionName("WriteUserAfterEdit")]
         /// <summary>
         /// Writes user contact details to the database. 
         /// </summary>
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "AdminWriteUser")] HttpRequest req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WriteUserAfterEdit")] HttpRequest req
             )
         {
             try

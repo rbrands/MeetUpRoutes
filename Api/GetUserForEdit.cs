@@ -44,7 +44,7 @@ namespace BlazorApp.Api
             {
                 TenantSettings tenantSettings = await UserDetails.AssertTenantAdminAccess(req, _tenantRepository);
 
-                UserContactInfo userInfo = await _cosmosRepository.GetItemByKey(id);
+                UserContactInfo userInfo = await _cosmosRepository.GetItem(id);
 
                 return new OkObjectResult(userInfo);
             }
