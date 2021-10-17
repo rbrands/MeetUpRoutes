@@ -42,6 +42,18 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<User>($"/api/GetUser");
         }
+        public async Task<UserContactInfo> AdminGetUser(string key)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<UserContactInfo>($"/api/AdminGetUser/{key}");
+        }
+        public async Task<UserContactInfo> AdminWriteUser(UserContactInfo userContactInfo)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<UserContactInfo>($"/api/AdminWriteUser", userContactInfo);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<UserContactInfo>();
+        }
 
         public async Task<string> GetFunctionsVersion()
         {

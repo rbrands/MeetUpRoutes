@@ -36,7 +36,9 @@
                     @foreach (UserContactInfo member in _members)
                     {
                     <tr>
-                        <td></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditMember(member.LogicalKey))"><span class="oi oi-pencil"></span></button>
+                        </td>
                         <td>@member.UserName</td>
                         <td>@member.UserNickName</td>
                         <td>@member.UserMail</td>
@@ -60,8 +62,8 @@
 
 
 @code {
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private NotificationMessage _notificationMessage;
     IEnumerable<UserContactInfo> _members = null;
@@ -81,5 +83,11 @@
             _notificationMessage.ShowError($"Daten können nicht gelesen werden: {ex.Message}");
         }
     }
+
+    protected void EditMember(string Key)
+    {
+        NavigationManager.NavigateTo($"/editmember/{Key}");
+    }
+
 
 }

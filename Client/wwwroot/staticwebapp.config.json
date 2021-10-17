@@ -18,7 +18,15 @@
     },
     {
       "route": "/api/GetUsers",
-      "allowedRoles": [ "admin","tenantadmin" ]
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/AdminGetUser",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/AdminWriteUser",
+      "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {
       "route": "/api/*",
