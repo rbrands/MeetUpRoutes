@@ -44,32 +44,7 @@
         </small>
     </div>
 
-    <div class="form-group">
-        <div class="form-check">
-            <InputCheckbox id="confirmed" aria-describedby="confirmedHelp" class="form-check-input" @bind-Value="_userContactInfo.IsConfirmed"></InputCheckbox>
-            <label for="confirmed" class="form-check-label">Ist der Benutzer bestätigt?</label>
-        </div>
-        <small id="confirmedHelp">Nur ein bestätigter Benutzer kann Touren anlegen und entsprechend markierte Touren sehen.</small>
-    </div>
-
-    <div class="form-group">
-        <div class="form-check">
-            <InputCheckbox id="author" aria-describedby="authorHelp" class="form-check-input" @bind-Value="_userContactInfo.IsAuthor"></InputCheckbox>
-            <label for="author" class="form-check-label">Ist der Benutzer ein Autor?</label>
-        </div>
-        <small id="authorHelp">Ein Benutzer mit Status "Autor" kann Touren anlegen, die sofort ohne Freigabe durch einen Reviewer frei gegeben werden.</small>
-    </div>
-
-    <div class="form-group">
-        <div class="form-check">
-            <InputCheckbox id="reviewer" aria-describedby="reviewerHelp" class="form-check-input" @bind-Value="_userContactInfo.IsReviewer"></InputCheckbox>
-            <label for="reviewer" class="form-check-label">Ist der Benutzer ein Reviewer?</label>
-        </div>
-        <small id="authorHelp">Ein Benutzer mit Status "Reviewer" kann Touren von bestätigten Benutzern frei geben.</small>
-    </div>
-
-
-    <div class="form-group">
+     <div class="form-group">
         <h3>Dein Status</h3>
         <ul>
             <li>
