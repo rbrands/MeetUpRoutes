@@ -21,7 +21,7 @@
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {
-      "route": "/api/AdminGetUser",
+      "route": "/api/AdminGetUser/*",
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {
