@@ -11,7 +11,45 @@
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
 <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
     <Authorized>
-        Autorisiert
+        @if (null == _members)
+        {
+            <p><em>Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
+        }
+        else
+        {
+            <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Aktion</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Namenskürzel</th>
+                        <th scope="col">Mail</th>
+                        <th scope="col">Schlüsselwort</th>
+                        <th scope="col">Änderungsdatum</th>
+                        <th scope="col">Bestätigt?</th>
+                        <th scope="col">Autor?</th>
+                        <th scope="col">Reviewer?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (UserContactInfo member in _members)
+                    {
+                    <tr>
+                        <td></td>
+                        <td>@member.UserName</td>
+                        <td>@member.UserNickName</td>
+                        <td>@member.UserMail</td>
+                        <td>@member.RegistrationCode</td>
+                        <td>@member.LastModified.ToLocalTime()</td>
+                        <td>@member.IsConfirmed ? "Ja" : "Nein"</td>
+                        <td>@member.IsAuthor ? "Ja" : "Nein"</td>
+                        <td>@member.IsReviewer ? "Ja" : "Nein"</td>
+                    </tr>
+                    }
+                </tbody>
+
+            </table>
+        }
     </Authorized>
     <NotAuthorized>
         Du bist für diesen Club nicht berechtigt, die Mitglieder zu verwalten.
@@ -21,10 +59,13 @@
 
 @code {
     private NotificationMessage _notificationMessage;
+    IEnumerable<UserContactInfo> _members = null;
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            _members = await Api.GetUsers();
         }
         catch (Exception ex)
         {

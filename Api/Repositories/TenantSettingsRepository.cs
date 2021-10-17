@@ -14,6 +14,12 @@ namespace BlazorApp.Api.Repositories
         public TenantSettingsRepository(IConfiguration config, CosmosClient cosmosClient) : base(config, cosmosClient)
         {
         }
+        public async Task<TenantSettings> GetTenantSettings(string tenant)
+        {
+            TenantSettings tenantSettings = await this.GetFirstItemOrDefault(t => t.TrackKey.CompareTo(tenant) == 0);
+
+            return tenantSettings;
+        }
 
     }
 }

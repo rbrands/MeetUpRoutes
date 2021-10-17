@@ -57,5 +57,11 @@ namespace BlazorApp.Client.Utils
             return await response.Content.ReadFromJsonAsync<UserContactInfo>();
         }
 
+        public async Task<IEnumerable<UserContactInfo>> GetUsers()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<IEnumerable<UserContactInfo>>($"/api/GetUsers");
+        }
+
     }
 }

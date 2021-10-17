@@ -11,6 +11,9 @@ using BlazorApp.Shared;
 using System.Web.Http;
 using BlazorApp.Api.Repositories;
 using BlazorApp.Api.Utils;
+using System.Collections.Generic;
+using System.Linq;
+
 
 namespace BlazorApp.Api
 {
@@ -19,14 +22,14 @@ namespace BlazorApp.Api
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
         private CosmosDBRepository<UserContactInfo> _cosmosRepository;
-        private CosmosDBRepository<TenantSettings> _tenantRepository;
+        private TenantSettingsRepository _tenantRepository;
         private ServerSettingsRepository _serverSettingsRepository;
 
         public GetUsers(ILogger<GetUser> logger,
                         IConfiguration config,
                         ServerSettingsRepository serverSettingsRepository,
-                        CosmosDBRepository<TenantSettings> tenantRepository,
-                           CosmosDBRepository<UserContactInfo> cosmosRepository
+                        TenantSettingsRepository tenantRepository,
+                        CosmosDBRepository<UserContactInfo> cosmosRepository
         )
         {
             _logger = logger;
@@ -40,20 +43,18 @@ namespace BlazorApp.Api
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetUsers")] HttpRequest req)
         {
-            ClientPrincipal clientPrincipal = Utils.UserDetails.GetClientPrincipal(req);
-            _logger.LogInformation($"GetUsers");
-            string tenant = req.Headers[Constants.HEADER_TENANT];
-            User user = new User();
-            user.Principal = clientPrincipal;
-            // Read UserDetails by assembling key
-            if (clientPrincipal.IsUserAuthenticated())
+            try
             {
-                string key = tenant + "-" + clientPrincipal.GetUserKey();
-                _logger.LogInformation($"GetUserDetails for user {key}");
-                user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
-            }
+                TenantSettings tenantSettings = await UserDetails.AssertTenantAdminAccess(req, _tenantRepository);
 
-            return new OkObjectResult(user);
+                IEnumerable<UserContactInfo> userInfos = await _cosmosRepository.GetItems(u => u.Tenant.CompareTo(tenantSettings.TrackKey) == 0);
+
+                return new OkObjectResult(userInfos);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestErrorMessageResult(ex.Message);
+            }
         }
     }
 }

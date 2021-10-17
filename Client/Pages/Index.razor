@@ -10,7 +10,7 @@
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
 <div class="jumbotron">
-    <h3>Tourenverwaltung @AppStateStore.Tenant.TenantName</h3>
+    <h3>Tourenverzeichnis @AppStateStore.Tenant.TenantName</h3>
     @if (!AppStateStore.TenantsAlreadyRead)
     {
         <p><em>Einstellungen werden gelesen...</em></p>
@@ -44,6 +44,12 @@
                 das du für den MeetUpPlanner verwendest.
             </li>
         </ul>
+    </p>
+    <p class="text-info">
+        <em><b>
+            Diese Anwendung befindet sich gerade in der Entwicklung, du kannst hier verfolgen, wie sie Schritt für Schritt entsteht.
+            Aktuell steht das Grundgerüst der Anwendung mit Registrierung und Berechtigung der Benutzer. Noch gibt es keine Touren. Das kommt als nächstes ...
+        </b></em>
     </p>
 </div>
 
