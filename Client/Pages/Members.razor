@@ -13,7 +13,7 @@
     <Authorized>
         @if (null == _members)
         {
-            <p><em>Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
+            <p><em>Deine Zugriffsrechte werden geprüft und Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
         }
         else
         {
@@ -29,6 +29,7 @@
                         <th scope="col">Bestätigt?</th>
                         <th scope="col">Autor?</th>
                         <th scope="col">Reviewer?</th>
+                        <th scope="col">Identifier</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,9 +42,10 @@
                         <td>@member.UserMail</td>
                         <td>@member.RegistrationCode</td>
                         <td>@member.LastModified.ToLocalTime()</td>
-                        <td>@member.IsConfirmed ? "Ja" : "Nein"</td>
-                        <td>@member.IsAuthor ? "Ja" : "Nein"</td>
-                        <td>@member.IsReviewer ? "Ja" : "Nein"</td>
+                        <td>@member.IsConfirmed"</td>
+                        <td>@member.IsAuthor</td>
+                        <td>@member.IsReviewer"</td>
+                        <td>@member.UserKey</td>
                     </tr>
                     }
                 </tbody>
@@ -58,6 +60,9 @@
 
 
 @code {
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+
     private NotificationMessage _notificationMessage;
     IEnumerable<UserContactInfo> _members = null;
 
@@ -65,7 +70,11 @@
     {
         try
         {
-            _members = await Api.GetUsers();
+            var user = (await authenticationStateTask).User;
+            if (user.IsInRole(AppStateStore.Tenant.AdminRole) || user.IsInRole(Constants.RoleAdmin))
+            {
+                _members = await Api.GetUsers();
+            }
         }
         catch (Exception ex)
         {

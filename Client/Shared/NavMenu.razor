@@ -1,5 +1,6 @@
 ﻿@using BlazorApp.Shared
 @using BlazorApp.Client.Utils
+@implements IDisposable
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
@@ -55,4 +56,14 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+    protected override void OnInitialized()
+    {
+        AppStateStore.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppStateStore.OnChange -= StateHasChanged;
+    }
+
 }
