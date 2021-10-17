@@ -9,7 +9,7 @@
 <h3>Benutzer*in</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
 
-<EditForm Model="_userContactInfo">
+<EditForm Model="_userContactInfo" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
     <div class="form-group">
         <label for="title">Name</label>
@@ -86,14 +86,23 @@
     }
     protected void OnCancel()
     {
-        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+        NavigationManager.NavigateTo("/members");
+    }
+
+    private async Task OnSave()
+    {
+        _notificationMessage.Hide();
+
+        try
         {
-            NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}");
+            await Api.WriteUserAfterEdit(_userContactInfo);
+            NavigationManager.NavigateTo("/members");
         }
-        else
+        catch (Exception ex)
         {
-            NavigationManager.NavigateTo("/");
+            _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
         }
     }
+
 
 }
