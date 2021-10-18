@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Cosmos;
 using System.Threading.Tasks;
 using BlazorApp.Api.Utils;
+using BlazorApp.Shared;
 
 namespace BlazorApp.Api.Repositories
 {
@@ -18,9 +19,10 @@ namespace BlazorApp.Api.Repositories
         {
             return await GetServerSettings(null);
         }
-        public async Task<ServerSettings> GetServerSettings(string tenant)
+        public async Task<ServerSettings> GetServerSettings(TenantSettings tenantSettings)
         {
             string settingsKey = Constants.KEY_SERVER_SETTINGS;
+            string tenant = tenantSettings.TenantKey;
             if (!String.IsNullOrWhiteSpace(tenant))
             {
                 settingsKey += "-" + tenant;

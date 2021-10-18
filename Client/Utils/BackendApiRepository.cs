@@ -42,6 +42,18 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<User>($"/api/GetUser");
         }
+        public async Task<UserContactInfo> GetUserForEdit(string key)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<UserContactInfo>($"/api/GetUserForEdit/{key}");
+        }
+        public async Task<UserContactInfo> WriteUserAfterEdit(UserContactInfo userContactInfo)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<UserContactInfo>($"/api/WriteUserAfterEdit", userContactInfo);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<UserContactInfo>();
+        }
 
         public async Task<string> GetFunctionsVersion()
         {
@@ -55,6 +67,12 @@ namespace BlazorApp.Client.Utils
             HttpResponseMessage response = await _http.PostAsJsonAsync<UserContactInfo>($"/api/WriteUser", user);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<UserContactInfo>();
+        }
+
+        public async Task<IEnumerable<UserContactInfo>> GetUsers()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<IEnumerable<UserContactInfo>>($"/api/GetUsers");
         }
 
     }

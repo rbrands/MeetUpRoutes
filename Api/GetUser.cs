@@ -19,17 +19,14 @@ namespace BlazorApp.Api
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
         private CosmosDBRepository<UserContactInfo> _cosmosRepository;
-        private ServerSettingsRepository _serverSettingsRepository;
 
         public GetUser(ILogger<GetUser> logger,
                        IConfiguration config,
-                       ServerSettingsRepository serverSettingsRepository,
                        CosmosDBRepository<UserContactInfo> cosmosRepository
         )
         {
             _logger = logger;
             _config = config;
-            _serverSettingsRepository = serverSettingsRepository;
             _cosmosRepository = cosmosRepository;
         }
 

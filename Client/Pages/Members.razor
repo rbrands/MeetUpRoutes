@@ -1,0 +1,93 @@
+﻿@page "/members"
+@attribute [Authorize(Roles = "admin,tenantadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+<h3>Mitgliederverwaltung</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
+<AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
+    <Authorized>
+        @if (null == _members)
+        {
+            <p><em>Deine Zugriffsrechte werden geprüft und Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
+        }
+        else
+        {
+            <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Aktion</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Namenskürzel</th>
+                        <th scope="col">Mail</th>
+                        <th scope="col">Schlüsselwort</th>
+                        <th scope="col">Änderungsdatum</th>
+                        <th scope="col">Bestätigt?</th>
+                        <th scope="col">Autor?</th>
+                        <th scope="col">Reviewer?</th>
+                        <th scope="col">Identifier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (UserContactInfo member in _members)
+                    {
+                    <tr>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditMember(member.Id))"><span class="oi oi-pencil"></span></button>
+                        </td>
+                        <td>@member.UserName</td>
+                        <td>@member.UserNickName</td>
+                        <td>@member.UserMail</td>
+                        <td>@member.RegistrationCode</td>
+                        <td>@member.LastModified.ToLocalTime()</td>
+                        <td>@member.IsConfirmed</td>
+                        <td>@member.IsAuthor</td>
+                        <td>@member.IsReviewer</td>
+                        <td>@member.UserKey</td>
+                    </tr>
+                    }
+                </tbody>
+
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        Du bist für diesen Club nicht berechtigt, die Mitglieder zu verwalten.
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private NotificationMessage _notificationMessage;
+    IEnumerable<UserContactInfo> _members = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = (await authenticationStateTask).User;
+            if (user.IsInRole(AppStateStore.Tenant.AdminRole) || user.IsInRole(Constants.RoleAdmin))
+            {
+                _members = await Api.GetUsers();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Daten können nicht gelesen werden: {ex.Message}");
+        }
+    }
+
+    protected void EditMember(string id)
+    {
+        NavigationManager.NavigateTo($"/editmember/{id}");
+    }
+
+
+}

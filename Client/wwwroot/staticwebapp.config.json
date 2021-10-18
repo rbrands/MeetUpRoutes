@@ -13,6 +13,22 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetVersion",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/GetUsers",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/GetUserForEdit/*",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/WriteUserAfterEdit",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
       "route": "/api/*",
       "allowedRoles": [ "authenticated" ]
     }

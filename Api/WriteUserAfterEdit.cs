@@ -12,18 +12,16 @@ using System.Web.Http;
 using BlazorApp.Api.Repositories;
 using BlazorApp.Api.Utils;
 
-
 namespace BlazorApp.Api
 {
-    public class WriteUser
+    public class WriteUserAfterEdit
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<UserContactInfo> _cosmosRepository;
         private TenantSettingsRepository _tenantSettingsRepository;
         private ServerSettingsRepository _serverSettingsRepository;
 
-
-        public WriteUser(ILogger<WriteUser> logger,
+        public WriteUserAfterEdit(ILogger<WriteUser> logger,
                          ServerSettingsRepository serverSettingsRepository,
                          TenantSettingsRepository tenantSettingsRepository,
                          CosmosDBRepository<UserContactInfo> cosmosRepository)
@@ -34,41 +32,26 @@ namespace BlazorApp.Api
             _cosmosRepository = cosmosRepository;
         }
 
+        [FunctionName("WriteUserAfterEdit")]
         /// <summary>
         /// Writes user contact details to the database. 
         /// </summary>
-        [FunctionName("WriteUser")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WriteUser")] HttpRequest req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WriteUserAfterEdit")] HttpRequest req
             )
         {
             try
             {
-                TenantSettings tenantSettings = await UserDetails.AssertTenantAuthenticatedAccess(req, _tenantSettingsRepository);
-                ClientPrincipal clientPrincipal = UserDetails.GetClientPrincipal(req);
-                _logger.LogInformation($"WriteUser for {clientPrincipal.UserDetails}");
+                TenantSettings tenantSettings = await UserDetails.AssertTenantAdminAccess(req, _tenantSettingsRepository);
                 ServerSettings serverSettings = await _serverSettingsRepository.GetServerSettings(tenantSettings);
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 UserContactInfo userInfo = JsonConvert.DeserializeObject<UserContactInfo>(requestBody);
-                userInfo.LogicalKey = tenantSettings.TrackKey + "-" + clientPrincipal.GetUserKey();
-                userInfo.UserKey = clientPrincipal.GetUserKey();
+                // Set tenant again to ensure that the data is written to the correct tenant!
                 userInfo.Tenant = tenantSettings.TrackKey;
-                // Check if there are already UserContactInfo stored in database to ensure that the user doesn't overwrite his permissions on his own 
-                UserContactInfo userInfoAlreadyStored = await _cosmosRepository.GetItemByKey(userInfo.LogicalKey);
-                if (null != userInfoAlreadyStored)
-                {
-                    userInfo.IsConfirmed = userInfoAlreadyStored.IsConfirmed;
-                    userInfo.IsAuthor = userInfoAlreadyStored.IsAuthor;
-                    userInfo.IsReviewer = userInfoAlreadyStored.IsReviewer;
-                }
+                userInfo.LogicalKey = tenantSettings.TrackKey + "-" + userInfo.UserKey;
                 // Update last modified
                 userInfo.LastModified = DateTime.UtcNow;
-                // Check registration code
-                if (!userInfo.IsConfirmed && !String.IsNullOrEmpty(userInfo.RegistrationCode))
-                {
-                    userInfo.IsConfirmed = serverSettings.IsUser(userInfo.RegistrationCode);
-                }
 
                 UserContactInfo updatedUserInfo = await _cosmosRepository.UpsertItem(userInfo);
 

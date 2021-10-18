@@ -6,11 +6,9 @@
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
-<h1>Dein Benutzer-Profil</h1>
+<h3>Dein Benutzer-Profil</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
-<p>
-    TrackKey = @AppStateStore.TrackKey
-</p>
+
 <EditForm Model="@_userContactInfo" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
 
@@ -46,7 +44,7 @@
         </small>
     </div>
 
-    <div class="form-group">
+     <div class="form-group">
         <h3>Dein Status</h3>
         <ul>
             <li>
@@ -81,11 +79,14 @@
         </ul>
     </div>
     <ValidationSummary />
-    <button type="submit" id="BtnSave" class="btn btn-primary">Einstellungen speichern ...</button>
+    <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
     <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
 </EditForm>
 
 @code {
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+
     private NotificationMessage _notificationMessage;
     private UserContactInfo _userContactInfo = new UserContactInfo();
     protected override async Task OnInitializedAsync()

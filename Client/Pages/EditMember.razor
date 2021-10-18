@@ -1,0 +1,109 @@
+﻿@page "/editmember/{Id}"
+@attribute [Authorize(Roles = "admin,tenantadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<h3>Benutzer*in</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
+
+<EditForm Model="_userContactInfo" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="title">Name</label>
+        <InputText id="userName" aria-describedby="userNameHelp" class="form-control" @bind-Value="_userContactInfo.UserName" placeholder="Name" title="Name" />
+        <small id="userNameHelp" class="form-text text-muted">
+            Bitte hier den vollständigen Namen eingeben.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="title">Namenskürzel</label>
+        <InputText id="nickName" aria-describedby="nickNameHelp" class="form-control" @bind-Value="_userContactInfo.UserNickName" placeholder="Namenskürzel" title="Namenskürzel" />
+        <small id="nickNameHelp" class="form-text text-muted">
+            Bitte hier deinen Namen oder Namenskürzel angeben, wie er als Autor von Touren und Kommentraren angezeigt werden soll.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="mail">Mail</label>
+        <InputText id="mail" aria-describedby="mailHelp" class="form-control" @bind-Value="_userContactInfo.UserMail" placeholder="Dein Mail-Adresse" title="Mail" />
+        <small id="mailHelp" class="form-text text-muted">
+            E-Mail des Benutzers.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="confirmed" aria-describedby="confirmedHelp" class="form-check-input" @bind-Value="_userContactInfo.IsConfirmed"></InputCheckbox>
+            <label for="confirmed" class="form-check-label">Ist die Benutzer*in bestätigt?</label>
+        </div>
+        <small id="confirmedHelp">Nur bestätigte Benutzer*innen können Touren anlegen.</small>
+    </div>
+
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="author" aria-describedby="authorHelp" class="form-check-input" @bind-Value="_userContactInfo.IsAuthor"></InputCheckbox>
+            <label for="author" class="form-check-label">Ist die Benutzer*in auch Autor*in?</label>
+        </div>
+        <small id="authorHelp">Autor*in-Status erlaubt das Erstellen von Touren, die direkt veröffentlicht werden ohne Review.</small>
+    </div>
+
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="reviewer" aria-describedby="reviewerHelp" class="form-check-input" @bind-Value="_userContactInfo.IsReviewer"></InputCheckbox>
+            <label for="author" class="form-check-label">Ist die Benutzer*in auch Reviewer?</label>
+        </div>
+        <small id="reviewerHelp">Reviewer geben Touren von bestätigten Benutzer*innen frei.</small>
+    </div>
+
+
+    <ValidationSummary />
+    <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private NotificationMessage _notificationMessage;
+    private UserContactInfo _userContactInfo = new UserContactInfo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _userContactInfo = await Api.GetUserForEdit(Id);
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError(ex.Message);
+        }
+    }
+    protected void OnCancel()
+    {
+        NavigationManager.NavigateTo("/members");
+    }
+
+    private async Task OnSave()
+    {
+        _notificationMessage.Hide();
+
+        try
+        {
+            await Api.WriteUserAfterEdit(_userContactInfo);
+            NavigationManager.NavigateTo("/members");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
+
+}
