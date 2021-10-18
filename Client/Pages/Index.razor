@@ -60,7 +60,7 @@
         <AuthorizeView>
             <Authorized>
                 <p>
-                    Du bist angemeldet.
+                    Du bist angemeldet und hast den folgenden Mitgliedsstatus:
                     <ul>
                         <li>
                             @if (_userInfo.IsConfirmed)
@@ -104,7 +104,13 @@
             </Authorized>
             <NotAuthorized>
                 <p>
-                    Um Touren zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten.
+                    Um Touren zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten. MeetUpRoutes hat folgende Mitgliedslevel:
+                    <ul>
+                        <li>Ohne Anmeldung kannst du nur öffentliche Touren sehen.</li>
+                        <li>Wenn du dich anmeldest und dein Account bestätigt wird, kannst du Touren nur für Mitglieder sehen und selbst Touren erstellen.</li>
+                        <li>Wenn du den Autor*innen-Status erhälst, kannst du Touren erstellen, die ohne weiteres Review sofort veröffentlicht werden.</li>
+                        <li>Hast du auch die "Review"-Berechtigung kannst du Touren reviewen und freigeben.</li>
+                    </ul>
                     <a href="/LoginProviders">Anmelden</a>
                 </p>
             </NotAuthorized>
