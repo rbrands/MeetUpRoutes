@@ -80,16 +80,16 @@
                         <li>
                             @if (_userInfo.IsAuthor)
                             {
-                                <text>Dein Account hat Autor*innen-Berechtigung. D.h. du kannst Touren erstellen, die ohne ein Review veröffentlicht werden.</text>
+                                <text>Dein Account hat Autor:innen-Berechtigung. D.h. du kannst Touren erstellen, die ohne ein Review veröffentlicht werden.</text>
                             }
                             else
                             {
-                                <text>Du hast noch keine Autor*innen-Berechtigung, d.h. Touren, die du erstellst, müssen erst gereviewed werden, bevor sie veröffentlicht werden.</text>
+                                <text>Du hast noch keine Autor:innen-Berechtigung, d.h. Touren, die du erstellst, müssen erst gereviewed werden, bevor sie veröffentlicht werden.</text>
                             }
                         </li>
                         @if (_userInfo.IsReviewer)
                         {
-                            <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autor*innen-Berechtigung haben, sehen und freigeben.</li>
+                            <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
                         }
                         <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
                             <Authorized Context="authorizeContext">

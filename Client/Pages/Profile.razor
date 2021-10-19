@@ -24,7 +24,7 @@
         <label for="title">Namenskürzel</label>
         <InputText id="nickName" aria-describedby="nickNameHelp" class="form-control" @bind-Value="_userContactInfo.UserNickName" placeholder="Namenskürzel" title="Namenskürzel" />
         <small id="nickNameHelp" class="form-text text-muted">
-            Bitte hier deinen Namen oder Namenskürzel angeben, wie er als Autor*in von Touren und Kommentaren angezeigt werden soll.
+            Bitte hier deinen Namen oder Namenskürzel angeben, wie er als Autor:in von Touren und Kommentaren angezeigt werden soll.
         </small>
     </div>
 
@@ -60,16 +60,16 @@
             <li>
                 @if (_userContactInfo.IsAuthor)
                 {
-                    <text>Dein Account hat Autor*innenberechtigung.</text>
+                    <text>Dein Account hat Autor:innen-Berechtigung.</text>
                 }
                 else
                 {
-                    <text>Du hast noch keine Autor*innenberechtigung, d.h. du kannst noch keine Touren erstellen.</text>
+                    <text>Du hast noch keine Autor:innen-Berechtigung, d.h. du kannst noch keine Touren erstellen.</text>
                 }
             </li>
             @if (_userContactInfo.IsReviewer)
             {
-                <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autor*innenberechtigung haben, sehen und freigeben.</li>
+                <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
             }
             <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
                 <Authorized Context="authorizeContext">
