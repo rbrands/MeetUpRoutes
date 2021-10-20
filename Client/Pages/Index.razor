@@ -18,7 +18,7 @@
     else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
     {
         <p>
-            Zunächst musst du einen Club auswählen, um die Strecken zu sehen.
+            Zunächst musst du einen Club auswählen, um die Touren zu sehen.
         </p>
         <p class="container">
             @foreach (TenantSettings tenant in AppStateStore.Tenants)
@@ -33,17 +33,15 @@
                 }
             }
         </p>
+    } else
+    {
+        <p>
+            <a class="btn btn-primary" href="/routes">Zu den Touren</a>
+        </p>
     }
 
     <p>
-        Hier kannst du Touren suchen, für Ausfahrten auswählen oder auch neue Touren erstellen und mit anderen teilen. Bei den Touren wird unterschieden:
-        <ul>
-            <li>Öffentliche Touren, d.h. sichtbar ohne hier angemeldet zu sein.</li>
-            <li>
-                Touren nur für Mitglieder, d.h. sichtbar nur, wenn du hier angemeldet bist und dein Account freigeschaltet wurde. Die Freischaltung erfolgt über das gleiche Schlüsselwort,
-                das du für den MeetUpPlanner verwendest.
-            </li>
-        </ul>
+        Hier kannst du Touren suchen, für Ausfahrten auswählen oder auch neue Touren erstellen und mit anderen teilen.
     </p>
     <p class="text-info">
         <em><b>
@@ -73,8 +71,8 @@
                             else
                             {
                                 <text>
-                                    Dein Account ist noch nicht bestätigt. 
-                                    Gebe das Schlüsselwort ein, sofern bekannt oder bitte die Administratoren um Freigabe.
+                                    Dein Account ist noch nicht bestätigt.
+                                    Fülle die <a href="/profile" title="Profil">Profilseite</a> aus und gebe dort das Schlüsselwort ein, sofern bekannt oder bitte die Administratoren um Freigabe.
                                     Sobald dein Account bestätigt ist, kannst du alle Touren sehen.
                                 </text>
                             }
@@ -82,16 +80,16 @@
                         <li>
                             @if (_userInfo.IsAuthor)
                             {
-                                <text>Dein Account hat Autor*innen-Berechtigung. D.h. du kannst Touren erstellen, die ohne ein Review veröffentlicht werden.</text>
+                                <text>Dein Account hat Autor:innen-Berechtigung. D.h. du kannst Touren erstellen, die ohne ein Review veröffentlicht werden.</text>
                             }
                             else
                             {
-                                <text>Du hast noch keine Autorenberechtigung, d.h. Touren, die du erstellst, müssen erst gereviewed werden, bevor sie veröffentlicht werden.</text>
+                                <text>Du hast noch keine Autor:innen-Berechtigung, d.h. Touren, die du erstellst, müssen erst gereviewed werden, bevor sie veröffentlicht werden.</text>
                             }
                         </li>
                         @if (_userInfo.IsReviewer)
                         {
-                            <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autorenberechtigung haben, sehen und freigeben.</li>
+                            <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
                         }
                         <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
                             <Authorized Context="authorizeContext">
@@ -99,7 +97,6 @@
                             </Authorized>
                         </AuthorizeView>
                     </ul>
-
                 </p>
             </Authorized>
             <NotAuthorized>
@@ -111,7 +108,7 @@
                         <li>Wenn du den Autor*innen-Status erhälst, kannst du Touren erstellen, die ohne weiteres Review sofort veröffentlicht werden.</li>
                         <li>Hast du auch die "Review"-Berechtigung kannst du Touren reviewen und freigeben.</li>
                     </ul>
-                    <a href="/LoginProviders">Anmelden</a>
+                    <a class="btn btn-primary" href="/LoginProviders">Anmelden</a>
                 </p>
             </NotAuthorized>
         </AuthorizeView>
