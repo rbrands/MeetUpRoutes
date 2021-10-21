@@ -18,13 +18,15 @@ namespace BlazorApp.Shared
         public string ReviewerId { get; set; }
         [JsonProperty(PropertyName = "title", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Titel", Prompt = "Titel für Link eingeben"), MaxLength(120, ErrorMessage = "Titel zu lang."), Required(ErrorMessage = "Bitte Titel eingeben.")]
         public string Title { get; set; }
-        [JsonProperty(PropertyName = "urlTitle", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Titel-Link", Prompt = "Kurztitel wie er in der Url auftaucht"), MaxLength(160, ErrorMessage = "UrlTitel zu lang.")]
+        [JsonProperty(PropertyName = "scope", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Titel-Link", Prompt = "Kurztitel wie er in der Url auftaucht"), MaxLength(160, ErrorMessage = "UrlTitel zu lang.")]
         [RegularExpression("[a-z0-9-_]*", ErrorMessage = "Bitte nur Kleinbuchstaben und Zahlen für den Titel-Link eingeben.")]
-        public string UrlTitle { get; set; }
+        public string Scope { get; set; }
         [JsonProperty(PropertyName = "levelDescription"), Required(ErrorMessage = "Bitte Angaben zur Länge/Dauer machen."), MaxLength(60, ErrorMessage = "Angabe zur Länge bitte kürzen.")]
         public string LevelDesciption { get; set; }
         [JsonProperty(PropertyName = "description"), Display(Name = "Beschreibung"), MaxLength(5000, ErrorMessage = "Die Beschreibung ist zu lang.")]
         public string Description { get; set; }
+        [JsonProperty(PropertyName = "tags"), Display(Name = "Tags"), MaxLength(512, ErrorMessage = "Zu viele Tags.")]
+        public string Tags { get; set; }
         [JsonProperty(PropertyName = "photosLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Link zu Fotos"), UIHint("Url")]
         public string PhotosLink { get; set; }
         [JsonProperty(PropertyName = "videoLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Link zu einem Video", Prompt = "Link zu einem Video"), UIHint("Url")]
