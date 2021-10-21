@@ -44,16 +44,15 @@ namespace BlazorApp.Api
         {
             try
             {
-                TenantSettings tenantSettings = await UserDetails.AssertTenantAuthenticatedAccess(req, _tenantSettingsRepository);
-                ClientPrincipal clientPrincipal = UserDetails.GetClientPrincipal(req);
-                _logger.LogInformation($"WriteUser for {clientPrincipal.UserDetails}");
-                ServerSettings serverSettings = await _serverSettingsRepository.GetServerSettings(tenantSettings);
+                CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantSettingsRepository, _serverSettingsRepository, _cosmosRepository);
+                callingContext.AssertAuthenticatedAccess();
+                _logger.LogInformation($"WriteUser for {callingContext.User.Principal.UserDetails}");
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 UserContactInfo userInfo = JsonConvert.DeserializeObject<UserContactInfo>(requestBody);
-                userInfo.LogicalKey = tenantSettings.TrackKey + "-" + clientPrincipal.GetUserKey();
-                userInfo.UserKey = clientPrincipal.GetUserKey();
-                userInfo.Tenant = tenantSettings.TrackKey;
+                userInfo.LogicalKey = callingContext.TenantSettings.TrackKey + "-" + callingContext.User.Principal.GetUserKey();
+                userInfo.UserKey = callingContext.User.Principal.GetUserKey();
+                userInfo.Tenant = callingContext.TenantSettings.TrackKey;
                 // Check if there are already UserContactInfo stored in database to ensure that the user doesn't overwrite his permissions on his own 
                 UserContactInfo userInfoAlreadyStored = await _cosmosRepository.GetItemByKey(userInfo.LogicalKey);
                 if (null != userInfoAlreadyStored)
@@ -67,7 +66,7 @@ namespace BlazorApp.Api
                 // Check registration code
                 if (!userInfo.IsConfirmed && !String.IsNullOrEmpty(userInfo.RegistrationCode))
                 {
-                    userInfo.IsConfirmed = serverSettings.IsUser(userInfo.RegistrationCode);
+                    userInfo.IsConfirmed = callingContext.ServerSettings.IsUser(userInfo.RegistrationCode);
                 }
 
                 UserContactInfo updatedUserInfo = await _cosmosRepository.UpsertItem(userInfo);

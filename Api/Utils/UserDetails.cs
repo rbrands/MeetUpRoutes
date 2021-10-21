@@ -30,41 +30,5 @@ namespace BlazorApp.Api.Utils
             }
             return user;
         }
-
-        public static async Task<TenantSettings>  AssertTenantAdminAccess(HttpRequest req, TenantSettingsRepository tenantRepository)
-        {
-            ClientPrincipal clientPrincipal = Utils.UserDetails.GetClientPrincipal(req);
-            TenantSettings tenantSettings = await GetTenantSettings(req, tenantRepository);
-            if (!clientPrincipal.IsInRole(tenantSettings.AdminRole) && !clientPrincipal.IsInRole(Constants.ROLE_ADMIN))
-            {
-                throw new UnauthorizedAccessException($"User {clientPrincipal.UserDetails} not authorized for tenant {tenantSettings.TenantName}");
-            }
-            return tenantSettings;
-        }
-        public static async Task<TenantSettings> AssertTenantAuthenticatedAccess(HttpRequest req, TenantSettingsRepository tenantRepository)
-        {
-            ClientPrincipal clientPrincipal = Utils.UserDetails.GetClientPrincipal(req);
-            TenantSettings tenantSettings = await GetTenantSettings(req, tenantRepository);
-            if (!clientPrincipal.IsUserAuthenticated())
-            {
-                throw new UnauthorizedAccessException($"User {clientPrincipal.UserDetails} not authenticated");
-            }
-            return tenantSettings;
-        }
-
-        private static async Task<TenantSettings> GetTenantSettings(HttpRequest req, TenantSettingsRepository tenantRepository)
-        {
-            string tenant = req.Headers[Constants.HEADER_TENANT];
-            if (String.IsNullOrEmpty(tenant))
-            {
-                throw new UnauthorizedAccessException($"Tenant in header {Constants.HEADER_TENANT} empty.");
-            }
-            TenantSettings tenantSettings = await tenantRepository.GetTenantSettings(tenant);
-            if (null == tenantSettings)
-            {
-                throw new UnauthorizedAccessException($"Tenant with key {tenant} not found.");
-            }
-            return tenantSettings;
-        }
     }
 }
