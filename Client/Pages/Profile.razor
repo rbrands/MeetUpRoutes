@@ -84,8 +84,8 @@
 </EditForm>
 
 @code {
-    [CascadingParameter]
-    public IModalService Modal { get; set; }
+        [CascadingParameter]
+        public IModalService Modal { get; set; }
 
     private NotificationMessage _notificationMessage;
     private UserContactInfo _userContactInfo = new UserContactInfo();
@@ -147,8 +147,15 @@
 
         try
         {
-            await Api.WriteUser(_userContactInfo);
-            NavigationManager.NavigateTo("/");
+            UserContactInfo savedUserContactInfo = await Api.WriteUser(_userContactInfo);
+            if (!String.IsNullOrEmpty(savedUserContactInfo.RegistrationCode) && !savedUserContactInfo.IsConfirmed)
+            {
+                _notificationMessage.ShowWarning("Das angegebene Schlüsselwort ist falsch, du konntest daher nicht automatisch frei geschaltet werden");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+            }
         }
         catch (Exception ex)
         {

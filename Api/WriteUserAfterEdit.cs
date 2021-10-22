@@ -21,7 +21,7 @@ namespace BlazorApp.Api
         private TenantSettingsRepository _tenantSettingsRepository;
         private ServerSettingsRepository _serverSettingsRepository;
 
-        public WriteUserAfterEdit(ILogger<WriteUser> logger,
+        public WriteUserAfterEdit(ILogger<WriteUserAfterEdit> logger,
                          ServerSettingsRepository serverSettingsRepository,
                          TenantSettingsRepository tenantSettingsRepository,
                          CosmosDBRepository<UserContactInfo> cosmosRepository)
@@ -32,24 +32,24 @@ namespace BlazorApp.Api
             _cosmosRepository = cosmosRepository;
         }
 
-        [FunctionName("WriteUserAfterEdit")]
         /// <summary>
         /// Writes user contact details to the database. 
         /// </summary>
+        [FunctionName("WriteUserAfterEdit")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WriteUserAfterEdit")] HttpRequest req
             )
         {
             try
             {
-                TenantSettings tenantSettings = await UserDetails.AssertTenantAdminAccess(req, _tenantSettingsRepository);
-                ServerSettings serverSettings = await _serverSettingsRepository.GetServerSettings(tenantSettings);
+                CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantSettingsRepository, _serverSettingsRepository, _cosmosRepository);
+                callingContext.AssertTenantAdminAccess();
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 UserContactInfo userInfo = JsonConvert.DeserializeObject<UserContactInfo>(requestBody);
                 // Set tenant again to ensure that the data is written to the correct tenant!
-                userInfo.Tenant = tenantSettings.TrackKey;
-                userInfo.LogicalKey = tenantSettings.TrackKey + "-" + userInfo.UserKey;
+                userInfo.Tenant = callingContext.TenantSettings.TrackKey;
+                userInfo.LogicalKey = callingContext.TenantSettings.TrackKey + "-" + userInfo.UserKey;
                 // Update last modified
                 userInfo.LastModified = DateTime.UtcNow;
 

@@ -54,6 +54,13 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<UserContactInfo>();
         }
+        public async Task<Route> WriteRoute(Route route)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<Route>($"/api/WriteRoute", route);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Route>();
+        }
 
         public async Task<string> GetFunctionsVersion()
         {

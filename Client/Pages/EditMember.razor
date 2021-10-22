@@ -23,7 +23,7 @@
         <label for="title">Namenskürzel</label>
         <InputText id="nickName" aria-describedby="nickNameHelp" class="form-control" @bind-Value="_userContactInfo.UserNickName" placeholder="Namenskürzel" title="Namenskürzel" />
         <small id="nickNameHelp" class="form-text text-muted">
-            Bitte hier deinen Namen oder Namenskürzel angeben, wie er als Autor von Touren und Kommentaren angezeigt werden soll.
+            Hier den Namen oder Namenskürzel angeben, wie er als Autor:in von Touren und Kommentaren angezeigt werden soll.
         </small>
     </div>
 
@@ -31,14 +31,14 @@
         <label for="mail">Mail</label>
         <InputText id="mail" aria-describedby="mailHelp" class="form-control" @bind-Value="_userContactInfo.UserMail" placeholder="Dein Mail-Adresse" title="Mail" />
         <small id="mailHelp" class="form-text text-muted">
-            E-Mail des Benutzers.
+            E-Mail der Benutzer:in.
         </small>
     </div>
 
     <div class="form-group">
         <div class="form-check">
             <InputCheckbox id="confirmed" aria-describedby="confirmedHelp" class="form-check-input" @bind-Value="_userContactInfo.IsConfirmed"></InputCheckbox>
-            <label for="confirmed" class="form-check-label">Ist die Benutzer*in bestätigt?</label>
+            <label for="confirmed" class="form-check-label">Ist die Benutzer:in bestätigt?</label>
         </div>
         <small id="confirmedHelp">Nur bestätigte Benutzer:innen können Touren anlegen.</small>
     </div>
@@ -46,7 +46,7 @@
     <div class="form-group">
         <div class="form-check">
             <InputCheckbox id="author" aria-describedby="authorHelp" class="form-check-input" @bind-Value="_userContactInfo.IsAuthor"></InputCheckbox>
-            <label for="author" class="form-check-label">Ist die Benutzer*in auch Autor*in?</label>
+            <label for="author" class="form-check-label">Ist die Benutzer:in auch Autor:in?</label>
         </div>
         <small id="authorHelp">Autor:innen-Status erlaubt das Erstellen von Touren, die direkt veröffentlicht werden ohne Review.</small>
     </div>
@@ -54,7 +54,7 @@
     <div class="form-group">
         <div class="form-check">
             <InputCheckbox id="reviewer" aria-describedby="reviewerHelp" class="form-check-input" @bind-Value="_userContactInfo.IsReviewer"></InputCheckbox>
-            <label for="author" class="form-check-label">Ist die Benutzer*in auch Reviewer?</label>
+            <label for="author" class="form-check-label">Ist die Benutzer:in auch Reviewer?</label>
         </div>
         <small id="reviewerHelp">Reviewer geben Touren von bestätigten Benutzer:innen frei.</small>
     </div>

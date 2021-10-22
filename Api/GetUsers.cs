@@ -45,9 +45,10 @@ namespace BlazorApp.Api
         {
             try
             {
-                TenantSettings tenantSettings = await UserDetails.AssertTenantAdminAccess(req, _tenantRepository);
+                CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosRepository);
+                callingContext.AssertTenantAdminAccess();
 
-                IEnumerable<UserContactInfo> userInfos = await _cosmosRepository.GetItems(u => u.Tenant.CompareTo(tenantSettings.TrackKey) == 0);
+                IEnumerable<UserContactInfo> userInfos = await _cosmosRepository.GetItems(u => u.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0);
 
                 return new OkObjectResult(userInfos);
             }
