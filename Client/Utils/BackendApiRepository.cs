@@ -61,6 +61,11 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<Route>();
         }
+        public async Task<TagSet> GetTagSet(string id)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<TagSet>($"/api/GetTagSet/{id}");
+        }
 
         public async Task<string> GetFunctionsVersion()
         {
@@ -80,6 +85,11 @@ namespace BlazorApp.Client.Utils
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<UserContactInfo>>($"/api/GetUsers");
+        }
+        public async Task<IEnumerable<TagSet>> GetTagSets()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<IEnumerable<TagSet>>($"/api/GetTagSets");
         }
 
     }
