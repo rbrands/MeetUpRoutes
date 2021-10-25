@@ -2,7 +2,7 @@
 @using BlazorApp.Shared
 @inject AppState AppStateStore
 
-<EditForm Model="@_tagSet">
+<EditForm Model="@_tagSet" OnValidSubmit="Save">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="form-group">
@@ -48,5 +48,14 @@
     }
     private Boolean saveDisabled = false;
     private TagSet _tagSet;
+
+    private async Task Save()
+    {
+        saveDisabled = true;
+        StateHasChanged();
+        await OnSave.InvokeAsync(TagSetToEdit);
+        saveDisabled = false;
+        StateHasChanged();
+    }
 
 }
