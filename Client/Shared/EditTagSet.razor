@@ -1,0 +1,52 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+
+<EditForm Model="@_tagSet">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="tagName">Name</label>
+        <InputText id="tagName" aria-describedby="tagNameHelp" class="form-control" @bind-Value="_tagSet.Name" placeholder="Name der Kategorie" title="Kategorie" />
+        <small id="linkTitleHelp" class="form-text text-muted">
+            Bezeichnung der Kategorie.
+        </small>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="mandatory" aria-describedby="mandatoryHelp" class="form-check-input" @bind-Value="_tagSet.IsMandatory"></InputCheckbox>
+            <label for="mandatory" class="form-check-label">Pflicht-Kategorie?</label>
+        </div>
+        <small id="mandatoryHelp">Ist dies eine Pflicht-Kategorie, aus der ein Tag gewählt werden muss?</small>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="mutuallyExclusive" aria-describedby="mutuallyExlcusiveHelp" class="form-check-input" @bind-Value="_tagSet.IsMutuallyExclusive"></InputCheckbox>
+            <label for="mandatory" class="form-check-label">Ausschließlich ein Tag wählbar?</label>
+        </div>
+        <small id="mutuallyExclusiveHelp">Kann aus dieser Kategorie höchstens ein Tag gewählt werden?</small>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="restricted" aria-describedby="restrictedHelp" class="form-check-input" @bind-Value="_tagSet.HasRestrictedAccess"></InputCheckbox>
+            <label for="restricted" class="form-check-label">Nur mit Review-Berechtigung?</label>
+        </div>
+        <small id="restrictedHelp">Wird für diese Kategorie Review-Berechtigung benötigt?</small>
+    </div>
+
+    <button type="submit" id="BtnSave" disabled="@saveDisabled" class="btn btn-primary">Tags speichern ...</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public EventCallback<TagSet> OnSave { get; set; }
+    [Parameter]
+    public TagSet TagSetToEdit
+    {
+        get { return _tagSet; }
+        set { _tagSet = value; }
+    }
+    private Boolean saveDisabled = false;
+    private TagSet _tagSet;
+
+}

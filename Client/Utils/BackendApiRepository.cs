@@ -54,6 +54,13 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<UserContactInfo>();
         }
+        public async Task<TagSet> WriteTagSet(TagSet tagSet)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<TagSet>($"/api/WriteTagSet", tagSet);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<TagSet>();
+        }
         public async Task<Route> WriteRoute(Route route)
         {
             this.PrepareHttpClient();
