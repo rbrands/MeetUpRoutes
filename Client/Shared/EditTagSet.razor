@@ -1,5 +1,6 @@
 ﻿@using BlazorApp.Client.Utils
 @using BlazorApp.Shared
+@using System.Text.RegularExpressions 
 @inject AppState AppStateStore
 
 <EditForm Model="@_tagSet" OnValidSubmit="Save">
@@ -22,9 +23,9 @@
     <div class="form-group">
         <div class="form-check">
             <InputCheckbox id="mutuallyExclusive" aria-describedby="mutuallyExlcusiveHelp" class="form-check-input" @bind-Value="_tagSet.IsMutuallyExclusive"></InputCheckbox>
-            <label for="mandatory" class="form-check-label">Ausschließlich ein Tag wählbar?</label>
+            <label for="mandatory" class="form-check-label">Ausschließlich ein "Tag" wählbar?</label>
         </div>
-        <small id="mutuallyExclusiveHelp">Kann aus dieser Kategorie höchstens ein Tag gewählt werden?</small>
+        <small id="mutuallyExclusiveHelp">Kann aus dieser Kategorie höchstens ein "Tag" gewählt werden?</small>
     </div>
     <div class="form-group">
         <div class="form-check">
@@ -33,7 +34,40 @@
         </div>
         <small id="restrictedHelp">Wird für diese Kategorie Review-Berechtigung benötigt?</small>
     </div>
-
+    <div class="form-group">
+        <label for="badgeColor">Badge-Farbe</label>
+        <div class="form-control">
+            <InputRadioGroup id="badgeColor" @bind-Value="@_tagSet.BadgeColor">
+                @foreach (TagBadgeColor c in Enum.GetValues(typeof(TagBadgeColor)))
+                {
+                    <div class="form-check form-check-inline">
+                        <InputRadio class="form-check-input" Value="@c"></InputRadio><label class="form-check-label badge badge-@GetBadgeClass(c)">@BadgeClasses[(int)c]</label>
+                    </div>
+                }
+            </InputRadioGroup>
+        </div>
+    </div>
+    <h6>"Tag" - Labels</h6>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <InputText id="tag" class="form-control" aria-describedby="tagHelp" @bind-Value="@_workingTag.Label" placeholder="Tag-Label" title="Tag-label"></InputText>
+            <small id="tagHelp" class="form-text text-muted">
+                Label des Tags eingeben. Für Änderungen Tags unten anclicken.
+            </small>
+        </div>
+        <div class="form-group col-md-3">
+            <button class="btn btn-sm btn-outline-secondary" type="button" @onclick="@(() => SaveTag())"><span class="oi oi-check" title="Speichern"></span></button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" @onclick="@(() => DeleteTag())"><span class="oi oi-trash" title="Löschen"></span></button>
+        </div>
+    </div>
+    <div class="form-row">
+        @foreach (Tag t in _tagSet.Tags)
+        {
+            <div class="badge badge-@GetBadgeClass(_tagSet.BadgeColor) p-2 m-1" @onclick="@(() => ChangeWorkingTag(t))" title="Tag ändern">@t.Label</div>
+        }
+    </div>
+    <hr />
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
     <button type="submit" id="BtnSave" disabled="@saveDisabled" class="btn btn-primary">Tags speichern ...</button>
 </EditForm>
 
@@ -48,6 +82,24 @@
     }
     private Boolean saveDisabled = false;
     private TagSet _tagSet;
+    private Tag _workingTag = new Tag();
+    private string[] BadgeClasses =
+    {
+        "primary",
+        "secondary",
+        "success",
+        "danger",
+        "warning",
+        "info",
+        "light",
+        "dark"
+    };
+    private NotificationMessage _notificationMessage;
+
+    private string GetBadgeClass(TagBadgeColor color)
+    {
+        return BadgeClasses[(int)color];
+    }
 
     private async Task Save()
     {
@@ -58,4 +110,32 @@
         StateHasChanged();
     }
 
+    private void SaveTag()
+    {
+        if (!String.IsNullOrEmpty(_workingTag.Label))
+        {
+            string pattern = @"^[a-zA-Z0-9-]*$";
+            Match match = Regex.Match(_workingTag.Label, pattern);
+            if (!match.Success || _workingTag.Label.Length > 80)
+            {
+                _workingTag.Label = "tbd";
+                _notificationMessage.ShowError("Label für Tags dürfen nur Buchstaben und Zahlen enthalten und nicht länger als 80 Zeichen sein.");
+            }
+            else
+            {
+                _tagSet.AddTag(_workingTag);
+                _workingTag = new Tag();
+                _notificationMessage.Hide();
+            }
+        }
+    }
+    private void DeleteTag()
+    {
+        _tagSet.Tags.Remove(_workingTag);
+        _workingTag = new Tag();
+    }
+    private void ChangeWorkingTag(Tag t)
+    {
+        _workingTag = t;
+    }
 }

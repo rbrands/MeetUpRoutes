@@ -49,7 +49,8 @@ namespace BlazorApp.Shared
     public class RouteTag
     {
         public string TagSetId { get; set; }
-        public int TagId { get; set; }
+        public string TagId { get; set; }
         public string TabLabel { get; set; }
+        public TagBadgeColor BadgeColor { get; set; }
     }
 }

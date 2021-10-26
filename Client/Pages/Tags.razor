@@ -6,7 +6,7 @@
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
-<h3>Tags</h3>
+<h3>Kategorie mit "Tags"</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
 <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
     <Authorized>
@@ -58,6 +58,9 @@
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+
 
     private NotificationMessage _notificationMessage;
     IEnumerable<TagSet> _tagSets = null;
@@ -101,6 +104,11 @@
     }
     protected async Task ConfirmDelete(TagSet tagSet)
     {
+        ModalResult result = await Confirm.ShowDialog(Modal, "Tags löschen?", "Sollen die Tags wirklich gelöscht werden?");
+        if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+        {
+            return;
+        }
         try
         {
             if (null != tagSet.Name)
