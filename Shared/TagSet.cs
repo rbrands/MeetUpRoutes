@@ -44,7 +44,7 @@ namespace BlazorApp.Shared
         [JsonProperty(PropertyName = "tagId"), Display(Name = "Tag Id")]
         public string TagId { get; set; } = System.Guid.NewGuid().ToString();
         [JsonProperty(PropertyName = "label"), Display(Name = "Tag Label")]
-        [RegularExpression("[a-zA-Z0-9-]*", ErrorMessage = "Bitte nur Buchstaben und Zahlen für das Label.")]
+        [RegularExpression("[a-zA-Z0-9-<>]*", ErrorMessage = "Bitte nur Buchstaben und Zahlen für das Label.")]
         public string Label { get; set; }
     }
 
