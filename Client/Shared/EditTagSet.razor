@@ -83,6 +83,8 @@
     private Boolean saveDisabled = false;
     private TagSet _tagSet;
     private Tag _workingTag = new Tag();
+    private NotificationMessage _notificationMessage;
+
     private string[] BadgeClasses =
     {
         "primary",
@@ -94,7 +96,6 @@
         "light",
         "dark"
     };
-    private NotificationMessage _notificationMessage;
 
     private string GetBadgeClass(TagBadgeColor color)
     {

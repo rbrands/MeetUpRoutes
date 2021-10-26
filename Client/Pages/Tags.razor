@@ -42,7 +42,12 @@
                             <td>@tagSet.IsMandatory</td>
                             <td>@tagSet.IsMutuallyExclusive</td>
                             <td>@tagSet.HasRestrictedAccess</td>
-                            <td>@tagSet.GetAllTagsAsString()</td>
+                            <td>
+                                @foreach(Tag t in tagSet.Tags)
+                                {
+                                    <div class="badge badge-@GetBadgeClass(tagSet.BadgeColor) p-2 m-1">@t.Label</div>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -60,11 +65,25 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     [CascadingParameter]
     public IModalService Modal { get; set; }
-
-
     private NotificationMessage _notificationMessage;
     IEnumerable<TagSet> _tagSets = null;
     TagSet _tagSetSelected = new TagSet();
+    private string[] BadgeClasses =
+{
+        "primary",
+        "secondary",
+        "success",
+        "danger",
+        "warning",
+        "info",
+        "light",
+        "dark"
+    };
+    private string GetBadgeClass(TagBadgeColor color)
+    {
+        return BadgeClasses[(int)color];
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
