@@ -61,6 +61,12 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<TagSet>();
         }
+        public async Task DeleteTagSet(TagSet tagSet)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<TagSet>($"/api/DeleteTagSet", tagSet);
+            response.EnsureSuccessStatusCode();
+        }
         public async Task<Route> WriteRoute(Route route)
         {
             this.PrepareHttpClient();

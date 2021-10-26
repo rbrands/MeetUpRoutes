@@ -35,6 +35,8 @@
                     {
                         <tr>
                             <td>
+                                <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => Edit(tagSet))"><span class="oi oi-pencil"></span></button>
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => ConfirmDelete(tagSet))"><span class="oi oi-trash" title="Löschen"></span></button>
                             </td>
                             <td>@tagSet.Name</td>
                             <td>@tagSet.IsMandatory</td>
@@ -79,10 +81,40 @@
 
     private async Task SaveTagSet(TagSet tagSet)
     {
-        if (null != tagSet.Name)
+        try
         {
-            await Api.WriteTagSet(tagSet);
+            if (null != tagSet.Name)
+            {
+                await Api.WriteTagSet(tagSet);
+                _tagSets = await Api.GetTagSets();
+                _tagSetSelected = new TagSet();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler: {ex.Message}");
         }
     }
+    protected void Edit(TagSet tagSet)
+    {
+        _tagSetSelected = tagSet;
+    }
+    protected async Task ConfirmDelete(TagSet tagSet)
+    {
+        try
+        {
+            if (null != tagSet.Name)
+            {
+                await Api.DeleteTagSet(tagSet);
+                _tagSets = await Api.GetTagSets();
+                _tagSetSelected = new TagSet();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler: {ex.Message}");
+        }
+    }
+
 
 }

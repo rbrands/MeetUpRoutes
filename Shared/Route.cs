@@ -50,5 +50,6 @@ namespace BlazorApp.Shared
     {
         public string TagSetId { get; set; }
         public int TagId { get; set; }
+        public string TabLabel { get; set; }
     }
 }
