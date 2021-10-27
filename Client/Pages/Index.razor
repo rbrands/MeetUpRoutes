@@ -136,10 +136,12 @@
         try
         {
             bool validTrackKey = await ClubCheck.SetClub(TrackKey);
-            if (!validTrackKey && !String.IsNullOrEmpty(TrackKey))
+            if (await ClubCheck.SetClub(TrackKey))
             {
-                TrackKey = null;
-                AppStateStore.TrackKey = null;
+                _userInfo = AppStateStore.CurrentUser.ContactInfo;
+            }
+            else if (!String.IsNullOrEmpty(TrackKey))
+            {
                 _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
             }
         }
@@ -154,6 +156,7 @@
         {
             if (await ClubCheck.SetClub(trackKey))
             {
+                _userInfo = AppStateStore.CurrentUser.ContactInfo;
                 NavigationManager.NavigateTo($"/{trackKey}");
             }
             else

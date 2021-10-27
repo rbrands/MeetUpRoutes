@@ -46,6 +46,10 @@ namespace BlazorApp.Api
                 _logger.LogInformation($"GetUserDetails for user {key}");
                 user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
             }
+            else
+            {
+                user.ContactInfo = new UserContactInfo();
+            }
 
             return new OkObjectResult(user);
         }
