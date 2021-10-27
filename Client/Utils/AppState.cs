@@ -65,21 +65,21 @@ namespace BlazorApp.Client.Utils
         {
             get
             {
-                return (null != CurrentUser && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed);
+                return (null != CurrentUser && CurrentUser.Principal.IsUserAuthenticated() && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed);
             }
         }
         public bool IsUserAuthor
         {
             get
             {
-                return (null != CurrentUser && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed && CurrentUser.ContactInfo.IsAuthor);
+                return (null != CurrentUser && CurrentUser.Principal.IsUserAuthenticated() && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed && CurrentUser.ContactInfo.IsAuthor);
             }
         }
         public bool IsUserReviewer
         {
             get
             {
-                return (null != CurrentUser && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed && CurrentUser.ContactInfo.IsReviewer);
+                return (null != CurrentUser && CurrentUser.Principal.IsUserAuthenticated() && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed && CurrentUser.ContactInfo.IsReviewer);
             }
         }
         public bool IsDev
