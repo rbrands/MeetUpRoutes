@@ -21,6 +21,7 @@ namespace BlazorApp.Client
             builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
             builder.Services.AddScoped<BackendApiRepository>();
             builder.Services.AddSingleton<AppState>();
+            builder.Services.AddScoped<ClubCheck>();
             builder.Services.AddBlazoredModal();
             builder.Services.AddStaticWebAppsAuthentication();
 
