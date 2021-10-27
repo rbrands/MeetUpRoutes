@@ -21,10 +21,6 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
-      "route": "/api/GetVersion",
-      "allowedRoles": [ "anonymous" ]
-    },
-    {
       "route": "/api/GetUsers",
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
