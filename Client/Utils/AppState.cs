@@ -14,9 +14,11 @@ namespace BlazorApp.Client.Utils
     {
         private TenantSettings _tenantSettings = null;
         private string _trackKey = null;
+        private User _user = null;
 
         public IEnumerable<TenantSettings> Tenants { get; set; } = new List<TenantSettings>();
         public Boolean TenantsAlreadyRead { get; set; } = false;
+
         public TenantSettings Tenant
         {
             get { return _tenantSettings; }
@@ -35,7 +37,18 @@ namespace BlazorApp.Client.Utils
                 NotifyStateChanged();
             } 
         }
-        public User CurrentUser { get; set; }
+        public User CurrentUser
+        {
+            get
+            {
+                return _user;
+            }
+            set
+            {
+                _user = value;
+                NotifyStateChanged();
+            }
+        }
 
         public event Action OnChange;
         public bool NotificationSubscriptionRequested { get; set; } = false;
