@@ -1,0 +1,147 @@
+﻿@page "/tags"
+@attribute [Authorize(Roles = "admin,tenantadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<h3>Kategorie mit "Tags"</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
+<AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
+    <Authorized>
+        @if (null == _tagSets)
+        {
+            <p><em>Deine Zugriffsrechte werden geprüft und Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
+        }
+        else
+        {
+            <p>
+                <EditTagSet TagSetToEdit="@_tagSetSelected" OnSave="SaveTagSet"></EditTagSet>
+            </p>
+            <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Aktion</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Pflicht?</th>
+                        <th scope="col">Nur ein Wert?</th>
+                        <th scope="col">Nur für Reviewer?</th>
+                        <th scope="col">Tags</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (TagSet tagSet in _tagSets)
+                    {
+                        <tr>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => Edit(tagSet))"><span class="oi oi-pencil"></span></button>
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => ConfirmDelete(tagSet))"><span class="oi oi-trash" title="Löschen"></span></button>
+                            </td>
+                            <td>@tagSet.Name</td>
+                            <td>@tagSet.IsMandatory</td>
+                            <td>@tagSet.IsMutuallyExclusive</td>
+                            <td>@tagSet.HasRestrictedAccess</td>
+                            <td>
+                                @foreach(Tag t in tagSet.Tags)
+                                {
+                                    <div class="badge badge-@GetBadgeClass(tagSet.BadgeColor) p-2 m-1">@t.Label</div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        Du bist für diesen Club nicht berechtigt, die Mitglieder zu verwalten.
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+    private NotificationMessage _notificationMessage;
+    IEnumerable<TagSet> _tagSets = null;
+    TagSet _tagSetSelected = new TagSet();
+    private string[] BadgeClasses =
+{
+        "primary",
+        "secondary",
+        "success",
+        "danger",
+        "warning",
+        "info",
+        "light",
+        "dark"
+    };
+    private string GetBadgeClass(TagBadgeColor color)
+    {
+        return BadgeClasses[(int)color];
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = (await authenticationStateTask).User;
+            if (user.IsInRole(AppStateStore.Tenant.AdminRole) || user.IsInRole(Constants.RoleAdmin))
+            {
+                _tagSets = await Api.GetTagSets();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Daten können nicht gelesen werden: {ex.Message}");
+        }
+    }
+
+    private async Task SaveTagSet(TagSet tagSet)
+    {
+        try
+        {
+            if (null != tagSet.Name)
+            {
+                await Api.WriteTagSet(tagSet);
+                _tagSets = await Api.GetTagSets();
+                _tagSetSelected = new TagSet();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler: {ex.Message}");
+        }
+    }
+    protected void Edit(TagSet tagSet)
+    {
+        _tagSetSelected = tagSet;
+    }
+    protected async Task ConfirmDelete(TagSet tagSet)
+    {
+        ModalResult result = await Confirm.ShowDialog(Modal, "Tags löschen?", "Sollen die Tags wirklich gelöscht werden?");
+        if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+        {
+            return;
+        }
+        try
+        {
+            if (null != tagSet.Name)
+            {
+                await Api.DeleteTagSet(tagSet);
+                _tagSets = await Api.GetTagSets();
+                _tagSetSelected = new TagSet();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler: {ex.Message}");
+        }
+    }
+
+
+}

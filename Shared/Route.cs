@@ -25,8 +25,6 @@ namespace BlazorApp.Shared
         public string LevelDesciption { get; set; }
         [JsonProperty(PropertyName = "description"), Display(Name = "Beschreibung"), MaxLength(5000, ErrorMessage = "Die Beschreibung ist zu lang.")]
         public string Description { get; set; }
-        [JsonProperty(PropertyName = "tags"), Display(Name = "Tags"), MaxLength(512, ErrorMessage = "Zu viele Tags.")]
-        public string Tags { get; set; }
         [JsonProperty(PropertyName = "photosLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Link zu Fotos"), UIHint("Url")]
         public string PhotosLink { get; set; }
         [JsonProperty(PropertyName = "videoLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Link zu einem Video", Prompt = "Link zu einem Video"), UIHint("Url")]
@@ -39,7 +37,20 @@ namespace BlazorApp.Shared
         public string RouteLinkTitle { get; set; }
         [JsonProperty(PropertyName = "gpxLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "GPX", Prompt = "Link zu GPX Datei"), UIHint("Url")]
         public string GpxLink { get; set; }
+        [JsonProperty(PropertyName = "isReviewed")]
         public Boolean IsReviewed { get; set; }
+        [JsonProperty(PropertyName = "isNonPublic")]
         public Boolean IsNonPublic { get; set; }
+        [JsonProperty(PropertyName = "tags"), Display(Name = "Tags"), MaxLength(512, ErrorMessage = "Zu viele Tags.")]
+        public string Tags { get; set; }
+        public IList<RouteTag> RouteTags { get; set; } = new List<RouteTag>();
+    }
+
+    public class RouteTag
+    {
+        public string TagSetId { get; set; }
+        public string TagId { get; set; }
+        public string TabLabel { get; set; }
+        public TagBadgeColor BadgeColor { get; set; }
     }
 }

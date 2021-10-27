@@ -1,17 +1,46 @@
 ﻿@page "/routes"
+@page "/{TrackKey}/routes"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
+@inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
 <div class="jumbotron">
-    Hier findest du die Zusammenstellung aller Touren - sortiert nach Aktualität, d.h. die neuesten Touren stehen oben. Nutze die Filterfunktonen, 
-    um leichter zu finden was du suchst. 
+    Hier findest du die Zusammenstellung aller Touren - sortiert nach Aktualität, d.h. die neuesten Touren stehen oben. Nutze die Filterfunktonen,
+    um leichter zu finden was du suchst.
 </div>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
 <h3>Touren</h3>
 
 @code {
+    [Parameter]
+    public string TrackKey { get; set; }
+    private NotificationMessage _notificationMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if a club is given as part of url or selected before
+        if (!String.IsNullOrEmpty(TrackKey))
+        {
+            try
+            {
+                await ClubCheck.SetClub(TrackKey);
+            }
+            catch (Exception ex)
+            {
+                _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
+                return;
+            }
+        }
+        if (String.IsNullOrEmpty(AppStateStore.TrackKey))
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+    }
+
 
 }
