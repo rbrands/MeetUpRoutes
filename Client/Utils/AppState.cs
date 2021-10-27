@@ -47,5 +47,34 @@ namespace BlazorApp.Client.Utils
             Tenant.Tenant = "Demo";
             Tenant.AdminRole = "Demo";
         }
+
+        public bool IsUserConfirmed
+        {
+            get
+            {
+                return (null != CurrentUser && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed);
+            }
+        }
+        public bool IsUserAuthor
+        {
+            get
+            {
+                return (null != CurrentUser && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed && CurrentUser.ContactInfo.IsAuthor);
+            }
+        }
+        public bool IsUserReviewer
+        {
+            get
+            {
+                return (null != CurrentUser && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed && CurrentUser.ContactInfo.IsReviewer);
+            }
+        }
+        public bool IsDev
+        {
+            get
+            {
+                return (null != CurrentUser && CurrentUser.Principal.IdentityProvider.CompareTo("devtest") == 0);
+            }
+        }
     }
 }

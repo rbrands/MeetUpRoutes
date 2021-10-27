@@ -1,4 +1,6 @@
-﻿@page "/{TrackKey}/routes"
+﻿@page "/{TrackKey}/editroute"
+@page "/{TrackKey}/editroute/{id}"
+@attribute [Authorize]
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
@@ -7,29 +9,17 @@
 @inject NavigationManager NavigationManager
 
 <div class="jumbotron">
-    Hier findest du die Zusammenstellung aller Touren - sortiert nach Aktualität, d.h. die neuesten Touren stehen oben. Nutze die Filterfunktonen,
-    um leichter zu finden was du suchst.
+    Hier kannst du die Daten zu einer neuen Tour anlegen bzw. ändern.
 </div>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
-
-<h3>Touren</h3>
-@if (null == _routes)
-{
-    <p><em>Deine Zugriffsrechte werden geprüft und Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
-}
-else
-{
-    <p>
-        <a class="btn btn-primary" href=@($"{AppStateStore.TrackKey}/editroute") title="Neue Strecke" hidden="@(!AppStateStore.IsUserConfirmed && !AppStateStore.IsDev)">Neue Strecke</a>
-    </p>
-}
+<h3>EditRoute</h3>
 
 @code {
     [Parameter]
     public string TrackKey { get; set; }
+    [Parameter]
+    public string Id { get; set; }
     private NotificationMessage _notificationMessage;
-    IEnumerable<ExtendedRoute> _routes = null;
-    RouteFilter _filter = new RouteFilter();
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,7 +33,6 @@ else
                 return;
             }
 
-            _routes = await Api.GetRoutes(_filter);
         }
         catch (Exception ex)
         {

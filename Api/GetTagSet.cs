@@ -24,7 +24,7 @@ namespace BlazorApp.Api
 
         private TenantSettingsRepository _tenantRepository;
         private ServerSettingsRepository _serverSettingsRepository;
-        public GetTagSet(ILogger<GetUserForEdit> logger,
+        public GetTagSet(ILogger<GetTagSet> logger,
                         IConfiguration config,
                         ServerSettingsRepository serverSettingsRepository,
                         TenantSettingsRepository tenantRepository,

@@ -72,6 +72,12 @@
     {
         try
         {
+            if (String.IsNullOrEmpty(AppStateStore.TrackKey))
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+
             var user = (await authenticationStateTask).User;
             if (user.IsInRole(AppStateStore.Tenant.AdminRole) || user.IsInRole(Constants.RoleAdmin))
             {

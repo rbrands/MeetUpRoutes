@@ -2,6 +2,13 @@
   "name": "MeetUpRoutes",
   "short_name": "MeetUpRoutes",
   "start_url": "/",
+  "shortcuts": [
+    {
+      "name": "Scuderia",
+      "short_name": "Scuderia",
+      "url":  "/scuderia"
+    }
+  ],
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",

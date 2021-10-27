@@ -33,6 +33,18 @@ namespace BlazorApp.Api.Utils
             set { _serverSettings = value; }
         }
 
+        public Boolean IsUserConfirmed
+        {
+            get
+            {
+                return (
+                            null != _user.ContactInfo
+                            && null != _user.Principal
+                            && _user.Principal.IsUserAuthenticated()
+                            && _user.ContactInfo.IsConfirmed
+                       );
+            }
+        }
         public Boolean IsUserAuthor
         {
             get
@@ -122,6 +134,16 @@ namespace BlazorApp.Api.Utils
             {
                 throw new UnauthorizedAccessException($"User {_user.Principal.UserDetails} has no rights as reviewer.");
             }
+        }
+        public bool CheckAuthor(string authorId)
+        {
+            return (
+                         null != _user.ContactInfo
+                         && null != _user.Principal
+                         && _user.Principal.IsUserAuthenticated()
+                         && _user.ContactInfo.IsConfirmed
+                         && (_user.ContactInfo.Id.CompareTo(authorId) == 0)
+                     );
         }
 
     }

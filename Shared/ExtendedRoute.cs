@@ -10,7 +10,9 @@ namespace BlazorApp.Shared
     {
         public Route Core { get; set; }
         public UserContactInfo Author { get; set; }
+        public string AuthorDisplayName { get; set; }
         public UserContactInfo Reviewer { get; set; }
+        public string ReviewerDisplayName { get; set; }
         public DateTime LastUpdate {get;set;}
 
         public ExtendedRoute()
