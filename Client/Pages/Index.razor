@@ -3,6 +3,7 @@
 @using BlazorApp.Shared
 @using BlazorApp.Client.Utils
 @inject AppState AppStateStore
+@inject ClubCheck ClubCheck
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
@@ -33,7 +34,8 @@
                 }
             }
         </p>
-    } else
+    }
+    else
     {
         <p>
             <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/routes")>Zu den Touren</a>
@@ -44,10 +46,12 @@
         Hier kannst du Touren suchen, für Ausfahrten auswählen oder auch neue Touren erstellen und mit anderen teilen.
     </p>
     <p class="text-info">
-        <em><b>
-            Diese Anwendung befindet sich gerade in der Entwicklung, du kannst hier verfolgen, wie sie Schritt für Schritt entsteht.
-            Aktuell steht das Grundgerüst der Anwendung mit Registrierung und Berechtigung der Benutzer. Noch gibt es keine Touren. Das kommt als nächstes ...
-        </b></em>
+        <em>
+            <b>
+                Diese Anwendung befindet sich gerade in der Entwicklung, du kannst hier verfolgen, wie sie Schritt für Schritt entsteht.
+                Aktuell steht das Grundgerüst der Anwendung mit Registrierung und Berechtigung der Benutzer. Noch gibt es keine Touren. Das kommt als nächstes ...
+            </b>
+        </em>
     </p>
 </div>
 
@@ -131,64 +135,36 @@
         }
         try
         {
-            // Read all tenant settings
-            AppStateStore.Tenants = await Api.GetTenants();
-            AppStateStore.TenantsAlreadyRead = true;
-        }
-        catch (Exception ex)
-        {
-            _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
-        }
-        if (!String.IsNullOrEmpty(TrackKey))
-        {
-            Boolean validTrackKey = SetTenant(TrackKey);
-            if (!validTrackKey)
+            bool validTrackKey = await ClubCheck.SetClub(TrackKey);
+            if (!validTrackKey && !String.IsNullOrEmpty(TrackKey))
             {
                 TrackKey = null;
                 AppStateStore.TrackKey = null;
                 _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
             }
         }
-        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+        catch (Exception ex)
         {
-            AppStateStore.CurrentUser = await Api.GetUser();
-            _userInfo = AppStateStore.CurrentUser.ContactInfo;
-            if (null == _userInfo)
-            {
-                _userInfo = new UserContactInfo();
-            }
+            _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
         }
     }
-    protected void ShowRoutes(string trackKey)
+    protected async Task ShowRoutes(string trackKey)
     {
-        AppStateStore.TrackKey = trackKey;
-        SetTenant(trackKey);
-        NavigationManager.NavigateTo($"/{trackKey}");
+        try
+        {
+            if (await ClubCheck.SetClub(trackKey))
+            {
+                NavigationManager.NavigateTo($"/{trackKey}");
+            }
+            else
+            {
+                _notificationMessage.ShowError("Falsche Club-Konfiguration");
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError(ex.Message);
+        }
     }
 
-    private Boolean SetTenant(string trackKey)
-    {
-        Boolean validTrackKey = false;
-        if (!String.IsNullOrEmpty(trackKey))
-        {
-            // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found
-            foreach (TenantSettings tenant in AppStateStore.Tenants)
-            {
-                if (tenant.TracksEnabled && !String.IsNullOrEmpty(tenant.TrackKey) && String.Compare(tenant.TrackKey, trackKey) == 0)
-                {
-                    AppStateStore.Tenant = tenant;
-                    AppStateStore.TrackKey = tenant.TrackKey;
-                    _notificationMessage.Hide();
-                    validTrackKey = true;
-                    break;
-                }
-            }
-            if (!validTrackKey)
-            {
-                AppStateStore.TrackKey = null;
-                _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
-            }
-        }
-        return validTrackKey;
-    }
 }

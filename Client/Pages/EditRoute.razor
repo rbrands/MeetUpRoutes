@@ -26,8 +26,7 @@
         try
         {
             // Check if a club is given as part of url or selected before
-            await ClubCheck.SetClub(TrackKey);
-            if (String.IsNullOrEmpty(AppStateStore.TrackKey))
+            if (!await ClubCheck.SetClub(TrackKey))
             {
                 NavigationManager.NavigateTo("/");
                 return;

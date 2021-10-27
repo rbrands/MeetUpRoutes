@@ -19,13 +19,15 @@ namespace BlazorApp.Client.Utils
         public async Task<Boolean> SetClub(string trackKey)
         {
             Boolean validTrackKey = false;
+            // Read all tenant settings
+            if (!_appStateStore.TenantsAlreadyRead)
+            {
+                _appStateStore.Tenants = await _backendApi.GetTenants();
+                _appStateStore.TenantsAlreadyRead = true;
+            }
             if (!String.IsNullOrEmpty(trackKey))
             { 
                 _appStateStore.TrackKey = trackKey;
-
-                // Read all tenant settings
-                _appStateStore.Tenants = await _backendApi.GetTenants();
-                _appStateStore.TenantsAlreadyRead = true;
                 validTrackKey = SetTenant(trackKey);
                 if (!validTrackKey)
                 {
