@@ -10,7 +10,7 @@ namespace BlazorApp.Shared
     {
         [JsonProperty(PropertyName = "date"), Display(Name = "Datum"), UIHint("Date"), Required]
         public DateTime Date { get; set; } = DateTime.Today;
-        [JsonProperty(PropertyName = "author"), Display(Name = "Autor")]
+        [JsonProperty(PropertyName = "authorId"), Display(Name = "Autor")]
         public string AuthorId { get; set; }
         [JsonProperty(PropertyName = "reviewDate"), Display(Name = "Datum"), UIHint("Date"), Required]
         public DateTime ReviewDate { get; set; } = DateTime.Today;
@@ -22,7 +22,7 @@ namespace BlazorApp.Shared
         [RegularExpression("[a-z0-9-_]*", ErrorMessage = "Bitte nur Kleinbuchstaben und Zahlen für den Titel-Link eingeben.")]
         public string Scope { get; set; }
         [JsonProperty(PropertyName = "levelDescription"), Required(ErrorMessage = "Bitte Angaben zur Länge/Dauer machen."), MaxLength(60, ErrorMessage = "Angabe zur Länge bitte kürzen.")]
-        public string LevelDesciption { get; set; }
+        public string LevelDescription { get; set; }
         [JsonProperty(PropertyName = "description"), Display(Name = "Beschreibung"), MaxLength(5000, ErrorMessage = "Die Beschreibung ist zu lang.")]
         public string Description { get; set; }
         [JsonProperty(PropertyName = "photosLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Link zu Fotos"), UIHint("Url")]
