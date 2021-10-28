@@ -42,7 +42,7 @@
     },
     {
       "route": "/api/GetTagSets",
-      "allowedRoles": [ "admin", "tenantadmin" ]
+      "allowedRoles": [ "authenticated" ]
     },
     {
       "route": "/api/*",

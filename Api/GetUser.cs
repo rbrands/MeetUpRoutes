@@ -45,6 +45,10 @@ namespace BlazorApp.Api
                 string key = tenant + "-" + clientPrincipal.GetUserKey();
                 _logger.LogInformation($"GetUserDetails for user {key}");
                 user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
+                if (null == user.ContactInfo)
+                {
+                    user.ContactInfo = new UserContactInfo();
+                }
             }
             else
             {
