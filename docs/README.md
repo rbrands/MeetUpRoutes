@@ -2,6 +2,8 @@
 
 Diese Web-App ist als Ergänzung zum [MeetUpPlanner](https://www.meetupplanner.de) gedacht, um Touren zu verwalten und ist als eine Art "Meta-Verzeichnis" oder einfacher als Link-Sammlung zu verstehen. MeetUpRoutes soll und kann natürlich nicht komoot und ähnliche Web-Anwendungen ersetzen, sondern ergänzt diese, um eine Vereins/Club-spezifische Tourensammlung anzulegen.
 
+Der aktuelle Stand der Entwicklung von MeetUpRoutes kann am öffentlichen Projekt-Board https://github.com/rbrands/MeetUpRoutes/projects/1 verfolgt werden.
+
 Basis für den Zugriff auf die Touren und die Erstellung der Touren ist das folgende <b>Berechtigungskonzept</b>:
 - Ohne weitere Anmeldung können die öffentlichen Touren eingesehen werden, es können keine Touren erstellt und kommentiert werden.
 - Eine Benutzer:in kann sich authentifizieren über die Online-Services von Microsoft, Google, Twitter oder GitHub. Eine Benutzer:in muss dann aber noch bestätigt werden. Die Bestätigung kann automatisch erfolgen, wenn im Profil das Schlüsselwort zum MeetUpPlanner eingegeben wird. Alternativ kann eine Benutzer:in durch einen Club-Administrator bestätigt werden. Durch die Bestätigung wird eine Benutzer:in zum <em>Clubmitglied</em>. 
