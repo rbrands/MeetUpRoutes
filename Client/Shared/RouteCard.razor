@@ -30,15 +30,22 @@
             <hr />
             @if (!String.IsNullOrEmpty(RouteItem.Core.RouteLink))
             {
-                <a href="@RouteItem.Core.RouteLink" target="_blank" class="card-link">@RouteItem.Core.RouteLinkTitle</a>
+                <a href="@RouteItem.Core.RouteLink" target="_blank" class="card-link">@RouteItem.DisplayLinkTitle</a>
             }
         </p>
 
     </div>
     <div class="card-footer">
         <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zur Tour">
-            <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(RouteItem.Core.Id))" hidden="@HideAuthoring"><span class="oi oi-pencil"></span></button>
-            <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem())" hidden="@HideAuthoring"><span class="oi oi-trash"></span></button>
+            <AuthorizeView>
+                <Authorized>
+                    @if (AppStateStore.IsUserConfirmed)
+                    {
+                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(RouteItem.Core.Id))" hidden="@HideAuthoring"><span class="oi oi-pencil"></span></button>
+                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem())" hidden="@HideAuthoring"><span class="oi oi-trash"></span></button>
+                    }
+                </Authorized>
+            </AuthorizeView>
         </div>
     </div>
 </div>

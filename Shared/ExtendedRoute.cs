@@ -27,5 +27,30 @@ namespace BlazorApp.Shared
         {
             Core = route;
         }
+        [JsonIgnore]
+        public string DisplayLinkTitle
+        {
+            get
+            {
+                string title = this.Core.RouteLinkTitle;
+                if (!String.IsNullOrEmpty(this.Core.RouteLink) && String.IsNullOrEmpty(this.Core.RouteLinkTitle))
+                {
+                    if (this.Core.RouteLink.Contains("komoot"))
+                    {
+                        title = "Tour auf Komoot";
+                    }
+                    else if (this.Core.RouteLink.Contains("strava"))
+                    {
+                        title = "Tour auf Strava";
+                    }
+                    else
+                    {
+                        title = "Weitere Info...";
+                    }
+                }
+                return title;
+            }
+        }
+
     }
 }

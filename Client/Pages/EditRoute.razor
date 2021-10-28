@@ -77,6 +77,14 @@
             </div>
         }
         <div class="form-group">
+            <label for="linkTitle">Link-Bezeichnung</label>
+            <InputText id="linkTitle" aria-describedby="linkTitleHelp" class="form-control" @bind-Value="_routeToEdit.Core.RouteLinkTitle" placeholder="Kurze Überschrift zum Link" title="Bezeichnung des Links zur weiterern Tourinfo" />
+            <small id="linkTitleHelp" class="form-text text-muted">
+                Optional: Kurze Bezeichnung zu dem Link oben, falls der Standardtext "Tour auf Komoot" oder "Weitere Info ..." nicht passt.
+            </small>
+        </div>
+
+        <div class="form-group">
             <label for="gpx">GPX-Track</label>
             <InputText id="gpx" aria-describedby="gpxHelp" class="form-control" @bind-Value="_routeToEdit.Core.GpxLink" autocomplete="on" placeholder="Link zu GPX-Track" />
             <small id="gpxHelp" class="form-text text-muted">
