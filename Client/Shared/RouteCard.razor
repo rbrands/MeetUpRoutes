@@ -2,6 +2,8 @@
 @using BlazorApp.Shared
 @using System.Text.RegularExpressions
 @inject AppState AppStateStore
+@inject NavigationManager NavigationManager
+
 
 <div class="card">
     <div class="card-header">
@@ -33,12 +35,26 @@
 
     </div>
     <div class="card-footer">
-
+        <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zur Tour">
+            <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(RouteItem.Core.Id))" hidden="@HideAuthoring"><span class="oi oi-pencil"></span></button>
+        </div>
     </div>
 </div>
 
 @code {
     [Parameter]
     public ExtendedRoute RouteItem { get; set; } = new ExtendedRoute();
+
+    protected void EditItem(string itemId)
+    {
+        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/editroute/{itemId}");
+    }
+    private Boolean HideAuthoring
+    {
+        get
+        {
+            return (!AppStateStore.IsUserReviewer && RouteItem.Core.AuthorId.CompareTo(AppStateStore.CurrentUser.ContactInfo.Id) != 0);
+        }
+    }
 
 }

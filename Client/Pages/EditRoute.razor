@@ -208,6 +208,7 @@
         {
             _formIsDisabled = true;
             StateHasChanged();
+            _routeToEdit.Core.Description = await _htmlDescription.GetHTML();
             await Api.WriteRoute(_routeToEdit.Core);
             NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes");
         }
