@@ -34,7 +34,7 @@
             </li>
             <AuthorizeView>
                 <Authorized>
-                    @if (AppStateStore.IsUserAuthor || AppStateStore.IsDev)
+                    @if (AppStateStore.IsUserConfirmed)
                     {
                         <li class="nav-item px-3">
                             <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/editroute")>
@@ -43,7 +43,7 @@
                         </li>
                     }
                     <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="profile">
+                        <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/profile")>
                             <span class="oi oi-person" aria-hidden="true"></span> Profil
                         </NavLink>
                     </li>
@@ -53,12 +53,12 @@
         <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
             <Authorized>
                 <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="members">
+                    <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/members")>
                         <span class="oi oi-people" aria-hidden="true"></span> Mitglieder
                     </NavLink>
                 </li>
                 <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="tags">
+                    <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/tags")>
                         <span class="oi oi-tags" aria-hidden="true"></span> Tags
                     </NavLink>
                 </li>

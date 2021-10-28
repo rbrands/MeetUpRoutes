@@ -20,7 +20,11 @@
 else
 {
     <p>
-        <a class="btn btn-primary" href=@($"{AppStateStore.TrackKey}/editroute") title="Neue Tour" hidden="@(!AppStateStore.IsUserConfirmed && !AppStateStore.IsDev)">Neue Strecke</a>
+        <AuthorizeView>
+            <Authorized>
+                <a class="btn btn-primary" href=@($"{AppStateStore.TrackKey}/editroute") title="Neue Tour" hidden="@(!AppStateStore.IsUserConfirmed)">Neue Tour</a>
+            </Authorized>
+        </AuthorizeView>
     </p>
 }
 
@@ -41,7 +45,6 @@ else
                 NavigationManager.NavigateTo("/");
                 return;
             }
-
             _routes = await Api.GetRoutes(_filter);
         }
         catch (Exception ex)

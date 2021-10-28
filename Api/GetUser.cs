@@ -40,7 +40,7 @@ namespace BlazorApp.Api
             User user = new User();
             user.Principal = clientPrincipal;
             // Read UserDetails by assembling key
-            if (clientPrincipal.IsUserAuthenticated())
+            if (user.IsAuthenticated)
             { 
                 string key = tenant + "-" + clientPrincipal.GetUserKey();
                 _logger.LogInformation($"GetUserDetails for user {key}");

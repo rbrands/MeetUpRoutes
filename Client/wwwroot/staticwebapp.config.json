@@ -33,6 +33,18 @@
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {
+      "route": "/api/WriteTagSet",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/GetTagSet",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/GetTagSets",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
       "route": "/api/*",
       "allowedRoles": [ "authenticated" ]
     }

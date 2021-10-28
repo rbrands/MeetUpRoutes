@@ -1,6 +1,6 @@
 {
   "clientPrincipal": {
-    "identityProvider": "github",
+    "identityProvider": "devtest",
     "userId": "test123",
     "userDetails": "rbrands",
     "userRoles": [
