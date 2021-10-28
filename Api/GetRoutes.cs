@@ -86,8 +86,11 @@ namespace BlazorApp.Api
                             extendedRoute.Reviewer = reviewer;
                         }
                     }
+                    extendedRoute.LastUpdate = r.Date;
                     extendedRoutes.Add(extendedRoute);
                 }
+                // Sort descending on date
+                extendedRoutes.Sort((x, y) => y.LastUpdate.CompareTo(x.LastUpdate));
 
                 return new OkObjectResult(extendedRoutes);
             }

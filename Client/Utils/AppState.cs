@@ -68,6 +68,13 @@ namespace BlazorApp.Client.Utils
                 return (null != CurrentUser && CurrentUser.IsAuthenticated && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed);
             }
         }
+        public void AssertUserIsConfirmed()
+        {
+            if (!IsUserConfirmed)
+            {
+                throw new Exception("Benutzer:in ist noch nicht als Mitglied bestätigt.");
+            }
+        }
         public bool IsUserAuthor
         {
             get

@@ -1,0 +1,44 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using System.Text.RegularExpressions
+@inject AppState AppStateStore
+
+<div class="card">
+    <div class="card-header">
+
+    </div>
+    @if (!String.IsNullOrEmpty(RouteItem.Core.RouteLinkImage))
+    {
+        <a href="@RouteItem.Core.RouteLink" target="_blank">
+            <img class="card-img-top" src="@RouteItem.Core.RouteLinkImage" alt="@RouteItem.Core.RouteLinkTitle">
+        </a>
+    }
+    <div class="card-body">
+        <h6 class="text-muted card-subtitle mb-2">
+            @RouteItem.Core.LevelDesciption
+        </h6>
+        <h4 class="card-title">
+            @RouteItem.Core.Title
+        </h4>
+        <p class="card-text">
+            <div class="overflow-auto" style="max-height: 500px">
+                @((MarkupString)RouteItem.Core.Description)
+            </div>
+            <hr />
+            @if (!String.IsNullOrEmpty(RouteItem.Core.RouteLink))
+            {
+                <a href="@RouteItem.Core.RouteLink" target="_blank" class="card-link">@RouteItem.Core.RouteLinkTitle</a>
+            }
+        </p>
+
+    </div>
+    <div class="card-footer">
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ExtendedRoute RouteItem { get; set; } = new ExtendedRoute();
+
+}

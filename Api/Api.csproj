@@ -9,6 +9,9 @@
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.OpenApi" Version="0.7.2-preview" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
+    <PackageReference Include="MSiccDev.Libs.LinkTools.Core" Version="1.0.21261.1" />
+    <PackageReference Include="MSiccDev.Libs.LinkTools.Data" Version="1.0.21261.1" />
+    <PackageReference Include="MSiccDev.Libs.LinkTools.LinkPreview" Version="1.0.21262.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />

@@ -13,7 +13,7 @@
 <EditForm Model="_userContactInfo" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
     <div class="form-group">
-        <label for="title">Name</label>
+        <label for="userName">Name</label>
         <InputText id="userName" aria-describedby="userNameHelp" class="form-control" @bind-Value="_userContactInfo.UserName" placeholder="Name" title="Name" />
         <small id="userNameHelp" class="form-text text-muted">
             Bitte hier den vollständigen Namen eingeben.

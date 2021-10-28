@@ -80,6 +80,13 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<Route>();
         }
+        public async Task<LinkPreview> GetLinkPreview(LinkPreview linkPreview)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<LinkPreview>($"/api/GetLinkPreview", linkPreview);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<LinkPreview>();
+        }
         public async Task<TagSet> GetTagSet(string id)
         {
             this.PrepareHttpClient();

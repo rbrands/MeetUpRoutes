@@ -51,13 +51,11 @@ namespace BlazorApp.Api
                 {
                     return new BadRequestErrorMessageResult("Die Id der Route fehlt.");
                 }
-
-                // Check if caller is allowed to delete this route (needs to be author or reviewer)
-                if (!callingContext.CheckAuthor(route.AuthorId))
+                if (route.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) != 0)
                 {
+                    // another one authored this version
                     callingContext.AssertReviewerAuthorization();
                 }
-
                 await _cosmosRepository.DeleteItemAsync(route.Id);
 
                 return new OkResult();

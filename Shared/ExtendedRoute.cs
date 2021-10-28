@@ -17,7 +17,7 @@ namespace BlazorApp.Shared
 
         public ExtendedRoute()
         {
-
+            Core = new Route();
         }
         /// <summary>
         /// "Copy" constructor with instance of base class

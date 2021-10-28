@@ -16,7 +16,7 @@ namespace BlazorApp.Shared
         public DateTime ReviewDate { get; set; } = DateTime.Today;
         [JsonProperty(PropertyName = "reviewer"), Display(Name = "Reviewer")]
         public string ReviewerId { get; set; }
-        [JsonProperty(PropertyName = "title", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Titel", Prompt = "Titel für Link eingeben"), MaxLength(120, ErrorMessage = "Titel zu lang."), Required(ErrorMessage = "Bitte Titel eingeben.")]
+        [JsonProperty(PropertyName = "title", NullValueHandling = NullValueHandling.Ignore), MaxLength(120, ErrorMessage = "Titel zu lang."), Required(ErrorMessage = "Bitte Titel eingeben.")]
         public string Title { get; set; }
         [JsonProperty(PropertyName = "scope", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Titel-Link", Prompt = "Kurztitel wie er in der Url auftaucht"), MaxLength(160, ErrorMessage = "UrlTitel zu lang.")]
         [RegularExpression("[a-z0-9-_]*", ErrorMessage = "Bitte nur Kleinbuchstaben und Zahlen für den Titel-Link eingeben.")]
