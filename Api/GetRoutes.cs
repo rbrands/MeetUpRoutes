@@ -71,11 +71,14 @@ namespace BlazorApp.Api
                 foreach (Route r in routes)
                 {
                     ExtendedRoute extendedRoute = new ExtendedRoute(r);
-                    UserContactInfo author = await _cosmosUserRepository.GetItem(r.AuthorId);
-                    extendedRoute.AuthorDisplayName = author.UserNickName;
-                    if (callingContext.IsUserReviewer)
-                    {
-                        extendedRoute.Author = author;
+                    if (!String.IsNullOrEmpty(r.AuthorId))
+                    { 
+                        UserContactInfo author = await _cosmosUserRepository.GetItem(r.AuthorId);
+                        extendedRoute.AuthorDisplayName = author.UserNickName;
+                        if (callingContext.IsUserReviewer)
+                        {
+                            extendedRoute.Author = author;
+                        }
                     }
                     if (r.IsReviewed && !String.IsNullOrEmpty(r.ReviewerId))
                     {

@@ -60,7 +60,7 @@ namespace BlazorApp.Api
                         route.IsReviewed = true;
                     }
                 }
-                else if (route.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) == 0)
+                else if (!String.IsNullOrEmpty(route.AuthorId) && route.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) == 0)
                 {
                     // Author is the same as the original author
                     route.Date = DateTime.UtcNow;
@@ -75,6 +75,10 @@ namespace BlazorApp.Api
                     callingContext.AssertReviewerAuthorization();
                     route.ReviewerId = callingContext.User.ContactInfo.Id;
                     route.ReviewDate = DateTime.UtcNow;
+                    if (String.IsNullOrEmpty(route.AuthorId))
+                    {
+                        route.AuthorId = callingContext.User.ContactInfo.Id;
+                    }
                 }
 
                 Route updatedRoute = await _cosmosRepository.UpsertItem(route);
