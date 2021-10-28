@@ -51,7 +51,7 @@ namespace BlazorApp.Api
                 {
                     return new BadRequestErrorMessageResult("Die Id der Route fehlt.");
                 }
-                if (route.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) != 0)
+                if (String.IsNullOrEmpty(route.AuthorId) || route.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) != 0)
                 {
                     // another one authored this version
                     callingContext.AssertReviewerAuthorization();
