@@ -62,7 +62,7 @@
     {
         get
         {
-            return (String.IsNullOrEmpty(RouteItem.Core.AuthorId) || !AppStateStore.IsUserReviewer && RouteItem.Core.AuthorId.CompareTo(AppStateStore.CurrentUser.ContactInfo.Id) != 0);
+            return (!String.IsNullOrEmpty(RouteItem.Core.AuthorId) && !AppStateStore.IsUserReviewer && RouteItem.Core.AuthorId?.CompareTo(AppStateStore.CurrentUser.ContactInfo.Id) != 0);
         }
     }
 
@@ -74,6 +74,6 @@
             return;
         }
         await Api.DeleteRoute(RouteItem.Core);
-        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes");
+        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes", true);
     }
 }
