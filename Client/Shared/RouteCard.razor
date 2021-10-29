@@ -39,7 +39,7 @@
                     @RouteItem.AuthorDisplayName @RouteItem.LastUpdate.ToLocalTime().ToString("dd.MM.yyyy")
                     @if (AppStateStore.IsUserReviewer && !String.IsNullOrEmpty(RouteItem.ReviewerDisplayName))
                     {
-                        @RouteItem.ReviewerDisplayName @RouteItem.Core.ReviewDate.ToLocalTime().ToString("dd.MM.yyyy")
+                        <text> Freigabe durch</text>@RouteItem.ReviewerDisplayName<text> </text>@RouteItem.Core.ReviewDate.ToLocalTime().ToString("dd.MM.yyyy")
                     }
                 </em>
             </small>
