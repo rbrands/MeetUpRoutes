@@ -109,17 +109,20 @@
                 Soll die Tour nicht öffentlich sichtbar sein sondern nur für Mitglieder?
             </small>
         </div>
-        <div class="form-group">
-            <div class="form-check">
-                <InputCheckbox id="reviewed" aria-describedby="reviewedHelp" disabled="!@AppStateStore.IsUserReviewer" class="form-check-input" @bind-Value="_routeToEdit.Core.IsReviewed" />
-                <label for="reviewed" class="form-checklabel">
-                    Tour als "gereviewed" freigeben?
-                </label>
+        @if (AppStateStore.IsUserReviewer)
+        {
+            <div class="form-group">
+                <div class="form-check">
+                    <InputCheckbox id="reviewed" aria-describedby="reviewedHelp" class="form-check-input" @bind-Value="_routeToEdit.Core.IsReviewed" />
+                    <label for="reviewed" class="form-checklabel">
+                        Tour als "gereviewed" freigeben?
+                    </label>
+                </div>
+                <small id="reviewedHelp" class="form-text text-muted">
+                    Wird die Tour als "gereviewed" markiert, kann sie von allen Benutzer:innen/Mitgliedern gesehen werden.
+                </small>
             </div>
-            <small id="reviewedHelp" class="form-text text-muted">
-                Wird die Tour als "gereviewed" markiert, kann sie von allen Benutzer:innen/Mitgliedern gesehen werden.
-            </small>
-        </div>
+        }
         <div class="form-group">
             <label for="guestScope">"Scope" für externen Link</label>
             <InputText id="guestScope" aria-describedby="guestScopeHelp" class="form-control" @bind-Value="_routeToEdit.Core.Scope" autocomplete="on" placeholder="Kürzel, das für externe Links verwendet wird." />
