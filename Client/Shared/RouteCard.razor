@@ -12,7 +12,7 @@
         {
             <span class="badge badge-warning" title="Review notwendig">Review!</span>
         }
-        @if (!RouteItem.Core.IsNonPublic)
+        @if (RouteItem.Core.IsNonPublic)
         {
             <span class="badge badge-danger"><span class="oi oi-key" title="Nicht öffentlich"></span></span>
         }

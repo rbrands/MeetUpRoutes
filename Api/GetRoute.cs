@@ -47,8 +47,7 @@ namespace BlazorApp.Api
             try
             {
                 CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosUserRepository);
-                callingContext.AssertTenantAdminAccess();
-
+            
                 if (String.IsNullOrEmpty(id))
                 {
                     throw new Exception("Missing id for call GetRoute()");
