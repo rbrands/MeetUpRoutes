@@ -40,11 +40,19 @@ namespace BlazorApp.Api
             User user = new User();
             user.Principal = clientPrincipal;
             // Read UserDetails by assembling key
-            if (clientPrincipal.IsUserAuthenticated())
+            if (user.IsAuthenticated)
             { 
                 string key = tenant + "-" + clientPrincipal.GetUserKey();
                 _logger.LogInformation($"GetUserDetails for user {key}");
                 user.ContactInfo = await _cosmosRepository.GetItemByKey(key);
+                if (null == user.ContactInfo)
+                {
+                    user.ContactInfo = new UserContactInfo();
+                }
+            }
+            else
+            {
+                user.ContactInfo = new UserContactInfo();
             }
 
             return new OkObjectResult(user);

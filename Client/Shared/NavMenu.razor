@@ -7,7 +7,7 @@
 
 
 <div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">MeetUpRoutes</a>
+    <a class="navbar-brand" href="">MeetUpRoutes</a><br/>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -16,36 +16,49 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
+            <div class="nav-link font-weight-bold text-white">
+                @AppStateStore.Tenant?.TenantName
+            </div>
+        </li>
+        <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </li>
-        <AuthorizeView>
-            <Authorized>
-                @if (AppStateStore.TrackKey != null)
-                {
+        @if (AppStateStore.TrackKey != null)
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/routes")>
+                    <span class="oi oi-location" aria-hidden="true"></span> Touren
+                </NavLink>
+            </li>
+            <AuthorizeView>
+                <Authorized>
+                    @if (AppStateStore.IsUserConfirmed)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/editroute")>
+                                <span class="oi oi-document" aria-hidden="true"></span> Neue Tour
+                            </NavLink>
+                        </li>
+                    }
                     <li class="nav-item px-3">
-                        <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/routes")>
-                            <span class="oi oi-location" aria-hidden="true"></span> Touren
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="profile">
+                        <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/profile")>
                             <span class="oi oi-person" aria-hidden="true"></span> Profil
                         </NavLink>
                     </li>
-                }
-            </Authorized>
-        </AuthorizeView>
+                </Authorized>
+            </AuthorizeView>
+        }
         <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
             <Authorized>
                 <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="members">
+                    <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/members")>
                         <span class="oi oi-people" aria-hidden="true"></span> Mitglieder
                     </NavLink>
                 </li>
                 <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="tags">
+                    <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/tags")>
                         <span class="oi oi-tags" aria-hidden="true"></span> Tags
                     </NavLink>
                 </li>

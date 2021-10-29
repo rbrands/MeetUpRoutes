@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Cosmos;
+using MSiccDev.Libs.LinkTools.LinkPreview;
 using BlazorApp.Api.Repositories;
 using BlazorApp.Shared;
 
@@ -44,6 +45,7 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton<CosmosDBRepository<TagSet>>();
             builder.Services.AddSingleton(new ServerSettingsRepository(config, cosmosClient));
             builder.Services.AddSingleton(new TenantSettingsRepository(config, cosmosClient));
+            builder.Services.AddSingleton(new LinkPreviewService());
         }
     }
 }

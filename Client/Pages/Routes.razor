@@ -1,5 +1,4 @@
-﻿@page "/routes"
-@page "/{TrackKey}/routes"
+﻿@page "/{TrackKey}/routes"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
@@ -14,30 +13,54 @@
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
 <h3>Touren</h3>
+@if (null == _routes)
+{
+    <p><em>Deine Zugriffsrechte werden geprüft und Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
+}
+else
+{
+    <p>
+        <AuthorizeView>
+            <Authorized>
+                <a class="btn btn-primary" href=@($"{AppStateStore.TrackKey}/editroute") title="Neue Tour" hidden="@(false && !AppStateStore.IsUserConfirmed)">Neue Tour</a>
+            </Authorized>
+            <NotAuthorized>
+                <a class="btn btn-primary" href="/LoginProviders/routes">Anmelden</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </p>
+    <div class="row">
+        @foreach (ExtendedRoute route in _routes)
+        {
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                <RouteCard RouteItem="@route"></RouteCard>
+            </div>
+        }
+    </div>
+}
 
 @code {
     [Parameter]
     public string TrackKey { get; set; }
     private NotificationMessage _notificationMessage;
+    IEnumerable<ExtendedRoute> _routes = null;
+    RouteFilter _filter = new RouteFilter();
 
     protected override async Task OnInitializedAsync()
     {
-        // Check if a club is given as part of url or selected before
-        if (!String.IsNullOrEmpty(TrackKey))
+        try
         {
-            try
+            // Check if a club is given as part of url or selected before
+            if (!await ClubCheck.SetClub(TrackKey))
             {
-                await ClubCheck.SetClub(TrackKey);
-            }
-            catch (Exception ex)
-            {
-                _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
+                NavigationManager.NavigateTo("/");
                 return;
             }
+            _routes = await Api.GetRoutes(_filter);
         }
-        if (String.IsNullOrEmpty(AppStateStore.TrackKey))
+        catch (Exception ex)
         {
-            NavigationManager.NavigateTo("/");
+            _notificationMessage.ShowError($"Fehler: {ex.Message}");
             return;
         }
     }

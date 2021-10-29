@@ -1,0 +1,251 @@
+﻿@page "/{TrackKey}/editroute"
+@page "/{TrackKey}/editroute/{Id}"
+@attribute [Authorize]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject ClubCheck ClubCheck
+@inject NavigationManager NavigationManager
+
+<h3>Tour editieren</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+<EditForm Model="@_routeToEdit.Core" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="title">Titel</label>
+        <InputText id="title" aria-describedby="titleHelp" class="form-control" @bind-Value="_routeToEdit.Core.Title" placeholder="Kurzer Titel" title="Titel" />
+        <small id="titleHelp" class="form-text text-muted">
+            Kurzer Titel der Tour als Überschrift.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="description">Beschreibung der Tour</label>
+        <BlazoredTextEditor @ref="_htmlDescription" Placeholder="Mehr oder weniger ausführliche Beschreibung der Tour">
+            <ToolbarContent>
+                <span class="ql-formats">
+                    <button class="ql-bold"></button>
+                    <button class="ql-italic"></button>
+                    <button class="ql-underline"></button>
+                </span>
+                <span class="ql-formats">
+                    <select class="ql-color"></select>
+                    <select class="ql-background"></select>
+                </span>
+                <span class="ql-formats">
+                    <button class="ql-list" value="ordered"></button>
+                    <button class="ql-list" value="bullet"></button>
+                </span>
+                <span class="ql-formats">
+                    <button class="ql-link"></button>
+                </span>
+            </ToolbarContent>
+            <EditorContent>
+                @if (null != _routeToEdit.Core.Description)
+                {@((MarkupString)_routeToEdit.Core.Description)}
+            </EditorContent>
+        </BlazoredTextEditor>
+        <div class="form-group">
+            <label for="level">Umfang</label>
+            <InputText id="level" aria-describedby="levelHelp" class="form-control" @bind-Value="_routeToEdit.Core.LevelDescription" autocomplete="on" placeholder="km / Hm" />
+            <small id="levelHelp" class="form-text text-muted">
+                Länge der Tour (zumindest ungefähr) und möglichst Höhenmeter oder auch ungefähre Fahrtzeit.
+            </small>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-10">
+                <InputText id="link" aria-describedby="linkHelp" class="form-control" @bind-Value="_routeToEdit.Core.RouteLink" placeholder="Link zu weiterer Streckeninfo" title="Link zu weiterer Streckeninfo" />
+                <small id="linkHelp" class="form-text text-muted">
+                    Optional: Link zu weiteren Strecken-Infos, z.B. Komoot, Strava usw.
+                </small>
+            </div>
+            <div class="form-group col-md-2">
+                <div class="form-check">
+                    <button id="btnLinkPreviewEnabled" class="btn btn-primary" type="button" @onclick="@(() => ToggleLinkPreview())">Preview An/Aus</button>
+                </div>
+            </div>
+        </div>
+        @if (_linkPreviewEnabled)
+        {
+            <div class="form-row">
+                <div class="form-group col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                    <img src="@_routeToEdit.Core.RouteLinkImage" class="img-fluid" />
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <label for="linkTitle">Link-Bezeichnung</label>
+            <InputText id="linkTitle" aria-describedby="linkTitleHelp" class="form-control" @bind-Value="_routeToEdit.Core.RouteLinkTitle" placeholder="Kurze Überschrift zum Link" title="Bezeichnung des Links zur weiterern Tourinfo" />
+            <small id="linkTitleHelp" class="form-text text-muted">
+                Optional: Kurze Bezeichnung zu dem Link oben, falls der Standardtext "Tour auf Komoot" oder "Weitere Info ..." nicht passt.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="gpx">GPX-Track</label>
+            <InputText id="gpx" aria-describedby="gpxHelp" class="form-control" @bind-Value="_routeToEdit.Core.GpxLink" placeholder="Link zu GPX-Track" />
+            <small id="gpxHelp" class="form-text text-muted">
+                Optional: Link zu einer GPX-Datei der Tour
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="strava">Strava</label>
+            <InputText id="strava" aria-describedby="stravaHelp" class="form-control" @bind-Value="_routeToEdit.Core.StravaLink" placeholder="Link zu Strava" />
+            <small id="gpxHelp" class="form-text text-muted">
+                Optional: Link zu Strava
+            </small>
+        </div>
+        <div class="form-group">
+            <div class="form-check">
+                <InputCheckbox id="public" aria-describedby="crossHelp" class="form-check-input" @bind-Value="_routeToEdit.Core.IsNonPublic" />
+                <label for="public" class="form-checklabel">
+                    Tour nur für Mitglieder?
+                </label>
+            </div>
+            <small id="crossHelp" class="form-text text-muted">
+                Soll die Tour nicht öffentlich sichtbar sein sondern nur für Mitglieder?
+            </small>
+        </div>
+        @if (AppStateStore.IsUserReviewer)
+        {
+            <div class="form-group">
+                <div class="form-check">
+                    <InputCheckbox id="reviewed" aria-describedby="reviewedHelp" class="form-check-input" @bind-Value="_routeToEdit.Core.IsReviewed" />
+                    <label for="reviewed" class="form-checklabel">
+                        Tour als "gereviewed" freigeben?
+                    </label>
+                </div>
+                <small id="reviewedHelp" class="form-text text-muted">
+                    Wird die Tour als "gereviewed" markiert, kann sie von allen Benutzer:innen/Mitgliedern gesehen werden.
+                </small>
+            </div>
+        }
+        <div class="form-group">
+            <label for="guestScope">"Scope" für externen Link</label>
+            <InputText id="guestScope" aria-describedby="guestScopeHelp" class="form-control" @bind-Value="_routeToEdit.Core.Scope" autocomplete="on" placeholder="Kürzel, das für externe Links verwendet wird." />
+            <small id="guestScopeHelp" class="form-text text-muted">
+                Über den "Scope" können Touren zusammen gefasst werden und sind dann über einen Link der Form ".../routes/scope" erreichbar.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="photos">Fotos</label>
+            <InputText id="photos" aria-describedby="photosHelp" class="form-control" @bind-Value="_routeToEdit.Core.PhotosLink" autocomplete="on" placeholder="Link zu Fotos" />
+            <small id="photosHelp" class="form-text text-muted">
+                Optional: Link zu Fotos zu dieser Tour
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="photos">Video</label>
+            <InputText id="video" aria-describedby="videoHelp" class="form-control" @bind-Value="_routeToEdit.Core.VideoLink" autocomplete="on" placeholder="Link zu Video" />
+            <small id="videoHelp" class="form-text text-muted">
+                Optional: Link zu einem Video zu dieer Tour
+            </small>
+        </div>
+    </div>
+
+    <ValidationSummary />
+    <button type="submit" id="BtnSave" class="btn btn-primary" disabled="@_formIsDisabled">Speichern</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string TrackKey { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+    private NotificationMessage _notificationMessage;
+    private Boolean _formIsDisabled = false;
+    private ExtendedRoute _routeToEdit = new ExtendedRoute();
+    private BlazoredTextEditor _htmlDescription;
+    private IEnumerable<TagSet> _tagSets;
+    private bool _linkPreviewEnabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Check if a club is given as part of url or selected before
+            if (!await ClubCheck.SetClub(TrackKey))
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+            AppStateStore.AssertUserIsConfirmed();
+
+            if (!String.IsNullOrEmpty(Id))
+            {
+                _routeToEdit = await Api.GetRoute(Id);
+                _linkPreviewEnabled = !String.IsNullOrEmpty(_routeToEdit.Core.RouteLink);
+            }
+            _tagSets = await Api.GetTagSets();
+        }
+        catch (Exception ex)
+        {
+            _formIsDisabled = true;
+            _notificationMessage.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+    protected void OnCancel()
+    {
+        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes");
+    }
+    private string StripEmptyHtml(string htmlContent)
+    {
+        return htmlContent.Equals("<p><br></p>") ? null : htmlContent;
+    }
+
+    protected async Task ToggleLinkPreview()
+    {
+        try
+        {
+            _routeToEdit.Core.RouteLinkImage = null;
+            _linkPreviewEnabled = !_linkPreviewEnabled;
+            this.StateHasChanged();
+            if (_linkPreviewEnabled && !String.IsNullOrEmpty(_routeToEdit.Core.RouteLink))
+            {
+                LinkPreview linkPreview = new LinkPreview();
+                linkPreview.Url = new Uri(_routeToEdit.Core.RouteLink);
+                linkPreview = await Api.GetLinkPreview(linkPreview);
+                if (linkPreview.Success)
+                {
+                    if (null != linkPreview.ImageUrl)
+                    {
+                        _routeToEdit.Core.RouteLinkImage = linkPreview.ImageUrl.ToString();
+                    }
+                    if (null != linkPreview.Title)
+                    {
+                        _routeToEdit.Core.RouteLinkTitle = linkPreview.Title;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+
+    }
+    private async Task OnSave()
+    {
+        _notificationMessage.Hide();
+
+        try
+        {
+            _formIsDisabled = true;
+            StateHasChanged();
+            _routeToEdit.Core.Description = StripEmptyHtml(await _htmlDescription.GetHTML());
+            await Api.WriteRoute(_routeToEdit.Core);
+            NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
+}

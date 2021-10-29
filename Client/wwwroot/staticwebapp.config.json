@@ -17,6 +17,10 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetRoutes",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetUsers",
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
@@ -27,6 +31,18 @@
     {
       "route": "/api/WriteUserAfterEdit",
       "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/WriteTagSet",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/GetTagSet",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/GetTagSets",
+      "allowedRoles": [ "authenticated" ]
     },
     {
       "route": "/api/*",

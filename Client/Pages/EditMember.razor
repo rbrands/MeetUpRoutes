@@ -1,9 +1,10 @@
-﻿@page "/editmember/{Id}"
+﻿@page "/{TrackKey}/editmember/{Id}"
 @attribute [Authorize(Roles = "admin,tenantadmin")]
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
+@inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
 <h3>Benutzer:in</h3>
@@ -12,7 +13,7 @@
 <EditForm Model="_userContactInfo" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
     <div class="form-group">
-        <label for="title">Name</label>
+        <label for="userName">Name</label>
         <InputText id="userName" aria-describedby="userNameHelp" class="form-control" @bind-Value="_userContactInfo.UserName" placeholder="Name" title="Name" />
         <small id="userNameHelp" class="form-text text-muted">
             Bitte hier den vollständigen Namen eingeben.
@@ -70,6 +71,9 @@
     public string Id { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [Parameter]
+    public string TrackKey { get; set; }
+
 
     private NotificationMessage _notificationMessage;
     private UserContactInfo _userContactInfo = new UserContactInfo();
@@ -78,6 +82,12 @@
     {
         try
         {
+            // Check if a club is given as part of url or selected before
+            if (!await ClubCheck.SetClub(TrackKey))
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
             _userContactInfo = await Api.GetUserForEdit(Id);
         }
         catch (Exception ex)
@@ -87,7 +97,7 @@
     }
     protected void OnCancel()
     {
-        NavigationManager.NavigateTo("/members");
+        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/members");
     }
 
     private async Task OnSave()
@@ -97,7 +107,7 @@
         try
         {
             await Api.WriteUserAfterEdit(_userContactInfo);
-            NavigationManager.NavigateTo("/members");
+            NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/members");
         }
         catch (Exception ex)
         {

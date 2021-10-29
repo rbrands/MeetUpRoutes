@@ -33,6 +33,18 @@ namespace BlazorApp.Api.Utils
             set { _serverSettings = value; }
         }
 
+        public Boolean IsUserConfirmed
+        {
+            get
+            {
+                return (
+                            null != _user.ContactInfo
+                            && null != _user.Principal
+                            && _user.IsAuthenticated
+                            && _user.ContactInfo.IsConfirmed
+                       );
+            }
+        }
         public Boolean IsUserAuthor
         {
             get
@@ -40,7 +52,7 @@ namespace BlazorApp.Api.Utils
                 return (
                             null != _user.ContactInfo 
                             && null != _user.Principal 
-                            && _user.Principal.IsUserAuthenticated() 
+                            && _user.IsAuthenticated 
                             && _user.ContactInfo.IsConfirmed 
                             && (_user.ContactInfo.IsAuthor || _user.Principal.IsInRole(_tenantSettings.AdminRole) || _user.Principal.IsInRole(Constants.ROLE_ADMIN))
                        );
@@ -53,10 +65,25 @@ namespace BlazorApp.Api.Utils
                 return (
                             null != _user.ContactInfo 
                             && null != _user.Principal 
-                            && _user.Principal.IsUserAuthenticated()
+                            && _user.IsAuthenticated
                             && _user.ContactInfo.IsConfirmed
                             && (_user.ContactInfo.IsReviewer || _user.Principal.IsInRole(_tenantSettings.AdminRole) || _user.Principal.IsInRole(Constants.ROLE_ADMIN))
                         );
+            }
+        }
+        public Boolean IsDev
+        {
+            get
+            {
+                return _user.IsDev;
+            }
+        }
+
+        public Boolean IsTenantAdmin
+        {
+            get
+            {
+                return (_user.Principal.IsInRole(_tenantSettings.AdminRole) || _user.Principal.IsInRole(Constants.ROLE_ADMIN));
             }
         }
 
@@ -92,7 +119,7 @@ namespace BlazorApp.Api.Utils
 
         public void AssertTenantAdminAccess()
         {
-            if (!_user.Principal.IsInRole(_tenantSettings.AdminRole) && !_user.Principal.IsInRole(Constants.ROLE_ADMIN))
+            if (!IsTenantAdmin)
             {
                 throw new UnauthorizedAccessException($"User {_user.Principal.UserDetails} not authorized for tenant {_tenantSettings.TenantName}");
             }
@@ -100,14 +127,14 @@ namespace BlazorApp.Api.Utils
 
         public void AssertAuthenticatedAccess()
         {
-            if (!_user.Principal.IsUserAuthenticated())
+            if (!_user.IsAuthenticated)
             {
                 throw new UnauthorizedAccessException($"User {_user.Principal.UserDetails} not authenticated");
             }
         }
         public void AssertConfirmedAccess()
         {
-            if (!_user.Principal.IsUserAuthenticated())
+            if (!_user.IsAuthenticated)
             {
                 throw new UnauthorizedAccessException($"User {_user.Principal.UserDetails} not authenticated");
             }
@@ -122,6 +149,27 @@ namespace BlazorApp.Api.Utils
             {
                 throw new UnauthorizedAccessException($"User {_user.Principal.UserDetails} has no rights as reviewer.");
             }
+        }
+        public bool CheckAuthor(string authorId)
+        {
+            return (
+                         null != _user.ContactInfo
+                         && null != _user.Principal
+                         && _user.IsAuthenticated
+                         && _user.ContactInfo.IsConfirmed
+                         && (_user.ContactInfo.Id.CompareTo(authorId) == 0)
+                     );
+        }
+        public bool CheckAuthor(Route route)
+        {
+            string authorId = (null != route.AuthorId) ? route.AuthorId : String.Empty;
+            return (
+                         null != _user.ContactInfo
+                         && null != _user.Principal
+                         && _user.IsAuthenticated
+                         && _user.ContactInfo.IsConfirmed
+                         && (_user.ContactInfo.Id.CompareTo(authorId) == 0)
+                     );
         }
 
     }

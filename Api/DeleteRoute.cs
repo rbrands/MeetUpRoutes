@@ -14,7 +14,7 @@ using BlazorApp.Api.Utils;
 
 namespace BlazorApp.Api
 {
-    public class WriteRoute
+    public class DeleteRoute
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<Route> _cosmosRepository;
@@ -22,12 +22,11 @@ namespace BlazorApp.Api
         private TenantSettingsRepository _tenantSettingsRepository;
         private ServerSettingsRepository _serverSettingsRepository;
 
-        public WriteRoute(ILogger<WriteRoute> logger,
+        public DeleteRoute(ILogger<DeleteRoute> logger,
                          ServerSettingsRepository serverSettingsRepository,
                          TenantSettingsRepository tenantSettingsRepository,
                          CosmosDBRepository<UserContactInfo> cosmosUserRepository,
-                         CosmosDBRepository<Route> cosmosRepository
-                         )
+                         CosmosDBRepository<Route> cosmosRepository)
         {
             _logger = logger;
             _serverSettingsRepository = serverSettingsRepository;
@@ -36,9 +35,9 @@ namespace BlazorApp.Api
             _cosmosRepository = cosmosRepository;
         }
 
-        [FunctionName("WriteRoute")]
+        [FunctionName("DeleteRoute")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WriteRoute")] HttpRequest req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "DeleteRoute")] HttpRequest req
             )
         {
             try
@@ -48,42 +47,18 @@ namespace BlazorApp.Api
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 Route route = JsonConvert.DeserializeObject<Route>(requestBody);
-                // Set tenant again to ensure that the data is written to the correct tenant!
-                route.Tenant = callingContext.TenantSettings.TrackKey;
-                // Set create date if it is a new entry
                 if (String.IsNullOrEmpty(route.Id))
                 {
-                    route.Date = DateTime.UtcNow;
-                    route.AuthorId = callingContext.User.ContactInfo.Id;
-                    if (callingContext.IsUserAuthor)
-                    {
-                        route.IsReviewed = true;
-                    }
+                    return new BadRequestErrorMessageResult("Die Id der Route fehlt.");
                 }
-                else if (!String.IsNullOrEmpty(route.AuthorId) && route.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) == 0)
-                {
-                    // Author is the same as the original author
-                    route.Date = DateTime.UtcNow;
-                    if (callingContext.IsUserAuthor && !callingContext.IsUserReviewer)
-                    {
-                        route.IsReviewed = true;
-                    }
-                }
-                else
+                if (String.IsNullOrEmpty(route.AuthorId) || route.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) != 0)
                 {
                     // another one authored this version
                     callingContext.AssertReviewerAuthorization();
-                    route.ReviewerId = callingContext.User.ContactInfo.Id;
-                    route.ReviewDate = DateTime.UtcNow;
-                    if (String.IsNullOrEmpty(route.AuthorId))
-                    {
-                        route.AuthorId = callingContext.User.ContactInfo.Id;
-                    }
                 }
+                await _cosmosRepository.DeleteItemAsync(route.Id);
 
-                Route updatedRoute = await _cosmosRepository.UpsertItem(route);
-
-                return new OkObjectResult(updatedRoute);
+                return new OkResult();
             }
             catch (Exception ex)
             {

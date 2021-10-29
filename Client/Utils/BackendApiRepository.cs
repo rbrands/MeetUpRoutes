@@ -67,6 +67,12 @@ namespace BlazorApp.Client.Utils
             HttpResponseMessage response = await _http.PostAsJsonAsync<TagSet>($"/api/DeleteTagSet", tagSet);
             response.EnsureSuccessStatusCode();
         }
+        public async Task DeleteRoute(Route route)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<Route>($"/api/DeleteRoute", route);
+            response.EnsureSuccessStatusCode();
+        }
         public async Task<Route> WriteRoute(Route route)
         {
             this.PrepareHttpClient();
@@ -74,10 +80,29 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<Route>();
         }
+        public async Task<LinkPreview> GetLinkPreview(LinkPreview linkPreview)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<LinkPreview>($"/api/GetLinkPreview", linkPreview);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<LinkPreview>();
+        }
         public async Task<TagSet> GetTagSet(string id)
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<TagSet>($"/api/GetTagSet/{id}");
+        }
+        public async Task<ExtendedRoute> GetRoute(string id)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<ExtendedRoute>($"/api/GetRoute/{id}");
+        }
+        public async Task<IEnumerable<ExtendedRoute>> GetRoutes(RouteFilter filter)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<RouteFilter>($"/api/GetRoutes", filter);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<IEnumerable<ExtendedRoute>>();
         }
 
         public async Task<string> GetFunctionsVersion()

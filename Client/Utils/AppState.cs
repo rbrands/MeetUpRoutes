@@ -14,9 +14,11 @@ namespace BlazorApp.Client.Utils
     {
         private TenantSettings _tenantSettings = null;
         private string _trackKey = null;
+        private User _user = null;
 
         public IEnumerable<TenantSettings> Tenants { get; set; } = new List<TenantSettings>();
         public Boolean TenantsAlreadyRead { get; set; } = false;
+
         public TenantSettings Tenant
         {
             get { return _tenantSettings; }
@@ -35,7 +37,18 @@ namespace BlazorApp.Client.Utils
                 NotifyStateChanged();
             } 
         }
-        public User CurrentUser { get; set; }
+        public User CurrentUser
+        {
+            get
+            {
+                return _user;
+            }
+            set
+            {
+                _user = value;
+                NotifyStateChanged();
+            }
+        }
 
         public event Action OnChange;
         public bool NotificationSubscriptionRequested { get; set; } = false;
@@ -46,6 +59,42 @@ namespace BlazorApp.Client.Utils
             Tenant = new TenantSettings();
             Tenant.Tenant = "Demo";
             Tenant.AdminRole = "Demo";
+        }
+
+        public bool IsUserConfirmed
+        {
+            get
+            {
+                return (null != CurrentUser && CurrentUser.IsAuthenticated && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed);
+            }
+        }
+        public void AssertUserIsConfirmed()
+        {
+            if (!IsUserConfirmed)
+            {
+                throw new Exception("Benutzer:in ist noch nicht als Mitglied bestätigt.");
+            }
+        }
+        public bool IsUserAuthor
+        {
+            get
+            {
+                return (null != CurrentUser && CurrentUser.IsAuthenticated && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed && CurrentUser.ContactInfo.IsAuthor);
+            }
+        }
+        public bool IsUserReviewer
+        {
+            get
+            {
+                return (null != CurrentUser && CurrentUser.IsAuthenticated && null != CurrentUser.ContactInfo && CurrentUser.ContactInfo.IsConfirmed && CurrentUser.ContactInfo.IsReviewer);
+            }
+        }
+        public bool IsDev
+        {
+            get
+            {
+                return (null != CurrentUser && CurrentUser.IsDev);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@
 @using BlazorApp.Shared
 @using BlazorApp.Client.Utils
 @inject AppState AppStateStore
+@inject ClubCheck ClubCheck
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
@@ -33,7 +34,8 @@
                 }
             }
         </p>
-    } else
+    }
+    else
     {
         <p>
             <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/routes")>Zu den Touren</a>
@@ -44,10 +46,12 @@
         Hier kannst du Touren suchen, für Ausfahrten auswählen oder auch neue Touren erstellen und mit anderen teilen.
     </p>
     <p class="text-info">
-        <em><b>
-            Diese Anwendung befindet sich gerade in der Entwicklung, du kannst hier verfolgen, wie sie Schritt für Schritt entsteht.
-            Aktuell steht das Grundgerüst der Anwendung mit Registrierung und Berechtigung der Benutzer. Noch gibt es keine Touren. Das kommt als nächstes ...
-        </b></em>
+        <em>
+            <b>
+                Diese Anwendung befindet sich gerade in der Entwicklung, du kannst hier verfolgen, wie sie Schritt für Schritt entsteht.
+                Siehe <a href="https://github.com/rbrands/MeetUpRoutes/projects/1" title="Projekt" target="_blank">das Projektboard</a> zum aktuellen Stand.
+            </b>
+        </em>
     </p>
 </div>
 
@@ -58,7 +62,7 @@
         <AuthorizeView>
             <Authorized>
                 <p>
-                    <a class="btn btn-primary" href="/profile">Profil</a>
+                    <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/profile")>Profil</a>
                 </p>
                 <p>
                     Du bist angemeldet und hast den folgenden Mitgliedsstatus:
@@ -67,14 +71,14 @@
                             @if (_userInfo.IsConfirmed)
                             {
                                 <text>
-                                    Dein Account ist bestätigt, d.h. du kannst neben den öffentlichen Touren auch Touren sehen, die nur für Mitglieder sichtbar sind.
+                                    Du bist als Clubmitglied bestätigt, d.h. du kannst neben den öffentlichen Touren auch Touren sehen, die nur für Mitglieder sichtbar sind.
                                 </text>
                             }
                             else
                             {
                                 <text>
                                     Dein Account ist noch nicht bestätigt.
-                                    Fülle die <a href="/profile" title="Profil">Profilseite</a> aus und gebe dort das Schlüsselwort ein, sofern bekannt oder bitte die Administratoren um Freigabe.
+                                    Fülle die <a href=@($"/{AppStateStore.TrackKey}/profile") title="Profil">Profilseite</a> aus und gebe dort das Schlüsselwort ein, sofern bekannt oder bitte die Administratoren um Freigabe.
                                     Sobald dein Account bestätigt ist, kannst du alle Touren sehen.
                                 </text>
                             }
@@ -91,7 +95,7 @@
                         </li>
                         @if (_userInfo.IsReviewer)
                         {
-                            <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
+                            <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Mitgliedern, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
                         }
                         <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
                             <Authorized Context="authorizeContext">
@@ -106,9 +110,9 @@
                     Um Touren zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten. MeetUpRoutes hat folgende Mitgliedslevel:
                     <ul>
                         <li>Ohne Anmeldung kannst du nur öffentliche Touren sehen.</li>
-                        <li>Wenn du dich anmeldest und dein Account bestätigt wird, kannst du Touren nur für Mitglieder sehen und selbst Touren erstellen.</li>
-                        <li>Wenn du den Autor*innen-Status erhälst, kannst du Touren erstellen, die ohne weiteres Review sofort veröffentlicht werden.</li>
-                        <li>Hast du auch die "Review"-Berechtigung kannst du Touren reviewen und freigeben.</li>
+                        <li>Wenn du dich anmeldest und als Clubmitglied bestätigt wirst, kannst du auch nicht öffentliche Touren sehen und selbst Touren erstellen.</li>
+                        <li>Wenn du den Autor:innen-Status erhälst, kannst du Touren erstellen, die ohne weiteres Review sofort veröffentlicht werden.</li>
+                        <li>Hast du auch die "Review"-Berechtigung kannst du Touren der Mitglieder reviewen und freigeben.</li>
                     </ul>
                     <a class="btn btn-primary" href="/LoginProviders">Anmelden</a>
                 </p>
@@ -131,64 +135,39 @@
         }
         try
         {
-            // Read all tenant settings
-            AppStateStore.Tenants = await Api.GetTenants();
-            AppStateStore.TenantsAlreadyRead = true;
+            bool validTrackKey = await ClubCheck.SetClub(TrackKey);
+            if (await ClubCheck.SetClub(TrackKey))
+            {
+                _userInfo = AppStateStore.CurrentUser.ContactInfo;
+            }
+            else if (!String.IsNullOrEmpty(TrackKey))
+            {
+                _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
+            }
         }
         catch (Exception ex)
         {
             _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
         }
-        if (!String.IsNullOrEmpty(TrackKey))
-        {
-            Boolean validTrackKey = SetTenant(TrackKey);
-            if (!validTrackKey)
-            {
-                TrackKey = null;
-                AppStateStore.TrackKey = null;
-                _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
-            }
-        }
-        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
-        {
-            AppStateStore.CurrentUser = await Api.GetUser();
-            _userInfo = AppStateStore.CurrentUser.ContactInfo;
-            if (null == _userInfo)
-            {
-                _userInfo = new UserContactInfo();
-            }
-        }
     }
-    protected void ShowRoutes(string trackKey)
+    protected async Task ShowRoutes(string trackKey)
     {
-        AppStateStore.TrackKey = trackKey;
-        SetTenant(trackKey);
-        NavigationManager.NavigateTo($"/{trackKey}");
+        try
+        {
+            if (await ClubCheck.SetClub(trackKey))
+            {
+                _userInfo = AppStateStore.CurrentUser.ContactInfo;
+                NavigationManager.NavigateTo($"/{trackKey}");
+            }
+            else
+            {
+                _notificationMessage.ShowError("Falsche Club-Konfiguration");
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError(ex.Message);
+        }
     }
 
-    private Boolean SetTenant(string trackKey)
-    {
-        Boolean validTrackKey = false;
-        if (!String.IsNullOrEmpty(trackKey))
-        {
-            // If tenant key (TrackKey) is given as part of the query, check the list if a corresponding item can be found
-            foreach (TenantSettings tenant in AppStateStore.Tenants)
-            {
-                if (tenant.TracksEnabled && !String.IsNullOrEmpty(tenant.TrackKey) && String.Compare(tenant.TrackKey, trackKey) == 0)
-                {
-                    AppStateStore.Tenant = tenant;
-                    AppStateStore.TrackKey = tenant.TrackKey;
-                    _notificationMessage.Hide();
-                    validTrackKey = true;
-                    break;
-                }
-            }
-            if (!validTrackKey)
-            {
-                AppStateStore.TrackKey = null;
-                _notificationMessage.ShowWarning("Bitte einen existierenden Club auswählen.");
-            }
-        }
-        return validTrackKey;
-    }
 }

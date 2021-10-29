@@ -49,7 +49,10 @@ namespace BlazorApp.Api
             try
             {
                 CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosUserRepository);
-                callingContext.AssertConfirmedAccess();
+                if (!callingContext.IsTenantAdmin)
+                {
+                    callingContext.AssertConfirmedAccess();
+                }
 
                 IEnumerable<TagSet> tagSets = await _cosmosRepository.GetItems(t => t.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0);
 

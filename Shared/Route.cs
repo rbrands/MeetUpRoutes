@@ -10,19 +10,19 @@ namespace BlazorApp.Shared
     {
         [JsonProperty(PropertyName = "date"), Display(Name = "Datum"), UIHint("Date"), Required]
         public DateTime Date { get; set; } = DateTime.Today;
-        [JsonProperty(PropertyName = "author"), Display(Name = "Autor")]
+        [JsonProperty(PropertyName = "authorId"), Display(Name = "Autor")]
         public string AuthorId { get; set; }
         [JsonProperty(PropertyName = "reviewDate"), Display(Name = "Datum"), UIHint("Date"), Required]
         public DateTime ReviewDate { get; set; } = DateTime.Today;
         [JsonProperty(PropertyName = "reviewer"), Display(Name = "Reviewer")]
         public string ReviewerId { get; set; }
-        [JsonProperty(PropertyName = "title", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Titel", Prompt = "Titel für Link eingeben"), MaxLength(120, ErrorMessage = "Titel zu lang."), Required(ErrorMessage = "Bitte Titel eingeben.")]
+        [JsonProperty(PropertyName = "title", NullValueHandling = NullValueHandling.Ignore), MaxLength(120, ErrorMessage = "Titel zu lang."), Required(ErrorMessage = "Bitte Titel eingeben.")]
         public string Title { get; set; }
         [JsonProperty(PropertyName = "scope", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Titel-Link", Prompt = "Kurztitel wie er in der Url auftaucht"), MaxLength(160, ErrorMessage = "UrlTitel zu lang.")]
         [RegularExpression("[a-z0-9-_]*", ErrorMessage = "Bitte nur Kleinbuchstaben und Zahlen für den Titel-Link eingeben.")]
         public string Scope { get; set; }
         [JsonProperty(PropertyName = "levelDescription"), Required(ErrorMessage = "Bitte Angaben zur Länge/Dauer machen."), MaxLength(60, ErrorMessage = "Angabe zur Länge bitte kürzen.")]
-        public string LevelDesciption { get; set; }
+        public string LevelDescription { get; set; }
         [JsonProperty(PropertyName = "description"), Display(Name = "Beschreibung"), MaxLength(5000, ErrorMessage = "Die Beschreibung ist zu lang.")]
         public string Description { get; set; }
         [JsonProperty(PropertyName = "photosLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Link zu Fotos"), UIHint("Url")]
@@ -37,6 +37,8 @@ namespace BlazorApp.Shared
         public string RouteLinkTitle { get; set; }
         [JsonProperty(PropertyName = "gpxLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "GPX", Prompt = "Link zu GPX Datei"), UIHint("Url")]
         public string GpxLink { get; set; }
+        [JsonProperty(PropertyName = "stravaLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Strava", Prompt = "Link zu Strava"), UIHint("Url")]
+        public string StravaLink { get; set; }
         [JsonProperty(PropertyName = "isReviewed")]
         public Boolean IsReviewed { get; set; }
         [JsonProperty(PropertyName = "isNonPublic")]

@@ -1,9 +1,10 @@
-﻿@page "/members"
+﻿@page "/{TrackKey}/members"
 @attribute [Authorize(Roles = "admin,tenantadmin")]
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
+@inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
 
@@ -35,20 +36,20 @@
                 <tbody>
                     @foreach (UserContactInfo member in _members)
                     {
-                    <tr>
-                        <td>
-                            <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditMember(member.Id))"><span class="oi oi-pencil"></span></button>
-                        </td>
-                        <td>@member.UserName</td>
-                        <td>@member.UserNickName</td>
-                        <td>@member.UserMail</td>
-                        <td>@member.RegistrationCode</td>
-                        <td>@member.LastModified.ToLocalTime()</td>
-                        <td>@member.IsConfirmed</td>
-                        <td>@member.IsAuthor</td>
-                        <td>@member.IsReviewer</td>
-                        <td>@member.UserKey</td>
-                    </tr>
+                        <tr>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditMember(member.Id))"><span class="oi oi-pencil"></span></button>
+                            </td>
+                            <td>@member.UserName</td>
+                            <td>@member.UserNickName</td>
+                            <td>@member.UserMail</td>
+                            <td>@member.RegistrationCode</td>
+                            <td>@member.LastModified.ToLocalTime()</td>
+                            <td>@member.IsConfirmed</td>
+                            <td>@member.IsAuthor</td>
+                            <td>@member.IsReviewer</td>
+                            <td>@member.UserKey</td>
+                        </tr>
                     }
                 </tbody>
 
@@ -64,6 +65,9 @@
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [Parameter]
+    public string TrackKey { get; set; }
+
 
     private NotificationMessage _notificationMessage;
     IEnumerable<UserContactInfo> _members = null;
@@ -72,6 +76,13 @@
     {
         try
         {
+            // Check if a club is given as part of url or selected before
+            if (!await ClubCheck.SetClub(TrackKey))
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+
             var user = (await authenticationStateTask).User;
             if (user.IsInRole(AppStateStore.Tenant.AdminRole) || user.IsInRole(Constants.RoleAdmin))
             {
@@ -86,7 +97,7 @@
 
     protected void EditMember(string id)
     {
-        NavigationManager.NavigateTo($"/editmember/{id}");
+        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/editmember/{id}");
     }
 
 

@@ -1,9 +1,10 @@
-﻿@page "/profile"
+﻿@page "/{TrackKey}/profile"
 @attribute [Authorize]
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
+@inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
 <h3>Dein Profil</h3>
@@ -44,7 +45,7 @@
         </small>
     </div>
 
-     <div class="form-group">
+    <div class="form-group">
         <h3>Dein Status</h3>
         <ul>
             <li>
@@ -84,35 +85,26 @@
 </EditForm>
 
 @code {
-        [CascadingParameter]
-        public IModalService Modal { get; set; }
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+    [Parameter]
+    public string TrackKey { get; set; }
+
 
     private NotificationMessage _notificationMessage;
     private UserContactInfo _userContactInfo = new UserContactInfo();
     protected override async Task OnInitializedAsync()
     {
-        if (null == AppStateStore.TrackKey)
-        {
-            // Ensure a tenant is selected!
-            NavigationManager.NavigateTo("/");
-            return;
-        }
-        if (!AppStateStore.TenantsAlreadyRead)
-        {
-            try
-            {
-                AppStateStore.Tenants = await Api.GetTenants();
-                AppStateStore.TenantsAlreadyRead = true;
-            }
-            catch (Exception ex)
-            {
-                _notificationMessage.ShowError($"Fehler beim Lesen der Daten: {ex.Message}");
-            }
-        }
         try
         {
+            // Check if a club is given as part of url or selected before
+            if (!await ClubCheck.SetClub(TrackKey))
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
             AppStateStore.CurrentUser = await Api.GetUser();
-            if (!AppStateStore.CurrentUser.Principal.IsUserAuthenticated())
+            if (!AppStateStore.CurrentUser.IsAuthenticated)
             {
                 throw new ApplicationException("Bitte anmelden, um die Benutzerdaten zu ändern.");
             }
@@ -154,7 +146,7 @@
             }
             else
             {
-                NavigationManager.NavigateTo("/");
+                NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}");
             }
         }
         catch (Exception ex)
