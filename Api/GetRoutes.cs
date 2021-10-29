@@ -59,14 +59,14 @@ namespace BlazorApp.Api
                 IEnumerable<Route> routes = null;
                 if (callingContext.IsUserConfirmed)
                 { 
-                    // Get routes for review (if requested those) or only already reviewed or by authored by calling user
+                    // Get routes for review (if requested those) or only already reviewed or authored by calling user
                     if (filter.ForReview)
                     {
                         routes = await _cosmosRepository.GetItems(r => !r.IsReviewed);
                     } 
                     else 
                     {
-                        routes = await _cosmosRepository.GetItems(r => (r.IsReviewed || callingContext.CheckAuthor(r)));
+                        routes = await _cosmosRepository.GetItems(r => (r.IsReviewed || callingContext.UserContactInfo.Id.CompareTo(r.AuthorId) == 0));
                     }
                 }
                 else
