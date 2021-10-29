@@ -34,6 +34,15 @@
             <div class="overflow-auto" style="max-height: 500px">
                 @((MarkupString)RouteItem.Core.Description)
             </div>
+            <small>
+                <em>
+                    @RouteItem.AuthorDisplayName @RouteItem.LastUpdate.ToLocalTime().ToString("dd.MM.yyyy")
+                    @if (AppStateStore.IsUserReviewer && !String.IsNullOrEmpty(RouteItem.ReviewerDisplayName))
+                    {
+                        @RouteItem.ReviewerDisplayName @RouteItem.Core.ReviewDate.ToLocalTime().ToString("dd.MM.yyyy")
+                    }
+                </em>
+            </small>
             <hr />
             @if (!String.IsNullOrEmpty(RouteItem.Core.RouteLink))
             {
