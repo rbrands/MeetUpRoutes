@@ -1,0 +1,46 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using System.Text.RegularExpressions
+@inject AppState AppStateStore
+
+@if (null != RouteItem && null != TagSets)
+{ 
+    @foreach (TagSet ts in TagSets)
+    {
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+            <div class="card">
+                <div class="card-header">@ts.Name</div>
+                <div class="card-body">
+                    @foreach (Tag t in ts.Tags)
+                    {
+                        <div class="badge badge-@GetBadgeClass(ts.BadgeColor) p-2 m-1" title="Tag auswählen">@t.Label</div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public ExtendedRoute RouteItem { get; set; } = new ExtendedRoute();
+    [Parameter]
+    public IEnumerable<TagSet> TagSets { get; set; } = new List<TagSet>();
+    private string[] BadgeClasses =
+{
+        "primary",
+        "secondary",
+        "success",
+        "danger",
+        "warning",
+        "info",
+        "light",
+        "dark"
+    };
+
+    private string GetBadgeClass(TagBadgeColor color)
+    {
+        return BadgeClasses[(int)color];
+    }
+
+}

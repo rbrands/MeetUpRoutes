@@ -49,6 +49,13 @@
             </EditorContent>
         </BlazoredTextEditor>
         <div class="form-group">
+            <label>Tags zuweisen</label>
+            <div class="row">
+                <AssignTags RouteItem="@_routeToEdit" TagSets="@_tagSets"></AssignTags>
+            </div>
+
+        </div>
+        <div class="form-group">
             <label for="level">Umfang</label>
             <InputText id="level" aria-describedby="levelHelp" class="form-control" @bind-Value="_routeToEdit.Core.LevelDescription" autocomplete="on" placeholder="km / Hm" />
             <small id="levelHelp" class="form-text text-muted">
