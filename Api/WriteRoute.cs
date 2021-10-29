@@ -51,7 +51,7 @@ namespace BlazorApp.Api
                 // Set tenant again to ensure that the data is written to the correct tenant!
                 route.Tenant = callingContext.TenantSettings.TrackKey;
                 // Set create date if it is a new entry
-                if (null == route.Id)
+                if (String.IsNullOrEmpty(route.Id))
                 {
                     route.Date = DateTime.UtcNow;
                     route.AuthorId = callingContext.User.ContactInfo.Id;
@@ -64,7 +64,7 @@ namespace BlazorApp.Api
                 {
                     // Author is the same as the original author
                     route.Date = DateTime.UtcNow;
-                    if (callingContext.IsUserAuthor)
+                    if (callingContext.IsUserAuthor && !callingContext.IsUserReviewer)
                     {
                         route.IsReviewed = true;
                     }
