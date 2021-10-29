@@ -5,15 +5,36 @@
 
 @if (null != RouteItem && null != TagSets)
 { 
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-0 ">
+        <div class="card">
+            <div class="card-header">Zugewiesene Tags</div>
+            <div class="card-body">
+                @foreach (RouteTag rt in RouteItem.Core.RouteTags)
+                {
+                    <div class="badge badge-@GetBadgeClass(rt.BadgeColor) p-2 m-1" title="Tag auswählen">
+                        @rt.TagLabel<text>&nbsp;</text><span class="oi oi-minus"></span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
     @foreach (TagSet ts in TagSets)
     {
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+        if (ts.HasRestrictedAccess && !AppStateStore.IsUserReviewer)
+        {
+            continue;
+        }
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-0 mb-0 ml-0 mr-0">
             <div class="card">
-                <div class="card-header">@ts.Name</div>
+                <div class="card-header">
+                    @ts.Name
+                </div>
                 <div class="card-body">
                     @foreach (Tag t in ts.Tags)
                     {
-                        <div class="badge badge-@GetBadgeClass(ts.BadgeColor) p-2 m-1" title="Tag auswählen">@t.Label</div>
+                        <div class="badge badge-@GetBadgeClass(ts.BadgeColor) p-2 m-1" title="Tag auswählen" @onclick="@(() => AssignTag(ts, t))">
+                            @t.Label<text>&nbsp;</text><span class="oi oi-plus"></span>
+                        </div>
                     }
                 </div>
             </div>
@@ -27,7 +48,7 @@
     [Parameter]
     public IEnumerable<TagSet> TagSets { get; set; } = new List<TagSet>();
     private string[] BadgeClasses =
-{
+    {
         "primary",
         "secondary",
         "success",
@@ -41,6 +62,21 @@
     private string GetBadgeClass(TagBadgeColor color)
     {
         return BadgeClasses[(int)color];
+    }
+
+    private void AssignTag(TagSet tagSet, Tag tag)
+    {
+        RouteTag routeTag = RouteItem.Core.RouteTags.FirstOrDefault(t => t.TagId.CompareTo(tag.TagId) == 0);
+        if (null == routeTag)
+        {
+            routeTag = new RouteTag();
+            RouteItem.Core.RouteTags.Add(routeTag);
+        }
+        routeTag.TagId = tag.TagId;
+        routeTag.TagLabel = tag.Label;
+        routeTag.TagSetId = tagSet.Id;
+        routeTag.BadgeColor = tagSet.BadgeColor;
+
     }
 
 }
