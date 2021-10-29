@@ -160,6 +160,17 @@ namespace BlazorApp.Api.Utils
                          && (_user.ContactInfo.Id.CompareTo(authorId) == 0)
                      );
         }
+        public bool CheckAuthor(Route route)
+        {
+            string authorId = (null != route.AuthorId) ? route.AuthorId : String.Empty;
+            return (
+                         null != _user.ContactInfo
+                         && null != _user.Principal
+                         && _user.IsAuthenticated
+                         && _user.ContactInfo.IsConfirmed
+                         && (_user.ContactInfo.Id.CompareTo(authorId) == 0)
+                     );
+        }
 
     }
 }

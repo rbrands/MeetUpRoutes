@@ -65,7 +65,7 @@ namespace BlazorApp.Api
                 {
                     callingContext.AssertConfirmedAccess();
                 }
-                if (!route.IsReviewed)
+                if (!route.IsReviewed && !callingContext.CheckAuthor(route))
                 {
                     callingContext.AssertReviewerAuthorization();
                 }
