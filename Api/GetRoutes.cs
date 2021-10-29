@@ -59,11 +59,19 @@ namespace BlazorApp.Api
                 IEnumerable<Route> routes = null;
                 if (callingContext.IsUserConfirmed)
                 { 
-                    // Get only public routes
-                    routes = await _cosmosRepository.GetItems(r => r.IsReviewed != filter.ForReview);
+                    // Get routes for review (if requested those) or only already reviewed or by authored by calling user
+                    if (filter.ForReview)
+                    {
+                        routes = await _cosmosRepository.GetItems(r => !r.IsReviewed);
+                    } 
+                    else 
+                    {
+                        routes = await _cosmosRepository.GetItems(r => r.IsReviewed || r.AuthorId.CompareTo(callingContext.UserContactInfo.Id) == 0);
+                    }
                 }
                 else
                 {
+                    // Get only public and reviewed routes
                     routes = await _cosmosRepository.GetItems(r => !r.IsNonPublic && r.IsReviewed);
                 }
 
