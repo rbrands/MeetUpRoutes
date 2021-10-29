@@ -37,6 +37,8 @@ namespace BlazorApp.Shared
         public string RouteLinkTitle { get; set; }
         [JsonProperty(PropertyName = "gpxLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "GPX", Prompt = "Link zu GPX Datei"), UIHint("Url")]
         public string GpxLink { get; set; }
+        [JsonProperty(PropertyName = "stravaLink", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Strava", Prompt = "Link zu Strava"), UIHint("Url")]
+        public string StravaLink { get; set; }
         [JsonProperty(PropertyName = "isReviewed")]
         public Boolean IsReviewed { get; set; }
         [JsonProperty(PropertyName = "isNonPublic")]

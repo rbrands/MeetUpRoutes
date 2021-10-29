@@ -41,11 +41,19 @@
                 <Authorized>
                     @if (AppStateStore.IsUserConfirmed)
                     {
-                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(RouteItem.Core.Id))" hidden="@HideAuthoring"><span class="oi oi-pencil"></span></button>
-                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem())" hidden="@HideAuthoring"><span class="oi oi-trash"></span></button>
+                        <div class="btn-group mr-2" role="group" aria-label="Ändern">
+                            <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(RouteItem.Core.Id))" hidden="@HideAuthoring"><span class="oi oi-pencil"></span></button>
+                            <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem())" hidden="@HideAuthoring"><span class="oi oi-trash"></span></button>
+                        </div>
                     }
                 </Authorized>
             </AuthorizeView>
+            <div class="btn-group mr-2" role="group" aria-label="Tour-Infos">
+                <a href="@RouteItem.Core.GpxLink" target="_blank" title="GPX-Link" class="btn btn-sm btn-outline-secondary" hidden="@(RouteItem.Core.GpxLink == null)">GPX</a>
+                <a href="@RouteItem.Core.StravaLink" target="_blank" title="Strava" class="btn btn-sm btn-outline-secondary" hidden="@(RouteItem.Core.StravaLink == null)">Strava</a>
+                <a href="@RouteItem.Core.PhotosLink" target="_blank" title="Fotos" class="btn btn-sm btn-outline-secondary" hidden="@(RouteItem.Core.PhotosLink == null)"><span class="oi oi-camera-slr"></span></a>
+                <a href="@RouteItem.Core.VideoLink" target="_blank" title="Video" class="btn btn-sm btn-outline-secondary" hidden="@(RouteItem.Core.VideoLink == null)"><span class="oi oi-video"></span></a>
+            </div>
         </div>
     </div>
 </div>
