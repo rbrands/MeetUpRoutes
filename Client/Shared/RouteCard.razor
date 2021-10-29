@@ -49,10 +49,10 @@
                 </Authorized>
             </AuthorizeView>
             <div class="btn-group mr-2" role="group" aria-label="Tour-Infos">
-                <a href="@RouteItem.Core.GpxLink" target="_blank" title="GPX-Link" class="btn btn-sm btn-outline-secondary" hidden="@(RouteItem.Core.GpxLink == null)">GPX</a>
-                <a href="@RouteItem.Core.StravaLink" target="_blank" title="Strava" class="btn btn-sm btn-outline-secondary" hidden="@(RouteItem.Core.StravaLink == null)">Strava</a>
-                <a href="@RouteItem.Core.PhotosLink" target="_blank" title="Fotos" class="btn btn-sm btn-outline-secondary" hidden="@(RouteItem.Core.PhotosLink == null)"><span class="oi oi-camera-slr"></span></a>
-                <a href="@RouteItem.Core.VideoLink" target="_blank" title="Video" class="btn btn-sm btn-outline-secondary" hidden="@(RouteItem.Core.VideoLink == null)"><span class="oi oi-video"></span></a>
+                <a href="@RouteItem.Core.GpxLink" target="_blank" title="GPX-Link" class="btn btn-sm btn-outline-secondary" hidden="@String.IsNullOrEmpty(RouteItem.Core.GpxLink)">GPX</a>
+                <a href="@RouteItem.Core.StravaLink" target="_blank" title="Strava" class="btn btn-sm btn-outline-secondary" hidden="@String.IsNullOrEmpty(RouteItem.Core.StravaLink)">Strava</a>
+                <a href="@RouteItem.Core.PhotosLink" target="_blank" title="Fotos" class="btn btn-sm btn-outline-secondary" hidden="@String.IsNullOrEmpty(RouteItem.Core.PhotosLink)"><span class="oi oi-camera-slr"></span></a>
+                <a href="@RouteItem.Core.VideoLink" target="_blank" title="Video" class="btn btn-sm btn-outline-secondary" hidden="@String.IsNullOrEmpty(RouteItem.Core.VideoLink)"><span class="oi oi-video"></span></a>
             </div>
         </div>
     </div>
