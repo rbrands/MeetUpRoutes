@@ -66,7 +66,7 @@ namespace BlazorApp.Api
                     } 
                     else 
                     {
-                        routes = await _cosmosRepository.GetItems(r => r.IsReviewed || r.AuthorId.CompareTo(callingContext.UserContactInfo.Id) == 0);
+                        routes = await _cosmosRepository.GetItems(r => r.IsReviewed || r.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) == 0);
                     }
                 }
                 else
