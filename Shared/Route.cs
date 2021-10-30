@@ -52,7 +52,7 @@ namespace BlazorApp.Shared
     {
         public string TagSetId { get; set; }
         public string TagId { get; set; }
-        public string TabLabel { get; set; }
+        public string TagLabel { get; set; }
         public TagBadgeColor BadgeColor { get; set; }
     }
 }

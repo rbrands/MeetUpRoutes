@@ -4,6 +4,7 @@
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @using Blazored.TextEditor
+@using System.Text 
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject ClubCheck ClubCheck
@@ -48,6 +49,15 @@
                 {@((MarkupString)_routeToEdit.Core.Description)}
             </EditorContent>
         </BlazoredTextEditor>
+        <div class="form-group">
+            <label>Tags zuweisen</label>
+            <small id="tagHelp" class="form-text text-muted">
+                Durch anclicken auf "Tags" in "Verfügbare Tags" auswählen oder in "Zugewiesene Tags" abwählen.
+            </small>
+            <div class="row">
+                <AssignTags RouteItem="@_routeToEdit" TagSets="@_tagSets"></AssignTags>
+            </div>
+        </div>
         <div class="form-group">
             <label for="level">Umfang</label>
             <InputText id="level" aria-describedby="levelHelp" class="form-control" @bind-Value="_routeToEdit.Core.LevelDescription" autocomplete="on" placeholder="km / Hm" />
@@ -147,6 +157,8 @@
     </div>
 
     <ValidationSummary />
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
+
     <button type="submit" id="BtnSave" class="btn btn-primary" disabled="@_formIsDisabled">Speichern</button>
     <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
 </EditForm>
@@ -157,6 +169,7 @@
     [Parameter]
     public string Id { get; set; }
     private NotificationMessage _notificationMessage;
+    private NotificationMessage _saveMessage;
     private Boolean _formIsDisabled = false;
     private ExtendedRoute _routeToEdit = new ExtendedRoute();
     private BlazoredTextEditor _htmlDescription;
@@ -189,6 +202,41 @@
             return;
         }
     }
+
+    private bool CheckMandatoryTags()
+    {
+        bool checkOk = true;
+        // Check if all mandatory tags are set.
+        foreach (TagSet tagSet in _tagSets)
+        {
+            if (!tagSet.IsMandatory)
+            {
+                // not mandatory ==> check next one
+                continue;
+            }
+            bool mandatoryTagFound = false;
+            StringBuilder sb = new StringBuilder($"{tagSet.Name}: ");
+            foreach (Tag tag in tagSet.Tags)
+            {
+                RouteTag routeTag = _routeToEdit.Core.RouteTags.FirstOrDefault(t => t.TagId.CompareTo(tag.TagId) == 0);
+                if (null != routeTag)
+                {
+                    mandatoryTagFound = true;
+                    break;
+                }
+                sb.Append($"\"{tag.Label}\" ");
+            }
+            if (!mandatoryTagFound)
+            {
+                _saveMessage.ShowError($"Bitte ein Tag aus {sb.ToString()}auswählen.");
+                checkOk = false;
+                break;
+            }
+        }
+        return checkOk;
+    }
+
+
     protected void OnCancel()
     {
         NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes");
@@ -236,6 +284,11 @@
 
         try
         {
+            if (!CheckMandatoryTags())
+            {
+                return;
+            }
+            _saveMessage.Hide();
             _formIsDisabled = true;
             StateHasChanged();
             _routeToEdit.Core.Description = StripEmptyHtml(await _htmlDescription.GetHTML());
@@ -247,5 +300,4 @@
             _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
         }
     }
-
 }

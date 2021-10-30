@@ -10,11 +10,17 @@
     <div class="card-header">
         @if (!RouteItem.Core.IsReviewed)
         {
-            <span class="badge badge-warning" title="Freigabe notwendig">Review!</span>
+            <span class="badge badge-warning p-2 m-1" title="Freigabe notwendig">Review!</span>
         }
         @if (RouteItem.Core.IsNonPublic)
         {
-            <span class="badge badge-danger"><span class="oi oi-key" title="Nicht öffentlich"></span></span>
+            <span class="badge badge-danger p-2 m-1"><span class="oi oi-key" title="Nicht öffentlich"></span></span>
+        }
+        @foreach (RouteTag rt in RouteItem.Core.RouteTags)
+        {
+            <span class="badge badge-@GetBadgeClass(rt.BadgeColor) p-2 m-1">
+                @rt.TagLabel
+            </span>
         }
     </div>
     @if (!String.IsNullOrEmpty(RouteItem.Core.RouteLinkImage))
@@ -79,6 +85,22 @@
     public ExtendedRoute RouteItem { get; set; } = new ExtendedRoute();
     [CascadingParameter]
     public IModalService Modal { get; set; }
+    private string[] BadgeClasses =
+    {
+        "primary",
+        "secondary",
+        "success",
+        "danger",
+        "warning",
+        "info",
+        "light",
+        "dark"
+    };
+
+    private string GetBadgeClass(TagBadgeColor color)
+    {
+        return BadgeClasses[(int)color];
+    }
 
 
     protected void EditItem(string itemId)

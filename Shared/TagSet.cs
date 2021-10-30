@@ -43,9 +43,11 @@ namespace BlazorApp.Shared
     {
         [JsonProperty(PropertyName = "tagId"), Display(Name = "Tag Id")]
         public string TagId { get; set; } = System.Guid.NewGuid().ToString();
-        [JsonProperty(PropertyName = "label"), Display(Name = "Tag Label")]
-        [RegularExpression("[a-zA-Z0-9-<>]*", ErrorMessage = "Bitte nur Buchstaben und Zahlen für das Label.")]
+        [JsonProperty(PropertyName = "label"), Display(Name = "Tag Label"), MaxLength(30, ErrorMessage = "Label bitte nicht länger als 30 Zeichen")]
+        [RegularExpression("[a-zA-Z0-9-<>üÜöÖäÄß]*", ErrorMessage = "Bitte nur Buchstaben und Zahlen für das Label.")]
         public string Label { get; set; }
+        [JsonIgnore]
+        public Boolean HideFromSelection;
     }
 
     public enum TagBadgeColor
