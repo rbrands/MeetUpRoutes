@@ -11,9 +11,12 @@
             <div class="card-body">
                 @foreach (RouteTag rt in RouteItem.Core.RouteTags)
                 {
-                    <div class="badge badge-@GetBadgeClass(rt.BadgeColor) p-2 m-1" title="Tag auswählen">
-                        @rt.TagLabel<text>&nbsp;</text><span class="oi oi-minus"></span>
-                    </div>
+                    @if (!CheckIfRouteTagIsRestricted(rt) || AppStateStore.IsUserReviewer)
+                    { 
+                        <div class="badge badge-@GetBadgeClass(rt.BadgeColor) p-2 m-1" title="Tag auswählen" @onclick="@(() => UnAssignTag(rt))">
+                            @rt.TagLabel<text>&nbsp;</text><span class="oi oi-minus"></span>
+                        </div>
+                    }
                 }
             </div>
         </div>
@@ -32,9 +35,12 @@
                 <div class="card-body">
                     @foreach (Tag t in ts.Tags)
                     {
-                        <div class="badge badge-@GetBadgeClass(ts.BadgeColor) p-2 m-1" title="Tag auswählen" @onclick="@(() => AssignTag(ts, t))">
-                            @t.Label<text>&nbsp;</text><span class="oi oi-plus"></span>
-                        </div>
+                        @if (!t.HideFromSelection)
+                        {
+                            <div class="badge badge-@GetBadgeClass(ts.BadgeColor) p-2 m-1" title="Tag auswählen" @onclick="@(() => AssignTag(ts, t))">
+                                @t.Label<text>&nbsp;</text><span class="oi oi-plus"></span>
+                            </div>
+                        }
                     }
                 </div>
             </div>
@@ -59,9 +65,26 @@
         "dark"
     };
 
+    protected override void OnInitialized()
+    {
+        CheckAvailableTags();
+    }
+
     private string GetBadgeClass(TagBadgeColor color)
     {
         return BadgeClasses[(int)color];
+    }
+
+    private void CheckAvailableTags()
+    {
+        foreach(RouteTag rt in RouteItem.Core.RouteTags)
+        {
+            Tag tag = FindCorrespondingTag(rt);
+            if (null != tag)
+            {
+                tag.HideFromSelection = true;
+            }
+        }
     }
 
     private void AssignTag(TagSet tagSet, Tag tag)
@@ -69,14 +92,52 @@
         RouteTag routeTag = RouteItem.Core.RouteTags.FirstOrDefault(t => t.TagId.CompareTo(tag.TagId) == 0);
         if (null == routeTag)
         {
+            // Check if there is another one from mutually selected already active ==> unassign it
+            if (tagSet.IsMutuallyExclusive)
+            {
+                foreach(Tag t in tagSet.Tags)
+                {
+                    RouteTag rt = RouteItem.Core.RouteTags.FirstOrDefault(rtt => rtt.TagId.CompareTo(t.TagId) == 0);
+                    if (null != rt)
+                    {
+                        UnAssignTag(rt);
+                    }
+                }
+            }
             routeTag = new RouteTag();
             RouteItem.Core.RouteTags.Add(routeTag);
         }
+        tag.HideFromSelection = true;
         routeTag.TagId = tag.TagId;
         routeTag.TagLabel = tag.Label;
         routeTag.TagSetId = tagSet.Id;
         routeTag.BadgeColor = tagSet.BadgeColor;
 
+    }
+    private void UnAssignTag(RouteTag routeTag)
+    {
+        RouteItem.Core.RouteTags.Remove(routeTag);
+        Tag tag = FindCorrespondingTag(routeTag);
+        if (null != tag)
+        {
+            tag.HideFromSelection = false;
+        }
+    }
+
+    private Tag FindCorrespondingTag(RouteTag routeTag)
+    {
+        TagSet tagSet = TagSets.FirstOrDefault(rt => rt.Id.CompareTo(routeTag.TagSetId) == 0);
+        Tag tag = null;
+        if (null != tagSet)
+        {
+            tag = tagSet.Tags.FirstOrDefault(ft => ft.TagId.CompareTo(routeTag.TagId) == 0);
+        }
+        return tag;
+    }
+    private bool CheckIfRouteTagIsRestricted(RouteTag routeTag)
+    {
+        TagSet tagSet = TagSets.FirstOrDefault(rt => rt.Id.CompareTo(routeTag.TagSetId) == 0);
+        return (null != tagSet && tagSet.HasRestrictedAccess);
     }
 
 }
