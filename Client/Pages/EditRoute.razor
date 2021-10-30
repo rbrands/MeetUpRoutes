@@ -155,6 +155,8 @@
     </div>
 
     <ValidationSummary />
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
+
     <button type="submit" id="BtnSave" class="btn btn-primary" disabled="@_formIsDisabled">Speichern</button>
     <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
 </EditForm>
@@ -165,6 +167,7 @@
     [Parameter]
     public string Id { get; set; }
     private NotificationMessage _notificationMessage;
+    private NotificationMessage _saveMessage;
     private Boolean _formIsDisabled = false;
     private ExtendedRoute _routeToEdit = new ExtendedRoute();
     private BlazoredTextEditor _htmlDescription;
@@ -223,7 +226,7 @@
             }
             if (!mandatoryTagFound)
             {
-                _notificationMessage.ShowError($"Bitte ein Tag aus {sb.ToString()}auswählen.");
+                _saveMessage.ShowError($"Bitte ein Tag aus {sb.ToString()}auswählen.");
                 checkOk = false;
             }
         }
@@ -282,6 +285,7 @@
             {
                 return;
             }
+            _saveMessage.Hide();
             _formIsDisabled = true;
             StateHasChanged();
             _routeToEdit.Core.Description = StripEmptyHtml(await _htmlDescription.GetHTML());
