@@ -28,7 +28,12 @@ else
                 <a class="btn btn-primary" href="/LoginProviders/routes">Anmelden</a>
             </NotAuthorized>
         </AuthorizeView>
+        <button class="btn btn-primary" title="Suche anzeigen" @onclick="@(() => ToggleSearchCollapse())"><span class="oi oi-magnifying-glass"></span></button>
+        <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><span class="oi oi-reload"></span></button>
     </p>
+    <div class="row @_searchCollapse">
+        <ComposeFilter Filter="@_filter" TagSets="@_tagSets"></ComposeFilter>
+    </div>
     <div class="row">
         @foreach (ExtendedRoute route in _routes)
         {
@@ -45,6 +50,8 @@ else
     private NotificationMessage _notificationMessage;
     IEnumerable<ExtendedRoute> _routes = null;
     RouteFilter _filter = new RouteFilter();
+    private IEnumerable<TagSet> _tagSets;
+    private string _searchCollapse = "collapse";
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,5 +72,24 @@ else
         }
     }
 
+    private async Task ToggleSearchCollapse()
+    {
+        _searchCollapse =  String.IsNullOrEmpty(_searchCollapse) ? "collapse" : String.Empty;
+        if (String.IsNullOrEmpty(_searchCollapse))
+        {
+            _tagSets = await Api.GetTagSets();
+        }
+    }
+    private async Task Reload()
+    {
+        try
+        {
+            _routes = await Api.GetRoutes(_filter);
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler: {ex.Message}");
+        }
+    }
 
 }

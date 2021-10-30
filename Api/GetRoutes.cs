@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -68,23 +69,51 @@ namespace BlazorApp.Api
                     {
                         if (!callingContext.IsUserReviewer)
                         {
-                            routes = await _cosmosRepository.GetItems(r => (r.IsReviewed || callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0));
+                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0));
                         }
                         else 
                         {
-                            routes = await _cosmosRepository.GetItems();
+                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0);
                         }
                     }
                 }
                 else
                 {
                     // Get only public and reviewed routes
-                    routes = await _cosmosRepository.GetItems(r => !r.IsNonPublic && r.IsReviewed);
+                    routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && !r.IsNonPublic && r.IsReviewed);
                 }
 
                 List<ExtendedRoute> extendedRoutes = new List<ExtendedRoute>();
                 foreach (Route r in routes)
                 {
+                    // Check filter
+                    Boolean checksPassed = true;
+                    foreach(IList<RouteTag> routeTagList in filter.Tags)
+                    {
+                        if (routeTagList.Count == 0)
+                        {
+                            continue;
+                        }
+                        checksPassed = false;
+                        foreach(RouteTag rt in routeTagList)
+                        {
+                            RouteTag foundRouteTag = r.RouteTags.FirstOrDefault(x => x.TagId.CompareTo(rt.TagId) == 0);
+                            if (null != foundRouteTag)
+                            {
+                                checksPassed = true;
+                                break;
+                            }
+                        }
+                        if (!checksPassed)
+                        {
+                            break;
+                        }
+                    }
+                    if (!checksPassed)
+                    {
+                        continue;
+                    }
+                    // Build ExtendedRoute
                     ExtendedRoute extendedRoute = new ExtendedRoute(r);
                     if (!String.IsNullOrEmpty(r.AuthorId))
                     { 
@@ -107,10 +136,17 @@ namespace BlazorApp.Api
                     extendedRoute.LastUpdate = r.Date;
                     extendedRoutes.Add(extendedRoute);
                 }
-                // Sort descending on date
+                // Sort descending on date and get max 100 items!
                 extendedRoutes.Sort((x, y) => y.LastUpdate.CompareTo(x.LastUpdate));
+                List<ExtendedRoute> returnList = extendedRoutes;
+                int maxSize = Math.Min(extendedRoutes.Count, 100);
+                if (maxSize > 0)
+                {
+                    returnList = extendedRoutes.GetRange(0, maxSize);
+                }
 
-                return new OkObjectResult(extendedRoutes);
+                // return the max 100 items of the list.
+                return new OkObjectResult(returnList);
             }
             catch (Exception ex)
             {
