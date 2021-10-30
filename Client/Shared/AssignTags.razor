@@ -4,7 +4,7 @@
 @inject AppState AppStateStore
 
 @if (null != RouteItem && null != TagSets)
-{ 
+{
     <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-0 ">
         <div class="card">
             <div class="card-header">Zugewiesene Tags</div>
@@ -12,7 +12,7 @@
                 @foreach (RouteTag rt in RouteItem.Core.RouteTags)
                 {
                     @if (!CheckIfRouteTagIsRestricted(rt) || AppStateStore.IsUserReviewer)
-                    { 
+                    {
                         <div class="badge badge-@GetBadgeClass(rt.BadgeColor) p-2 m-1" title="Tag auswählen" @onclick="@(() => UnAssignTag(rt))">
                             @rt.TagLabel<text>&nbsp;</text><span class="oi oi-minus"></span>
                         </div>
@@ -21,18 +21,16 @@
             </div>
         </div>
     </div>
-    @foreach (TagSet ts in TagSets)
-    {
-        if (ts.HasRestrictedAccess && !AppStateStore.IsUserReviewer)
-        {
-            continue;
-        }
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-0 mb-0 ml-0 mr-0">
-            <div class="card">
-                <div class="card-header">
-                    @ts.Name
-                </div>
-                <div class="card-body">
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-0 mb-0 ml-0 mr-0">
+        <div class="card">
+            <div class="card-header">Verfügbare Tags</div>
+            <div class="card-body">
+                @foreach (TagSet ts in TagSets)
+                {
+                    if (ts.HasRestrictedAccess && !AppStateStore.IsUserReviewer)
+                    {
+                        continue;
+                    }
                     @foreach (Tag t in ts.Tags)
                     {
                         @if (!t.HideFromSelection)
@@ -42,10 +40,10 @@
                             </div>
                         }
                     }
-                </div>
+                }
             </div>
         </div>
-    }
+    </div>
 }
 
 @code {
@@ -77,7 +75,7 @@
 
     private void CheckAvailableTags()
     {
-        foreach(RouteTag rt in RouteItem.Core.RouteTags)
+        foreach (RouteTag rt in RouteItem.Core.RouteTags)
         {
             Tag tag = FindCorrespondingTag(rt);
             if (null != tag)
@@ -95,7 +93,7 @@
             // Check if there is another one from mutually selected already active ==> unassign it
             if (tagSet.IsMutuallyExclusive)
             {
-                foreach(Tag t in tagSet.Tags)
+                foreach (Tag t in tagSet.Tags)
                 {
                     RouteTag rt = RouteItem.Core.RouteTags.FirstOrDefault(rtt => rtt.TagId.CompareTo(t.TagId) == 0);
                     if (null != rt)

@@ -4,6 +4,8 @@
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @using Blazored.TextEditor
+@using System.Text 
+@implements IDisposable
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject ClubCheck ClubCheck
@@ -12,7 +14,7 @@
 <h3>Tour editieren</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
-<EditForm Model="@_routeToEdit.Core" OnValidSubmit="OnSave">
+<EditForm EditContext="@_editContext" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
     <div class="form-group">
         <label for="title">Titel</label>
@@ -163,9 +165,11 @@
     public string TrackKey { get; set; }
     [Parameter]
     public string Id { get; set; }
+    private ValidationMessageStore _messageStore;
     private NotificationMessage _notificationMessage;
     private Boolean _formIsDisabled = false;
     private ExtendedRoute _routeToEdit = new ExtendedRoute();
+    private EditContext _editContext = new EditContext(new Route());
     private BlazoredTextEditor _htmlDescription;
     private IEnumerable<TagSet> _tagSets;
     private bool _linkPreviewEnabled = false;
@@ -180,7 +184,10 @@
                 NavigationManager.NavigateTo("/");
                 return;
             }
-            //AppStateStore.AssertUserIsConfirmed();
+            AppStateStore.AssertUserIsConfirmed();
+            _editContext = new EditContext(_routeToEdit.Core);
+            _messageStore = new ValidationMessageStore(_editContext);
+            _editContext.OnValidationRequested += HandleValidationRequested;
 
             if (!String.IsNullOrEmpty(Id))
             {
@@ -196,6 +203,38 @@
             return;
         }
     }
+
+    private void HandleValidationRequested(object sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore.Clear();
+
+        // Check if all mandatory tags are set.
+        foreach (TagSet tagSet in _tagSets)
+        {
+            if (!tagSet.IsMandatory)
+            {
+                // not mandatory ==> check next one
+                continue;
+            }
+            bool mandatoryTagFound = false;
+            StringBuilder sb = new StringBuilder($"{tagSet.Name}: ");
+            foreach (Tag tag in tagSet.Tags)
+            {
+                RouteTag routeTag = _routeToEdit.Core.RouteTags.FirstOrDefault(t => t.TagId.CompareTo(tag.TagId) == 0);
+                if (null != routeTag)
+                {
+                    mandatoryTagFound = true;
+                    break;
+                }
+                sb.Append($"\"{tag.Label}\" ");
+            }
+            if (!mandatoryTagFound)
+            {
+                _messageStore.Add(() => _routeToEdit.Core.RouteTags, $"Bitte ein Tag aus {sb.ToString()}auswählen.");
+            }
+        }
+    }
+
     protected void OnCancel()
     {
         NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes");
@@ -254,5 +293,8 @@
             _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
         }
     }
-
+    public void Dispose()
+    {
+        _editContext.OnValidationRequested -= HandleValidationRequested;
+    }
 }
