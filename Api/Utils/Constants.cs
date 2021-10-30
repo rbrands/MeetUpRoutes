@@ -12,7 +12,7 @@ namespace BlazorApp.Api.Utils
         public const string KEY_SERVER_SETTINGS = "serversettings";
         public const string KEY_CLIENT_SETTINGS = "clientsettings";
 
-        public const string VERSION = "2021-10-29";
+        public const string VERSION = "2021-10-30";
 
         public const string ROLE_ADMIN = "admin";
 
