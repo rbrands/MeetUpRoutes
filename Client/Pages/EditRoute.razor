@@ -169,7 +169,7 @@
     private NotificationMessage _notificationMessage;
     private Boolean _formIsDisabled = false;
     private ExtendedRoute _routeToEdit = new ExtendedRoute();
-    private EditContext _editContext = new EditContext(new Route());
+    private EditContext _editContext;
     private BlazoredTextEditor _htmlDescription;
     private IEnumerable<TagSet> _tagSets;
     private bool _linkPreviewEnabled = false;
@@ -185,9 +185,6 @@
                 return;
             }
             AppStateStore.AssertUserIsConfirmed();
-            _editContext = new EditContext(_routeToEdit.Core);
-            _messageStore = new ValidationMessageStore(_editContext);
-            _editContext.OnValidationRequested += HandleValidationRequested;
 
             if (!String.IsNullOrEmpty(Id))
             {
@@ -202,6 +199,12 @@
             _notificationMessage.ShowError($"Fehler: {ex.Message}");
             return;
         }
+    }
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_routeToEdit.Core);
+        _messageStore = new ValidationMessageStore(_editContext);
+        _editContext.OnValidationRequested += HandleValidationRequested;
     }
 
     private void HandleValidationRequested(object sender, ValidationRequestedEventArgs args)

@@ -115,12 +115,12 @@
     {
         if (!String.IsNullOrEmpty(_workingTag.Label))
         {
-            string pattern = @"^[a-zA-Z0-9-<>]*$";
+            string pattern = @"^[a-zA-Z0-9-<>äÄüÜöÖß]*$";
             Match match = Regex.Match(_workingTag.Label, pattern);
-            if (!match.Success || _workingTag.Label.Length > 80)
+            if (!match.Success || _workingTag.Label.Length > 40)
             {
                 _workingTag.Label = "tbd";
-                _notificationMessage.ShowError("Label für Tags dürfen nur Buchstaben und Zahlen enthalten und nicht länger als 80 Zeichen sein.");
+                _notificationMessage.ShowError("Label für Tags dürfen nur Buchstaben und Zahlen enthalten und nicht länger als 40 Zeichen sein.");
             }
             else
             {
