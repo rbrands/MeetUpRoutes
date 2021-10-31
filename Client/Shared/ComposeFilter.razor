@@ -15,10 +15,25 @@
                     </div>
                 }
             }
-            @if (AppStateStore.IsUserConfirmed && Filter.OnlyOwn)
+            @if (AppStateStore.IsUserConfirmed)
             {
-                <div class="badge badge-light p-2 m-1" title="Nur meine" @onclick="(() => UnSelectMyRoutes())">
-                    Meine Touren<text>&nbsp;</text><span class="oi oi-minus"></span>
+                @if (Filter.OnlyOwn)
+                {
+                    <div class="badge badge-light p-2 m-1" title="Nur meine" @onclick="(() => UnSelectMyRoutes())">
+                        Meine Touren<text>&nbsp;</text><span class="oi oi-minus"></span>
+                    </div>
+                }
+                @if (Filter.OnlyForMembers)
+                {
+                    <div class="badge badge-light p-2 m-1" title="Für Mitglieder" @onclick="(() => UnSelectMemberRoutes())">
+                        Für Mitglieder<text>&nbsp;</text><span class="oi oi-minus"></span>
+                    </div>
+                }
+            }
+            @if (AppStateStore.IsUserReviewer)
+            {
+                <div class="badge badge-light p-2 m-1" title="Review" @onclick="(() => UnSelectReviewRoutes())">
+                    Review<text>&nbsp;</text><span class="oi oi-minus"></span>
                 </div>
             }
         </div>
@@ -43,10 +58,25 @@
                     }
                 }
             }
-            @if(AppStateStore.IsUserConfirmed && !Filter.OnlyOwn)
-            { 
-                <div class="badge badge-light p-2 m-1" title="Nur meine" @onclick="(() => SelectMyRoutes())">
-                    Meine Touren<text>&nbsp;</text><span class="oi oi-plus"></span>
+            @if (AppStateStore.IsUserConfirmed)
+            {
+                if (!Filter.OnlyOwn)
+                {
+                    <div class="badge badge-light p-2 m-1" title="Nur meine" @onclick="(() => SelectMyRoutes())">
+                        Meine Touren<text>&nbsp;</text><span class="oi oi-plus"></span>
+                    </div>
+                }
+                if (!Filter.OnlyForMembers)
+                {
+                    <div class="badge badge-light p-2 m-1" title="Für Mitglieder" @onclick="(() => SelectMemberRoutes())">
+                        Für Mitglieder<text>&nbsp;</text><span class="oi oi-plus"></span>
+                    </div>
+                }
+            }
+            @if (AppStateStore.IsUserReviewer)
+            {
+                <div class="badge badge-light p-2 m-1" title="Review" @onclick="(() => SelectReviewRoutes())">
+                    Review<text>&nbsp;</text><span class="oi oi-plus"></span>
                 </div>
             }
         </div>
@@ -120,6 +150,26 @@
     private async Task UnSelectMyRoutes()
     {
         Filter.OnlyOwn = false;
+        await OnChangeCallback.InvokeAsync();
+    }
+    private async Task SelectMemberRoutes()
+    {
+        Filter.OnlyForMembers = true;
+        await OnChangeCallback.InvokeAsync();
+    }
+    private async Task UnSelectMemberRoutes()
+    {
+        Filter.OnlyForMembers = false;
+        await OnChangeCallback.InvokeAsync();
+    }
+    private async Task SelectReviewRoutes()
+    {
+        Filter.ForReview = true;
+        await OnChangeCallback.InvokeAsync();
+    }
+    private async Task UnSelectReviewRoutes()
+    {
+        Filter.ForReview = false;
         await OnChangeCallback.InvokeAsync();
     }
 
