@@ -30,7 +30,7 @@
                     </div>
                 }
             }
-            @if (AppStateStore.IsUserReviewer && Filter.ForRevew)
+            @if (AppStateStore.IsUserReviewer && Filter.ForReview)
             {
                 <div class="badge badge-light p-2 m-1" title="Review" @onclick="(() => UnSelectReviewRoutes())">
                     Review<text>&nbsp;</text><span class="oi oi-minus"></span>
