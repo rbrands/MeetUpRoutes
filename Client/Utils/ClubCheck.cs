@@ -33,7 +33,12 @@ namespace BlazorApp.Client.Utils
                 {
                     _appStateStore.TrackKey = null;
                 }
-                _appStateStore.CurrentUser = await _backendApi.GetUser();
+                else if (!_appStateStore.SettingsAlreadyRead)
+                {
+                    _appStateStore.CurrentUser = await _backendApi.GetUser();
+                    _appStateStore.Settings = await _backendApi.GetRoutesSettings();
+                    _appStateStore.SettingsAlreadyRead = true;
+                }
             }
             return validTrackKey;
         }

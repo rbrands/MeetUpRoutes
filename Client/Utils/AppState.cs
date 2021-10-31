@@ -18,6 +18,8 @@ namespace BlazorApp.Client.Utils
 
         public IEnumerable<TenantSettings> Tenants { get; set; } = new List<TenantSettings>();
         public Boolean TenantsAlreadyRead { get; set; } = false;
+        public Boolean SettingsAlreadyRead { get; set; } = false;
+        public RoutesSettings Settings {get; set;} = new RoutesSettings();
 
         public TenantSettings Tenant
         {

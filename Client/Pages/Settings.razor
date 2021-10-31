@@ -16,6 +16,7 @@
     [Parameter]
     public string TrackKey { get; set; }
     private NotificationMessage _notificationMessage;
+    private RoutesSettings _settings;
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,9 +30,9 @@
             }
 
             var user = (await authenticationStateTask).User;
-            if (user.IsInRole(AppStateStore.Tenant.AdminRole) || user.IsInRole(Constants.RoleAdmin))
+            if (!user.IsInRole(AppStateStore.Tenant.AdminRole) && !user.IsInRole(Constants.RoleAdmin))
             {
-                //_members = await Api.GetUsers();
+                throw new ApplicationException("Es fehlen die Admin_Rechte für diese Seite.");
             }
         }
         catch (Exception ex)
