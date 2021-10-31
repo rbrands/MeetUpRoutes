@@ -42,7 +42,7 @@
     },
     {
       "route": "/api/GetTagSets",
-      "allowedRoles": [ "authenticated" ]
+      "allowedRoles": [ "anonymous" ]
     },
     {
       "route": "/api/*",
