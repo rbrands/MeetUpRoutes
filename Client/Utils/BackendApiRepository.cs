@@ -61,6 +61,13 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<TagSet>();
         }
+        public async Task<RoutesSettings> WriteTagSet(RoutesSettings settings)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<RoutesSettings>($"/api/WriteRoutesSettings", settings);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<RoutesSettings>();
+        }
         public async Task DeleteTagSet(TagSet tagSet)
         {
             this.PrepareHttpClient();
@@ -128,6 +135,11 @@ namespace BlazorApp.Client.Utils
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<TagSet>>($"/api/GetTagSets");
+        }
+        public async Task<RoutesSettings> GetRoutesSettings()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<RoutesSettings>($"/api/GetRoutesSettings");
         }
         public async Task<IEnumerable<MeetingPlace>> GetMeetingPlaces()
         {

@@ -1,0 +1,44 @@
+﻿@page "/{TrackKey}/settings"
+@attribute [Authorize(Roles = "admin,tenantadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject ClubCheck ClubCheck
+@inject NavigationManager NavigationManager
+
+<h3>Einstellungen</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [Parameter]
+    public string TrackKey { get; set; }
+    private NotificationMessage _notificationMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Check if a club is given as part of url or selected before
+            if (!await ClubCheck.SetClub(TrackKey))
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+
+            var user = (await authenticationStateTask).User;
+            if (user.IsInRole(AppStateStore.Tenant.AdminRole) || user.IsInRole(Constants.RoleAdmin))
+            {
+                //_members = await Api.GetUsers();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Daten können nicht gelesen werden: {ex.Message}");
+        }
+    }
+
+
+}
