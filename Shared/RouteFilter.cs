@@ -9,6 +9,8 @@ namespace BlazorApp.Shared
     {
         public Boolean ForReview { get; set; }
         public Boolean OnlyForMembers { get; set; }
+        public Boolean OnlyOwn { get; set; }
+        
         // The filter is build as a list of lists:
         // At least one tag of every inner list must be found. 
         public IList<IList<RouteTag>> Tags { get; set; }

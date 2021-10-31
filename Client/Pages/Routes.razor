@@ -32,7 +32,7 @@ else
         <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><span class="oi oi-reload"></span></button>
     </p>
     <div class="row @_searchCollapse">
-        <ComposeFilter Filter="@_filter" TagSets="@_tagSets"></ComposeFilter>
+        <ComposeFilter Filter="@_filter" TagSets="@_tagSets" OnChangeCallback="Reload"></ComposeFilter>
     </div>
     <div class="row">
         @foreach (ExtendedRoute route in _routes)

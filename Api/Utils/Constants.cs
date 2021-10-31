@@ -16,6 +16,8 @@ namespace BlazorApp.Api.Utils
 
         public const string ROLE_ADMIN = "admin";
 
+        public static int MAX_ROUTES_COUNT = 80;
+
 
     }
 }

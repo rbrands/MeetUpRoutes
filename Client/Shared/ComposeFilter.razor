@@ -15,6 +15,12 @@
                     </div>
                 }
             }
+            @if (AppStateStore.IsUserConfirmed && Filter.OnlyOwn)
+            {
+                <div class="badge badge-light p-2 m-1" title="Nur meine" @onclick="(() => UnSelectMyRoutes())">
+                    Meine Touren<text>&nbsp;</text><span class="oi oi-minus"></span>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -23,7 +29,7 @@
         <div class="card-header">Auswählen</div>
         <div class="card-body">
             @if (null != TagSets)
-            { 
+            {
                 @foreach (TagSet ts in TagSets)
                 {
                     @foreach (Tag t in ts.Tags)
@@ -37,6 +43,12 @@
                     }
                 }
             }
+            @if(AppStateStore.IsUserConfirmed && !Filter.OnlyOwn)
+            { 
+                <div class="badge badge-light p-2 m-1" title="Nur meine" @onclick="(() => SelectMyRoutes())">
+                    Meine Touren<text>&nbsp;</text><span class="oi oi-plus"></span>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -46,8 +58,11 @@
     public RouteFilter Filter { get; set; } = new RouteFilter();
     [Parameter]
     public IEnumerable<TagSet> TagSets { get; set; } = new List<TagSet>();
+    [Parameter]
+    public EventCallback OnChangeCallback { get; set; }
+
     private string[] BadgeClasses =
-    {
+{
         "primary",
         "secondary",
         "success",
@@ -65,7 +80,7 @@
     {
         CheckAvailableTags();
     }
-    private void SelectTag(TagSet tagSet, Tag tag)
+    private async Task SelectTag(TagSet tagSet, Tag tag)
     {
         RouteTag routeTag = FindRouteTagInFilter(tag);
         if (null == routeTag)
@@ -95,8 +110,20 @@
             Filter.Tags.Add(filterRouteTag);
         }
         filterRouteTag.Add(routeTag);
+        await OnChangeCallback.InvokeAsync();
     }
-    private void UnSelectTag(IList<RouteTag> routeTagList, RouteTag routeTag)
+    private async Task SelectMyRoutes()
+    {
+        Filter.OnlyOwn = true;
+        await OnChangeCallback.InvokeAsync();
+    }
+    private async Task UnSelectMyRoutes()
+    {
+        Filter.OnlyOwn = false;
+        await OnChangeCallback.InvokeAsync();
+    }
+
+    private async Task UnSelectTag(IList<RouteTag> routeTagList, RouteTag routeTag)
     {
         routeTagList.Remove(routeTag);
         Tag tag = FindCorrespondingTag(routeTag);
@@ -104,7 +131,7 @@
         {
             tag.HideFromSelection = false;
         }
-
+        await OnChangeCallback.InvokeAsync();
     }
 
     private Tag FindCorrespondingTag(RouteTag routeTag)

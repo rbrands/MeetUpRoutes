@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -59,17 +60,31 @@ namespace BlazorApp.Api
 
                 IEnumerable<Route> routes = null;
                 if (callingContext.IsUserConfirmed)
-                { 
+                {
                     // Get routes for review (if requested those) or only already reviewed or authored by calling user
                     if (filter.ForReview)
                     {
-                        routes = await _cosmosRepository.GetItems(r => !r.IsReviewed);
+                        if (!filter.OnlyOwn)
+                        { 
+                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed);
+                        }
+                        else
+                        {
+                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed && callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                        }
                     } 
                     else 
                     {
                         if (!callingContext.IsUserReviewer)
                         {
-                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0));
+                            if (!filter.OnlyOwn)
+                            { 
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0));
+                            }
+                            else
+                            {
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                            }
                         }
                         else 
                         {
@@ -113,12 +128,16 @@ namespace BlazorApp.Api
                     {
                         continue;
                     }
+                    if (filter.OnlyForMembers && !r.IsNonPublic)
+                    {
+                        continue;
+                    }
                     // Build ExtendedRoute
                     ExtendedRoute extendedRoute = new ExtendedRoute(r);
                     if (!String.IsNullOrEmpty(r.AuthorId))
                     { 
                         UserContactInfo author = await _cosmosUserRepository.GetItem(r.AuthorId);
-                        extendedRoute.AuthorDisplayName = author.UserNickName;
+                        extendedRoute.AuthorDisplayName = author?.UserNickName;
                         if (callingContext.IsUserReviewer)
                         {
                             extendedRoute.Author = author;
@@ -127,7 +146,7 @@ namespace BlazorApp.Api
                     if (r.IsReviewed && !String.IsNullOrEmpty(r.ReviewerId))
                     {
                         UserContactInfo reviewer = await _cosmosUserRepository.GetItem(r.ReviewerId);
-                        extendedRoute.ReviewerDisplayName = reviewer.UserNickName;
+                        extendedRoute.ReviewerDisplayName = reviewer?.UserNickName;
                         if (callingContext.IsUserReviewer)
                         {
                             extendedRoute.Reviewer = reviewer;
@@ -136,17 +155,9 @@ namespace BlazorApp.Api
                     extendedRoute.LastUpdate = r.Date;
                     extendedRoutes.Add(extendedRoute);
                 }
-                // Sort descending on date and get max 100 items!
-                extendedRoutes.Sort((x, y) => y.LastUpdate.CompareTo(x.LastUpdate));
-                List<ExtendedRoute> returnList = extendedRoutes;
-                int maxSize = Math.Min(extendedRoutes.Count, 100);
-                if (maxSize > 0)
-                {
-                    returnList = extendedRoutes.GetRange(0, maxSize);
-                }
 
-                // return the max 100 items of the list.
-                return new OkObjectResult(returnList);
+                // return ordered descending by date and max Constants.MAX_ROUTES_COUNT items of the list.
+                return new OkObjectResult(extendedRoutes.OrderByDescending(r => r.LastUpdate).Take(Constants.MAX_ROUTES_COUNT));
             }
             catch (Exception ex)
             {
