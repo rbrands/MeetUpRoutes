@@ -88,7 +88,14 @@ namespace BlazorApp.Api
                         }
                         else 
                         {
-                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0);
+                            if (!filter.OnlyOwn)
+                            { 
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0);
+                            }
+                            else
+                            {
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                            }
                         }
                     }
                 }
