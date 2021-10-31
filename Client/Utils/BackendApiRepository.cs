@@ -129,6 +129,11 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<TagSet>>($"/api/GetTagSets");
         }
+        public async Task<IEnumerable<MeetingPlace>> GetMeetingPlaces()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<IEnumerable<MeetingPlace>>($"/api/GetMeetingPlaces");
+        }
 
     }
 }

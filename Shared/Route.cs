@@ -18,6 +18,10 @@ namespace BlazorApp.Shared
         public string ReviewerId { get; set; }
         [JsonProperty(PropertyName = "title", NullValueHandling = NullValueHandling.Ignore), MaxLength(120, ErrorMessage = "Titel zu lang."), Required(ErrorMessage = "Bitte Titel eingeben.")]
         public string Title { get; set; }
+        [JsonProperty(PropertyName = "place", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Ort", Prompt = "Wo findet die Veranstaltung statt bzw. wo ist der Start"), MaxLength(256)]
+        public string Place { get; set; }
+        [JsonProperty(PropertyName = "DirectionsLink"), Display(Name = "Link zum Startpunkt", Prompt = "Link zum Startpunkt der Ausfahrt."), MaxLength(256), UIHint("url")]
+        public string DirectionsLink { get; set; }
         [JsonProperty(PropertyName = "scope", NullValueHandling = NullValueHandling.Ignore), Display(Name = "Titel-Link", Prompt = "Kurztitel wie er in der Url auftaucht"), MaxLength(160, ErrorMessage = "UrlTitel zu lang.")]
         [RegularExpression("[a-z0-9-_]*", ErrorMessage = "Bitte nur Kleinbuchstaben und Zahlen für den Titel-Link eingeben.")]
         public string Scope { get; set; }

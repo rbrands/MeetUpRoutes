@@ -22,6 +22,10 @@
                 @rt.TagLabel
             </span>
         }
+        @if (!String.IsNullOrEmpty(RouteItem.Core.DirectionsLink))
+        {
+            <a href="@RouteItem.Core.DirectionsLink" class="btn btn-outline-success btn-sm" role="button" target="_blank" tite="Startort"><span class="oi oi-map-marker"></span></a>
+        }
     </div>
     @if (!String.IsNullOrEmpty(RouteItem.Core.RouteLinkImage))
     {

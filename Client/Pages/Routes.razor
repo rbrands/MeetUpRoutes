@@ -22,7 +22,7 @@ else
     <p>
         <AuthorizeView>
             <Authorized>
-                <a class="btn btn-primary" href=@($"{AppStateStore.TrackKey}/editroute") title="Neue Tour" hidden="@(false && !AppStateStore.IsUserConfirmed)">Neue Tour</a>
+                <a class="btn btn-primary" href=@($"{AppStateStore.TrackKey}/editroute") title="Tour anlegen" hidden="@(false && !AppStateStore.IsUserConfirmed)">Tour anlegen</a>
             </Authorized>
             <NotAuthorized>
                 <a class="btn btn-primary" href="/LoginProviders/routes">Anmelden</a>
