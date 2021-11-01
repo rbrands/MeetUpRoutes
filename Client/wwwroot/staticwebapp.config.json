@@ -13,6 +13,10 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetArticle",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetVersion",
       "allowedRoles": [ "anonymous" ]
     },
@@ -38,6 +42,10 @@
     },
     {
       "route": "/api/WriteRoutesSettings",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/WriteArticle",
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {

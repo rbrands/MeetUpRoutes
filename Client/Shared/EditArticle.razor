@@ -1,0 +1,78 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+@if (!_editMode)
+{
+    @if (!String.IsNullOrEmpty(_article.ArticleText))
+    {
+        @((MarkupString)_article.ArticleText)
+    }
+    <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
+        <Authorized>
+            <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SwitchToEditMode())"><span class="oi oi-pencil"></span></button>
+        </Authorized>
+    </AuthorizeView>
+}
+else
+{
+    <BlazoredTextEditor @ref="_htmlArticle" Placeholder="Artikel-Text">
+        <ToolbarContent>
+            <span class="ql-formats">
+                <button class="ql-bold"></button>
+                <button class="ql-italic"></button>
+                <button class="ql-underline"></button>
+            </span>
+            <span class="ql-formats">
+                <select class="ql-color"></select>
+                <select class="ql-background"></select>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-list" value="ordered"></button>
+                <button class="ql-list" value="bullet"></button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-link"></button>
+            </span>
+        </ToolbarContent>
+        <EditorContent>
+            @if (null != _article.ArticleText)
+            {@((MarkupString)_article.ArticleText)}
+        </EditorContent>
+    </BlazoredTextEditor>
+    <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SaveArticle())"><span class="oi oi-check" title="Speichern"></span></button>
+    <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => Cancel())"><span class="oi oi-x" title="Abbrechen"></span></button>
+}
+
+@code {
+    [Parameter]
+    public string ArticleKey { get; set; }
+    private Article _article = new Article();
+    private bool _editMode = false;
+    private BlazoredTextEditor _htmlArticle;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _article = await Api.GetArticle(ArticleKey);
+    }
+
+    private async Task SaveArticle()
+    {
+        _article.ArticleText = await _htmlArticle.GetHTML();
+        _article.ArticleKey = ArticleKey;
+        await Api.WriteArticle(_article);
+        _editMode = false;
+    }
+
+    private void SwitchToEditMode()
+    {
+        _editMode = true;
+    }
+    private void Cancel()
+    {
+        _editMode = false;
+    }
+}

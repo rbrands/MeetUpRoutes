@@ -68,6 +68,13 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<RoutesSettings>();
         }
+        public async Task<Article> WriteArticle(Article article)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<Article>($"/api/WriteArticle", article);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Article>();
+        }
         public async Task DeleteTagSet(TagSet tagSet)
         {
             this.PrepareHttpClient();
@@ -103,6 +110,11 @@ namespace BlazorApp.Client.Utils
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<ExtendedRoute>($"/api/GetRoute/{id}");
+        }
+        public async Task<Article> GetArticle(string key)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<Article>($"/api/GetArticle/{key}");
         }
         public async Task<IEnumerable<ExtendedRoute>> GetRoutes(RouteFilter filter)
         {
