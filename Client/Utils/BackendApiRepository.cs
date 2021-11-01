@@ -61,7 +61,7 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<TagSet>();
         }
-        public async Task<RoutesSettings> WriteTagSet(RoutesSettings settings)
+        public async Task<RoutesSettings> WriteRoutesSettings(RoutesSettings settings)
         {
             this.PrepareHttpClient();
             HttpResponseMessage response = await _http.PostAsJsonAsync<RoutesSettings>($"/api/WriteRoutesSettings", settings);
