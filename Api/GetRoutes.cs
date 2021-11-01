@@ -23,15 +23,18 @@ namespace BlazorApp.Api
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
         private CosmosDBRepository<Route> _cosmosRepository;
+        private CosmosDBRepository<Comment> _cosmosCommentRepository;
         private CosmosDBRepository<UserContactInfo> _cosmosUserRepository;
 
         private TenantSettingsRepository _tenantRepository;
         private ServerSettingsRepository _serverSettingsRepository;
+        private CallingContext _callingContext;
         public GetRoutes(ILogger<GetRoutes> logger,
                         IConfiguration config,
                         ServerSettingsRepository serverSettingsRepository,
                         TenantSettingsRepository tenantRepository,
-                         CosmosDBRepository<UserContactInfo> cosmosUserRepository,
+                        CosmosDBRepository<Comment> cosmosCommentRepository,
+                        CosmosDBRepository<UserContactInfo> cosmosUserRepository,
                         CosmosDBRepository<Route> cosmosRepository
         )
         {
@@ -40,6 +43,7 @@ namespace BlazorApp.Api
             _serverSettingsRepository = serverSettingsRepository;
             _tenantRepository = tenantRepository;
             _cosmosUserRepository = cosmosUserRepository;
+            _cosmosCommentRepository = cosmosCommentRepository;
             _cosmosRepository = cosmosRepository;
         }
 
@@ -49,52 +53,52 @@ namespace BlazorApp.Api
         {
             try
             {
-                CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosUserRepository);
+                _callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosUserRepository);
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 RouteFilter filter = JsonConvert.DeserializeObject<RouteFilter>(requestBody);
                 if (filter.ForReview)
                 {
-                    callingContext.AssertReviewerAuthorization();
+                    _callingContext.AssertReviewerAuthorization();
                 }
 
                 IEnumerable<Route> routes = null;
-                if (callingContext.IsUserConfirmed)
+                if (_callingContext.IsUserConfirmed)
                 {
                     // Get routes for review (if requested those) or only already reviewed or authored by calling user
                     if (filter.ForReview)
                     {
                         if (!filter.OnlyOwn)
                         { 
-                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed);
+                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed);
                         }
                         else
                         {
-                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed && callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed && _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
                         }
                     } 
                     else 
                     {
-                        if (!callingContext.IsUserReviewer)
+                        if (!_callingContext.IsUserReviewer)
                         {
                             if (!filter.OnlyOwn)
                             { 
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0));
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0));
                             }
                             else
                             {
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
                             }
                         }
                         else 
                         {
                             if (!filter.OnlyOwn)
                             { 
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0);
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0);
                             }
                             else
                             {
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
                             }
                         }
                     }
@@ -102,7 +106,7 @@ namespace BlazorApp.Api
                 else
                 {
                     // Get only public and reviewed routes
-                    routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(callingContext.TenantSettings.TrackKey) == 0 && !r.IsNonPublic && r.IsReviewed);
+                    routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsNonPublic && r.IsReviewed);
                 }
 
                 List<ExtendedRoute> extendedRoutes = new List<ExtendedRoute>();
@@ -158,7 +162,7 @@ namespace BlazorApp.Api
                     { 
                         UserContactInfo author = await _cosmosUserRepository.GetItem(r.AuthorId);
                         extendedRoute.AuthorDisplayName = author?.UserNickName;
-                        if (callingContext.IsUserReviewer)
+                        if (_callingContext.IsUserReviewer)
                         {
                             extendedRoute.Author = author;
                         }
@@ -167,11 +171,14 @@ namespace BlazorApp.Api
                     {
                         UserContactInfo reviewer = await _cosmosUserRepository.GetItem(r.ReviewerId);
                         extendedRoute.ReviewerDisplayName = reviewer?.UserNickName;
-                        if (callingContext.IsUserReviewer)
+                        if (_callingContext.IsUserReviewer)
                         {
                             extendedRoute.Reviewer = reviewer;
                         }
                     }
+                    // Get all comments
+                    IEnumerable<Comment> comments = await _cosmosCommentRepository.GetItems(c => c.ReferenceId.CompareTo(extendedRoute.Core.Id) == 0);
+                    extendedRoute.CommentsList = await ExpandCommentList(comments);
                     extendedRoute.LastUpdate = r.Date;
                     extendedRoutes.Add(extendedRoute);
                 }
@@ -183,6 +190,23 @@ namespace BlazorApp.Api
             {
                 return new BadRequestErrorMessageResult(ex.Message);
             }
+        }
+        private async Task<IEnumerable<ExtendedComment>> ExpandCommentList(IEnumerable<Comment> commentList)
+        {
+            List<ExtendedComment> extendedCommentList = new List<ExtendedComment>();
+            foreach (Comment comment in commentList)
+            { 
+                ExtendedComment extendedComment = new ExtendedComment(comment);
+
+                UserContactInfo author = await _cosmosUserRepository.GetItem(comment.AuthorId);
+                extendedComment.AuthorDisplayName = author?.UserNickName;
+                if (_callingContext.IsUserReviewer)
+                {
+                    extendedComment.Author = author;
+                }
+                extendedCommentList.Add(extendedComment);
+            }
+            return extendedCommentList;
         }
     }
 }

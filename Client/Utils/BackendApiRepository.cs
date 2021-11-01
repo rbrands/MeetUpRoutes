@@ -87,12 +87,25 @@ namespace BlazorApp.Client.Utils
             HttpResponseMessage response = await _http.PostAsJsonAsync<Route>($"/api/DeleteRoute", route);
             response.EnsureSuccessStatusCode();
         }
+        public async Task DeleteComment(Comment comment)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<Comment>($"/api/DeleteComment", comment);
+            response.EnsureSuccessStatusCode();
+        }
         public async Task<Route> WriteRoute(Route route)
         {
             this.PrepareHttpClient();
             HttpResponseMessage response = await _http.PostAsJsonAsync<Route>($"/api/WriteRoute", route);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<Route>();
+        }
+        public async Task<Comment> WriteComment(Comment comment)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<Comment>($"/api/WriteComment", comment);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Comment>();
         }
         public async Task<LinkPreview> GetLinkPreview(LinkPreview linkPreview)
         {
@@ -110,6 +123,11 @@ namespace BlazorApp.Client.Utils
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<ExtendedRoute>($"/api/GetRoute/{id}");
+        }
+        public async Task<ExtendedComment> GetComment(string id)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<ExtendedComment>($"/api/GetComment/{id}");
         }
         public async Task<Article> GetArticle(string key)
         {
