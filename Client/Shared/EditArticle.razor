@@ -1,6 +1,7 @@
 ﻿@using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @using Blazored.TextEditor
+@implements IDisposable
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 
@@ -56,7 +57,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _article = await Api.GetArticle(ArticleKey);
+        AppStateStore.OnChange += ReadArticle;
+        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+        {
+            _article = await Api.GetArticle(ArticleKey);
+        }
     }
 
     private async Task SaveArticle()
@@ -75,4 +80,17 @@ else
     {
         _editMode = false;
     }
+    private async void ReadArticle()
+    {
+        if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+        {
+            _article = await Api.GetArticle(ArticleKey);
+            StateHasChanged();
+        }
+    }
+    public void Dispose()
+    {
+        AppStateStore.OnChange -= ReadArticle;
+    }
+
 }
