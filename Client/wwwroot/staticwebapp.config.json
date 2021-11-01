@@ -13,6 +13,10 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetArticle/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetVersion",
       "allowedRoles": [ "anonymous" ]
     },
@@ -37,11 +41,23 @@
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {
+      "route": "/api/WriteRoutesSettings",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
+      "route": "/api/WriteArticle",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
       "route": "/api/GetTagSet",
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {
       "route": "/api/GetTagSets",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/GetRoutesSettings",
       "allowedRoles": [ "anonymous" ]
     },
     {

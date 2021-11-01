@@ -16,7 +16,7 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <div class="nav-link font-weight-bold text-white">
+            <div class="nav-link font-weight-bolder h5">
                 @AppStateStore.Tenant?.TenantName
             </div>
         </li>
@@ -38,7 +38,7 @@
                     {
                         <li class="nav-item px-3">
                             <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/editroute")>
-                                <span class="oi oi-document" aria-hidden="true"></span> Neue Tour
+                                <span class="oi oi-document" aria-hidden="true"></span> Tour anlegen
                             </NavLink>
                         </li>
                     }
@@ -60,6 +60,11 @@
                 <li class="nav-item px-3">
                     <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/tags")>
                         <span class="oi oi-tags" aria-hidden="true"></span> Tags
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href=@($"{AppStateStore.TrackKey}/settings")>
+                        <span class="oi oi-wrench" aria-hidden="true"></span> Einstellungen
                     </NavLink>
                 </li>
             </Authorized>

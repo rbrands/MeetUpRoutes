@@ -80,7 +80,11 @@ namespace BlazorApp.Api
                         route.AuthorId = callingContext.User.ContactInfo.Id;
                     }
                 }
-
+                // Set scope if not already set
+                if (String.IsNullOrEmpty(route.Scope))
+                {
+                    route.Scope = route.GetUrlFriendlyTitle();
+                }
                 Route updatedRoute = await _cosmosRepository.UpsertItem(route);
 
                 return new OkObjectResult(updatedRoute);

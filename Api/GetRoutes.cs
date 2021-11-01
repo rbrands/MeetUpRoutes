@@ -106,6 +106,11 @@ namespace BlazorApp.Api
                 }
 
                 List<ExtendedRoute> extendedRoutes = new List<ExtendedRoute>();
+                string scopeToCompare = null;
+                if (null != filter.Scope)
+                {
+                    scopeToCompare = filter.Scope.ToLowerInvariant();
+;                }
                 foreach (Route r in routes)
                 {
                     // Check filter
@@ -138,6 +143,14 @@ namespace BlazorApp.Api
                     if (filter.OnlyForMembers && !r.IsNonPublic)
                     {
                         continue;
+                    }
+                    // Check if scoped route is requested
+                    if (!String.IsNullOrEmpty(scopeToCompare)) 
+                    {
+                        if (String.IsNullOrEmpty(r.Scope) || r.Scope.ToLowerInvariant().CompareTo(scopeToCompare) != 0)
+                        {
+                            continue;
+                        }
                     }
                     // Build ExtendedRoute
                     ExtendedRoute extendedRoute = new ExtendedRoute(r);

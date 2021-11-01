@@ -22,6 +22,10 @@
                 @rt.TagLabel
             </span>
         }
+        @if (!String.IsNullOrEmpty(RouteItem.Core.DirectionsLink))
+        {
+            <a href="@RouteItem.Core.DirectionsLink" class="btn btn-outline-success btn-sm" role="button" target="_blank" tite="Startort"><span class="oi oi-map-marker"></span></a>
+        }
     </div>
     @if (!String.IsNullOrEmpty(RouteItem.Core.RouteLinkImage))
     {
@@ -35,6 +39,10 @@
         </h6>
         <h5 class="card-title">
             @RouteItem.Core.Title
+            @if (!String.IsNullOrEmpty(RouteItem.Core.Scope))
+            {
+                <text>&nbsp;</text><a href="/@AppStateStore.TrackKey/@RouteItem.Core.Scope"><span class="oi oi-link-intact"></span></a>
+            }
         </h5>
         <p class="card-text">
             <div class="overflow-auto" style="max-height: 500px">

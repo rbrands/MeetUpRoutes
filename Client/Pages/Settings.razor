@@ -1,0 +1,81 @@
+﻿@page "/{TrackKey}/settings"
+@attribute [Authorize(Roles = "admin,tenantadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject ClubCheck ClubCheck
+@inject NavigationManager NavigationManager
+
+<h3>Einstellungen</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
+
+<EditForm Model="@_settings" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="userName">Link zu Logo</label>
+        <InputText id="logo" aria-describedby="logoHelp" class="form-control" @bind-Value="_settings.LogoLink" placeholder="Logo-Link" title="Logo" />
+        <small id="logoHelp" class="form-text text-muted">
+            Optional: Link zu Logo-Image, dass dann auf der Startseite angezeigt wird.
+        </small>
+    </div>
+
+    <ValidationSummary />
+    <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [Parameter]
+    public string TrackKey { get; set; }
+    private NotificationMessage _notificationMessage;
+    private RoutesSettings _settings = new RoutesSettings();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Check if a club is given as part of url or selected before
+            if (!await ClubCheck.SetClub(TrackKey))
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+
+            var user = (await authenticationStateTask).User;
+            if (!user.IsInRole(AppStateStore.Tenant.AdminRole) && !user.IsInRole(Constants.RoleAdmin))
+            {
+                throw new ApplicationException("Es fehlen die Admin_Rechte für diese Seite.");
+            }
+            _settings = await Api.GetRoutesSettings();
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Daten können nicht gelesen werden: {ex.Message}");
+        }
+    }
+    private async Task OnSave()
+    {
+        _notificationMessage.Hide();
+
+        try
+        {
+            await Api.WriteRoutesSettings(_settings);
+            AppStateStore.Settings = _settings;
+            AppStateStore.SettingsAlreadyRead = true;
+            NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+    protected void OnCancel()
+    {
+        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}");
+    }
+
+
+}

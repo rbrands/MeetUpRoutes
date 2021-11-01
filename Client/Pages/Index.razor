@@ -12,47 +12,51 @@
 
 <div class="jumbotron">
     <h3>Tourenverzeichnis @AppStateStore.Tenant.TenantName</h3>
-    @if (!AppStateStore.TenantsAlreadyRead)
-    {
-        <p><em>Einstellungen werden gelesen...</em></p>
-    }
-    else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
-    {
-        <p>
-            Zunächst musst du einen Club auswählen, um die Touren zu sehen.
-        </p>
-        <p class="container">
-            @foreach (TenantSettings tenant in AppStateStore.Tenants)
-            {
-                if (tenant.TracksEnabled && tenant.TrackKey.CompareTo("demo") != 0)
+    <div class="row">
+        @if (!String.IsNullOrEmpty(AppStateStore.Settings?.LogoLink))
+        {
+            <div class="col-3">
+                <img src="@AppStateStore.Settings?.LogoLink" class="img-fluid" />
+            </div>
+        }
+    <div class="col">
+        @if (!AppStateStore.TenantsAlreadyRead)
+        {
+            <p><em>Einstellungen werden gelesen...</em></p>
+        }
+        else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
+        {
+            <p>
+                Zunächst musst du einen Club auswählen, um die Touren zu sehen.
+            </p>
+            <p class="container">
+                @foreach (TenantSettings tenant in AppStateStore.Tenants)
                 {
-                    <div class="row">
-                        <div class="col-sm-12 col-md-6 col-lg-4">
-                            <button type="button" class="btn btn-lg btn-block btn-outline-info btn-social" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
+                    if (tenant.TracksEnabled && tenant.TrackKey.CompareTo("demo") != 0)
+                    {
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6 col-lg-4">
+                                <button type="button" class="btn btn-lg btn-block btn-outline-info btn-social" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
+                            </div>
                         </div>
-                    </div>
+                    }
                 }
+            </p>
+        }
+        else
+        {
+            <p>
+                <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/routes")>Zu den Touren</a>
+            </p>
+        }
+        <p>
+            @if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+            {
+                <EditArticle ArticleKey="Start"></EditArticle>
             }
         </p>
-    }
-    else
-    {
-        <p>
-            <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/routes")>Zu den Touren</a>
-        </p>
-    }
-
-    <p>
-        Hier kannst du Touren suchen, für Ausfahrten auswählen oder auch neue Touren erstellen und mit anderen teilen.
-    </p>
-    <p class="text-info">
-        <em>
-            <b>
-                Diese Anwendung befindet sich gerade in der Entwicklung, du kannst hier verfolgen, wie sie Schritt für Schritt entsteht.
-                Siehe <a href="https://github.com/rbrands/MeetUpRoutes/projects/1" title="Projekt" target="_blank">das Projektboard</a> zum aktuellen Stand.
-            </b>
-        </em>
-    </p>
+    </div>
+    </div>
 </div>
 
 @if (null != AppStateStore.TrackKey)

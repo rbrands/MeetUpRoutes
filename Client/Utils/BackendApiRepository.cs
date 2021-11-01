@@ -61,6 +61,20 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<TagSet>();
         }
+        public async Task<RoutesSettings> WriteRoutesSettings(RoutesSettings settings)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<RoutesSettings>($"/api/WriteRoutesSettings", settings);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<RoutesSettings>();
+        }
+        public async Task<Article> WriteArticle(Article article)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<Article>($"/api/WriteArticle", article);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Article>();
+        }
         public async Task DeleteTagSet(TagSet tagSet)
         {
             this.PrepareHttpClient();
@@ -97,6 +111,11 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<ExtendedRoute>($"/api/GetRoute/{id}");
         }
+        public async Task<Article> GetArticle(string key)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<Article>($"/api/GetArticle/{key}");
+        }
         public async Task<IEnumerable<ExtendedRoute>> GetRoutes(RouteFilter filter)
         {
             this.PrepareHttpClient();
@@ -128,6 +147,16 @@ namespace BlazorApp.Client.Utils
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<TagSet>>($"/api/GetTagSets");
+        }
+        public async Task<RoutesSettings> GetRoutesSettings()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<RoutesSettings>($"/api/GetRoutesSettings");
+        }
+        public async Task<IEnumerable<MeetingPlace>> GetMeetingPlaces()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<IEnumerable<MeetingPlace>>($"/api/GetMeetingPlaces");
         }
 
     }

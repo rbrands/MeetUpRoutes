@@ -65,6 +65,34 @@
                 Länge der Tour (zumindest ungefähr) und möglichst Höhenmeter oder auch ungefähre Fahrtzeit.
             </small>
         </div>
+        <div class="form-group">
+            <label for="SelectMeetingPlace">Auswahl Standard-Startort</label>
+            <select class="form-control" @onchange="@((ChangeEventArgs e) => OnMeetingPlaceChanged(e.Value.ToString()))">
+                <option value=""></option>
+                @foreach (MeetingPlace place in _meetingPlaces)
+                {
+                    <option value="@place.Id">@place.Title</option>
+                }
+            </select>
+            <small id="standardPlaceHelp" class="form-text text-muted">
+                Hier sind die Standard-Treffpunkte zur Auswahl.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="place">Startort</label>
+            <InputText id="place" aria-describedby="placeHelp" class="form-control" @bind-Value="_routeToEdit.Core.Place" autocomplete="on" placeholder="Typischer Startpunkt der Tour" />
+            <small id="placeHelp" class="form-text text-muted">
+                Optional: Typischer Treffpunkt der Gruppe für die Tour. Eingabe nicht zwingend notwendig aber praktisch, wenn im MeetUpPlanner mit dieser Tour Ausfahrten angelegt werden sollen.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="link">Link zum Startort</label>
+            <InputText id="directionsLink" aria-describedby="directionsLinkHelp" class="form-control" @bind-Value="_routeToEdit.Core.DirectionsLink" placeholder="URL" title="Link zum Startort" />
+            <small id="directionsLinkHelp" class="form-text text-muted">
+                Optional: Link zum Startort, z.B. Google Maps, Bing usw.
+            </small>
+        </div>
+
         <div class="form-row">
             <div class="form-group col-md-10">
                 <InputText id="link" aria-describedby="linkHelp" class="form-control" @bind-Value="_routeToEdit.Core.RouteLink" placeholder="Link zu weiterer Streckeninfo" title="Link zu weiterer Streckeninfo" />
@@ -175,6 +203,8 @@
     private BlazoredTextEditor _htmlDescription;
     private IEnumerable<TagSet> _tagSets;
     private bool _linkPreviewEnabled = false;
+    IEnumerable<MeetingPlace> _meetingPlaces = new List<MeetingPlace>();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -194,6 +224,7 @@
                 _linkPreviewEnabled = !String.IsNullOrEmpty(_routeToEdit.Core.RouteLink);
             }
             _tagSets = await Api.GetTagSets();
+            _meetingPlaces = await Api.GetMeetingPlaces();
         }
         catch (Exception ex)
         {
@@ -300,4 +331,14 @@
             _notificationMessage.ShowError($"Fehler beim Speichern: {ex.Message}");
         }
     }
+    protected void OnMeetingPlaceChanged(string id)
+    {
+        MeetingPlace meetingPlace = _meetingPlaces.FirstOrDefault(m => m.Id.Equals(id));
+        if (null != meetingPlace)
+        {
+            _routeToEdit.Core.Place = meetingPlace.Title;
+            _routeToEdit.Core.DirectionsLink = meetingPlace.Link;
+        }
+    }
+
 }
