@@ -50,6 +50,76 @@ namespace BlazorApp.Shared
         [JsonProperty(PropertyName = "tags"), Display(Name = "Tags"), MaxLength(512, ErrorMessage = "Zu viele Tags.")]
         public string Tags { get; set; }
         public IList<RouteTag> RouteTags { get; set; } = new List<RouteTag>();
+
+        public string GetUrlFriendlyTitle()
+        {
+            string urlFriendlyTitle = null;
+            if (!String.IsNullOrEmpty(Title))
+            {
+                string titleLowerCase = Title.ToLowerInvariant();
+                StringBuilder sb = new StringBuilder();
+                int charCounter = 0;
+                foreach(char c in titleLowerCase)
+                {
+                    if (++charCounter > 160)
+                    {
+                        // url not longer than 160 chars
+                        break;
+                    }
+                    switch (c)
+                    {
+                        case 'ö':
+                        case 'Ö':
+                            sb.Append("oe");
+                            break;
+                        case 'ü':
+                        case 'Ü':
+                            sb.Append("ue");
+                            break;
+                        case 'ä':
+                        case 'Ä':
+                            sb.Append("ae");
+                            break;
+                        case 'ß':
+                            sb.Append("ss");
+                            break;
+                        case 'a':
+                        case 'b':
+                        case 'c':
+                        case 'd':
+                        case 'e':
+                        case 'f':
+                        case 'g':
+                        case 'h':
+                        case 'i':
+                        case 'J':
+                        case 'K':
+                        case 'L':
+                        case 'M':
+                        case 'N':
+                        case 'O':
+                        case 'P':
+                        case 'Q':
+                        case 'R':
+                        case 'S':
+                        case 'T':
+                        case 'U':
+                        case 'V':
+                        case 'W':
+                        case 'X':
+                        case 'Y':
+                        case 'Z':
+                            sb.Append(c);
+                            break;
+                        default:
+                            sb.Append('-');
+                            break;
+                    }
+                }
+                urlFriendlyTitle = sb.ToString();
+            }
+            return urlFriendlyTitle;
+        }
     }
 
     public class RouteTag

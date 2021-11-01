@@ -1,4 +1,4 @@
-﻿@page "/{TrackKey}/routes"
+﻿@page "/{TrackKey}/{Scope}"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
@@ -6,13 +6,9 @@
 @inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
-<div class="jumbotron">
-    Hier findest du die Zusammenstellung aller Touren - sortiert nach Aktualität, d.h. die neuesten Touren stehen oben. Nutze die Filterfunktonen,
-    um leichter zu finden was du suchst.
-</div>
+
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
-<h3>Touren</h3>
 @if (null == _routes)
 {
     <p><em>Deine Zugriffsrechte werden geprüft und Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
@@ -21,23 +17,15 @@ else
 {
     <p>
         <AuthorizeView>
-            <Authorized>
-                <a class="btn btn-primary" href=@($"{AppStateStore.TrackKey}/editroute") title="Tour anlegen" hidden="@(false && !AppStateStore.IsUserConfirmed)">Tour anlegen</a>
-            </Authorized>
             <NotAuthorized>
-                <a class="btn btn-primary" href="/LoginProviders/routes">Anmelden</a>
+                <a class="btn btn-primary" href="/LoginProviders/@Scope">Anmelden</a>
             </NotAuthorized>
         </AuthorizeView>
-        <button class="btn btn-primary" title="Suche anzeigen" @onclick="@(() => ToggleSearchCollapse())"><span class="oi oi-magnifying-glass"></span></button>
-        <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><span class="oi oi-reload"></span></button>
     </p>
-    <div class="row @_searchCollapse">
-        <ComposeFilter Filter="@_filter" TagSets="@_tagSets" OnChangeCallback="Reload"></ComposeFilter>
-    </div>
     <div class="row">
         @foreach (ExtendedRoute route in _routes)
         {
-            <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+            <div class="col">
                 <RouteCard RouteItem="@route"></RouteCard>
             </div>
         }
@@ -47,11 +35,11 @@ else
 @code {
     [Parameter]
     public string TrackKey { get; set; }
+    [Parameter]
+    public string Scope { get; set; }
     private NotificationMessage _notificationMessage;
     IEnumerable<ExtendedRoute> _routes = null;
     RouteFilter _filter = new RouteFilter();
-    private IEnumerable<TagSet> _tagSets;
-    private string _searchCollapse = "collapse";
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,6 +47,15 @@ else
         {
             // Check if a club is given as part of url or selected before
             if (!await ClubCheck.SetClub(TrackKey))
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+            if (!String.IsNullOrEmpty(Scope))
+            {
+                _filter.Scope = Scope;
+            }
+            else
             {
                 NavigationManager.NavigateTo("/");
                 return;
@@ -72,14 +69,6 @@ else
         }
     }
 
-    private async Task ToggleSearchCollapse()
-    {
-        _searchCollapse = String.IsNullOrEmpty(_searchCollapse) ? "collapse" : String.Empty;
-        if (String.IsNullOrEmpty(_searchCollapse))
-        {
-            _tagSets = await Api.GetTagSets();
-        }
-    }
     private async Task Reload()
     {
         try
