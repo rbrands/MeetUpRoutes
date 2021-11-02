@@ -10,7 +10,6 @@ namespace BlazorApp.Shared
     {
         public Comment Core { get; set; }
         public UserContactInfo Author { get; set; }
-        public string AuthorDisplayName { get; set; }
         public ExtendedComment()
         {
             Core = new Comment();

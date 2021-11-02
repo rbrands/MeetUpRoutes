@@ -11,7 +11,7 @@
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
 <div class="jumbotron">
-    <h3>Tourenverzeichnis @AppStateStore.Tenant.TenantName</h3>
+    <h3>Routen @AppStateStore.Tenant.TenantName</h3>
     <div class="row">
         @if (!String.IsNullOrEmpty(AppStateStore.Settings?.LogoLink))
         {
@@ -27,7 +27,7 @@
         else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
         {
             <p>
-                Zunächst musst du einen Club auswählen, um die Touren zu sehen.
+                Zunächst musst du einen Club auswählen, um die Routen zu sehen.
             </p>
             <p class="container">
                 @foreach (TenantSettings tenant in AppStateStore.Tenants)
@@ -46,7 +46,7 @@
         else
         {
             <p>
-                <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/routes")>Zu den Touren</a>
+                <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/routes") title="Routen">Zu den Routen</a>
             </p>
         }
         <p>
@@ -75,7 +75,7 @@
                             @if (_userInfo.IsConfirmed)
                             {
                                 <text>
-                                    Du bist als Clubmitglied bestätigt, d.h. du kannst neben den öffentlichen Touren auch Touren sehen, die nur für Mitglieder sichtbar sind.
+                                    Du bist als Clubmitglied bestätigt, d.h. du kannst neben den öffentlichen Routen auch Routen sehen, die nur für Mitglieder sichtbar sind.
                                 </text>
                             }
                             else
@@ -83,23 +83,23 @@
                                 <text>
                                     Dein Account ist noch nicht bestätigt.
                                     Fülle die <a href=@($"/{AppStateStore.TrackKey}/profile") title="Profil">Profilseite</a> aus und gebe dort das Schlüsselwort ein, sofern bekannt oder bitte die Administratoren um Freigabe.
-                                    Sobald dein Account bestätigt ist, kannst du alle Touren sehen.
+                                    Sobald dein Account bestätigt ist, kannst du alle Routen sehen.
                                 </text>
                             }
                         </li>
                         <li>
                             @if (_userInfo.IsAuthor)
                             {
-                                <text>Dein Account hat Autor:innen-Berechtigung. D.h. du kannst Touren erstellen, die ohne ein Review veröffentlicht werden.</text>
+                                <text>Dein Account hat Autor:innen-Berechtigung. D.h. du kannst Routen erstellen, die ohne ein Review veröffentlicht werden.</text>
                             }
                             else
                             {
-                                <text>Du hast noch keine Autor:innen-Berechtigung, d.h. Touren, die du erstellst, müssen erst gereviewed werden, bevor sie veröffentlicht werden.</text>
+                                <text>Du hast noch keine Autor:innen-Berechtigung, d.h. Routen, die du erstellst, müssen erst gereviewed werden, bevor sie veröffentlicht werden.</text>
                             }
                         </li>
                         @if (_userInfo.IsReviewer)
                         {
-                            <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Mitgliedern, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
+                            <li>Dein Account hat Review-Berechtigung, d.h. du kannst Routen von Mitgliedern, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
                         }
                         <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
                             <Authorized Context="authorizeContext">
@@ -111,12 +111,12 @@
             </Authorized>
             <NotAuthorized>
                 <p>
-                    Um Touren zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten. MeetUpRoutes hat folgende Mitgliedslevel:
+                    Um Routen zu erstellen usw. musst du dich anmelden und entsprechende Berechtigungen erhalten. MeetUpRoutes hat folgende Mitgliedslevel:
                     <ul>
-                        <li>Ohne Anmeldung kannst du nur öffentliche Touren sehen.</li>
-                        <li>Wenn du dich anmeldest und als Clubmitglied bestätigt wirst, kannst du auch nicht öffentliche Touren sehen und selbst Touren erstellen.</li>
-                        <li>Wenn du den Autor:innen-Status erhälst, kannst du Touren erstellen, die ohne weiteres Review sofort veröffentlicht werden.</li>
-                        <li>Hast du auch die "Review"-Berechtigung kannst du Touren der Mitglieder reviewen und freigeben.</li>
+                        <li>Ohne Anmeldung kannst du nur öffentliche Routen sehen.</li>
+                        <li>Wenn du dich anmeldest und als Clubmitglied bestätigt wirst, kannst du auch nicht öffentliche Routen sehen und selbst Routen erstellen.</li>
+                        <li>Wenn du den Autor:innen-Status erhälst, kannst du Routen erstellen, die ohne weiteres Review sofort veröffentlicht werden.</li>
+                        <li>Hast du auch die "Review"-Berechtigung kannst du Routen der Mitglieder reviewen und freigeben.</li>
                     </ul>
                     <a class="btn btn-primary" href="/LoginProviders">Anmelden</a>
                 </p>

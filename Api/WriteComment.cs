@@ -52,13 +52,14 @@ namespace BlazorApp.Api
                 comment.Tenant = callingContext.TenantSettings.TrackKey;
                 // Set create date and author
                 comment.CommentDate = DateTime.UtcNow;
-                comment.AuthorId = callingContext.User.ContactInfo.Id;
+                comment.AuthorId = callingContext.User?.ContactInfo?.Id;
                 Comment updatedComment = await _cosmosRepository.UpsertItem(comment);
 
                 return new OkObjectResult(updatedComment);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

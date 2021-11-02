@@ -1,0 +1,107 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using System.Collections.Generic 
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+@if (!_editMode)
+{
+    <div @onmouseover="ShowChangeButtons" @onmouseout="HideChangeButtons">
+        <AuthorizeView>
+            <Authorized>
+                @if (AppStateStore.IsUserReviewer || AppStateStore.IsUserGivenAuthor(Comment.Core.AuthorId))
+                { 
+                    <button hidden="@(!_showButtons)" class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SwitchToEditMode())" title="Kommentar editieren"><span class="oi oi-pencil"></span></button>
+                    <button hidden="@(!_showButtons)" class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => DeleteComment())" title="Kommentar löshcen"><span class="oi oi-trash"></span></button>
+                }
+            </Authorized>
+        </AuthorizeView>
+        <small>
+            <em>@Comment.Core.AuthorDisplayName (@Comment.Core.DisplayDate): </em>@Comment.Core.CommentText
+            @if (!String.IsNullOrEmpty(Comment.Core.Link))
+            {
+                <text>&nbsp;</text><a title="@Comment.Core.DisplayLinkTitle" target="_blank" href="@Comment.Core.Link">@Comment.Core.DisplayLinkTitle</a>
+            }
+        </small>
+    </div>
+}
+else
+{
+    <EditForm Model="@Comment.Core" OnValidSubmit="SaveComment">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <InputTextArea id="comment" aria-describedby="commentHelp" class="form-control" @bind-Value="Comment.Core.CommentText" placeholder="Kurzer Kommentar oder Frage."></InputTextArea>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary" type="submit"><span class="oi oi-check" title="Speichern"></span></button>
+        <button class="btn btn-sm btn-outline-secondary" type="reset" @onclick="@(() => Cancel())"><span class="oi oi-x" title="Abbrechen"></span></button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public ExtendedComment Comment { get; set; }
+    [Parameter]
+    public string ReferenceId { get; set; }
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+    private Boolean _showButtons = false;
+
+
+    private bool _editMode = false;
+
+    protected override void OnInitialized()
+    {
+        if (null == Comment)
+        {
+            Comment = new ExtendedComment();
+            Comment.Core.ReferenceId = ReferenceId;
+            _editMode = true;
+        }
+    }
+    private void SwitchToEditMode()
+    {
+        _editMode = true;
+    }
+    private async Task Cancel()
+    {
+        _editMode = false;
+        await OnCancel.InvokeAsync();
+    }
+
+    private async Task SaveComment()
+    {
+        if (!String.IsNullOrEmpty(Comment.Core.CommentText) || !String.IsNullOrEmpty(Comment.Core.Link))
+        {
+            await Api.WriteComment(Comment.Core);
+        }
+        _editMode = false;
+        await OnSave.InvokeAsync();
+    }
+    private async Task DeleteComment()
+    {
+        ModalResult result = await Confirm.ShowDialog(Modal, "Kommentar löschen?", "Soll der Kommentar wirklich gelöscht werden?");
+        if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+        {
+            return;
+        }
+        await Api.DeleteComment(Comment.Core);
+        _editMode = false;
+        await OnSave.InvokeAsync();
+    }
+    private void ShowChangeButtons()
+    {
+        _showButtons = true;
+    }
+    private void HideChangeButtons()
+    {
+        _showButtons = false;
+    }
+
+
+
+}

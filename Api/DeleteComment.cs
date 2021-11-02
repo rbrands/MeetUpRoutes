@@ -62,6 +62,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

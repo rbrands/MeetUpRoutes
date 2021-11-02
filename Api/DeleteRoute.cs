@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -19,6 +20,7 @@ namespace BlazorApp.Api
         private readonly ILogger _logger;
         private CosmosDBRepository<Route> _cosmosRepository;
         private CosmosDBRepository<UserContactInfo> _cosmosUserRepository;
+        private CosmosDBRepository<Comment> _cosmosCommentRepository;
         private TenantSettingsRepository _tenantSettingsRepository;
         private ServerSettingsRepository _serverSettingsRepository;
 
@@ -26,12 +28,14 @@ namespace BlazorApp.Api
                          ServerSettingsRepository serverSettingsRepository,
                          TenantSettingsRepository tenantSettingsRepository,
                          CosmosDBRepository<UserContactInfo> cosmosUserRepository,
+                         CosmosDBRepository<Comment> cosmosCommentRepository,
                          CosmosDBRepository<Route> cosmosRepository)
         {
             _logger = logger;
             _serverSettingsRepository = serverSettingsRepository;
             _tenantSettingsRepository = tenantSettingsRepository;
             _cosmosUserRepository = cosmosUserRepository;
+            _cosmosCommentRepository = cosmosCommentRepository;
             _cosmosRepository = cosmosRepository;
         }
 
@@ -57,11 +61,17 @@ namespace BlazorApp.Api
                     callingContext.AssertReviewerAuthorization();
                 }
                 await _cosmosRepository.DeleteItemAsync(route.Id);
-
+                // Delete all comments
+                IEnumerable<Comment> comments = await _cosmosCommentRepository.GetItems(c => c.ReferenceId.Equals(route.Id));
+                foreach (Comment c in comments)
+                {
+                    await _cosmosCommentRepository.DeleteItemAsync(c.Id);
+                }
                 return new OkResult();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

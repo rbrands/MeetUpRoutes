@@ -58,9 +58,12 @@ namespace BlazorApp.Api
                     throw new Exception($"Comment with id {id} not found.");
                 }
                 ExtendedComment extendedComment = new ExtendedComment(comment);
-
-                UserContactInfo author = await _cosmosUserRepository.GetItem(comment.AuthorId);
-                extendedComment.AuthorDisplayName = author?.UserNickName;
+                UserContactInfo author = null;
+                if (!String.IsNullOrEmpty(comment.AuthorId))
+                {
+                    author = await _cosmosUserRepository.GetItem(comment.AuthorId);
+                    extendedComment.Core.AuthorDisplayName = author?.UserNickName;
+                }
                 if (callingContext.IsUserReviewer)
                 {
                     extendedComment.Author = author;

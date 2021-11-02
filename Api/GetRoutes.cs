@@ -178,7 +178,12 @@ namespace BlazorApp.Api
                     }
                     // Get all comments
                     IEnumerable<Comment> comments = await _cosmosCommentRepository.GetItems(c => c.ReferenceId.CompareTo(extendedRoute.Core.Id) == 0);
-                    extendedRoute.CommentsList = await ExpandCommentList(comments);
+                    extendedRoute.CommentsList = (await ExpandCommentList(comments)).OrderByDescending(c => c.Core.CommentDate);
+                    ExtendedComment newestComment = extendedRoute.CommentsList.FirstOrDefault();
+                    if (null != newestComment)
+                    {
+                        extendedRoute.LastUpdate = newestComment.Core.CommentDate;
+                    }
                     extendedRoute.LastUpdate = r.Date;
                     extendedRoutes.Add(extendedRoute);
                 }
@@ -197,9 +202,12 @@ namespace BlazorApp.Api
             foreach (Comment comment in commentList)
             { 
                 ExtendedComment extendedComment = new ExtendedComment(comment);
-
-                UserContactInfo author = await _cosmosUserRepository.GetItem(comment.AuthorId);
-                extendedComment.AuthorDisplayName = author?.UserNickName;
+                UserContactInfo author = null;
+                if (!String.IsNullOrEmpty(comment.AuthorId))
+                {
+                    author = await _cosmosUserRepository.GetItem(comment.AuthorId);
+                    extendedComment.Core.AuthorDisplayName = author?.UserNickName;
+                }
                 if (_callingContext.IsUserReviewer)
                 {
                     extendedComment.Author = author;

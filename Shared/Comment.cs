@@ -12,6 +12,8 @@ namespace BlazorApp.Shared
         public string ReferenceId { get; set; }
         [JsonProperty(PropertyName = "authorId"), Display(Name = "Autor")]
         public string AuthorId { get; set; }
+        [JsonProperty(PropertyName = "authorDisplayName"), Display(Name = "Autor")]
+        public string AuthorDisplayName { get; set; }
         [JsonProperty(PropertyName = "commentDate")]
         public DateTime CommentDate { get; set; } = DateTime.UtcNow;
         [JsonProperty(PropertyName = "commentText"), MaxLength(350, ErrorMessage = "Kommentar zu lang.")]
@@ -25,7 +27,7 @@ namespace BlazorApp.Shared
         {
             get
             {
-                return (null != CommentDate) ? CommentDate.ToString("dd.MM. HH:mm") : String.Empty;
+                return (null != CommentDate) ? CommentDate.ToLocalTime().ToString("dd.MM. HH:mm") : String.Empty;
             }
         }
         [JsonIgnore]
