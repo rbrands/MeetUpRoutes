@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -15,33 +14,31 @@ using BlazorApp.Api.Utils;
 
 namespace BlazorApp.Api
 {
-    public class DeleteRoute
+    public class WriteComment
     {
         private readonly ILogger _logger;
-        private CosmosDBRepository<Route> _cosmosRepository;
+        private CosmosDBRepository<Comment> _cosmosRepository;
         private CosmosDBRepository<UserContactInfo> _cosmosUserRepository;
-        private CosmosDBRepository<Comment> _cosmosCommentRepository;
         private TenantSettingsRepository _tenantSettingsRepository;
         private ServerSettingsRepository _serverSettingsRepository;
 
-        public DeleteRoute(ILogger<DeleteRoute> logger,
+        public WriteComment(ILogger<WriteComment> logger,
                          ServerSettingsRepository serverSettingsRepository,
                          TenantSettingsRepository tenantSettingsRepository,
                          CosmosDBRepository<UserContactInfo> cosmosUserRepository,
-                         CosmosDBRepository<Comment> cosmosCommentRepository,
-                         CosmosDBRepository<Route> cosmosRepository)
+                         CosmosDBRepository<Comment> cosmosRepository
+                         )
         {
             _logger = logger;
             _serverSettingsRepository = serverSettingsRepository;
             _tenantSettingsRepository = tenantSettingsRepository;
             _cosmosUserRepository = cosmosUserRepository;
-            _cosmosCommentRepository = cosmosCommentRepository;
             _cosmosRepository = cosmosRepository;
         }
 
-        [FunctionName("DeleteRoute")]
+        [FunctionName("WriteComment")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "DeleteRoute")] HttpRequest req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WriteComment")] HttpRequest req
             )
         {
             try
@@ -50,24 +47,15 @@ namespace BlazorApp.Api
                 callingContext.AssertConfirmedAccess();
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                Route route = JsonConvert.DeserializeObject<Route>(requestBody);
-                if (String.IsNullOrEmpty(route.Id))
-                {
-                    return new BadRequestErrorMessageResult("Die Id der Route fehlt.");
-                }
-                if (String.IsNullOrEmpty(route.AuthorId) || route.AuthorId.CompareTo(callingContext.User.ContactInfo.Id) != 0)
-                {
-                    // another one authored this version
-                    callingContext.AssertReviewerAuthorization();
-                }
-                await _cosmosRepository.DeleteItemAsync(route.Id);
-                // Delete all comments
-                IEnumerable<Comment> comments = await _cosmosCommentRepository.GetItems(c => c.ReferenceId.Equals(route.Id));
-                foreach (Comment c in comments)
-                {
-                    await _cosmosCommentRepository.DeleteItemAsync(c.Id);
-                }
-                return new OkResult();
+                Comment comment = JsonConvert.DeserializeObject<Comment>(requestBody);
+                // Set tenant again to ensure that the data is written to the correct tenant!
+                comment.Tenant = callingContext.TenantSettings.TrackKey;
+                // Set create date and author
+                comment.CommentDate = DateTime.UtcNow;
+                comment.AuthorId = callingContext.User?.ContactInfo?.Id;
+                Comment updatedComment = await _cosmosRepository.UpsertItem(comment);
+
+                return new OkObjectResult(updatedComment);
             }
             catch (Exception ex)
             {

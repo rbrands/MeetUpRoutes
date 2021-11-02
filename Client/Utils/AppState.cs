@@ -98,5 +98,14 @@ namespace BlazorApp.Client.Utils
                 return (null != CurrentUser && CurrentUser.IsDev);
             }
         }
+        public Boolean IsUserGivenAuthor(string id)
+        {
+            return (null != CurrentUser && 
+                    CurrentUser.IsAuthenticated && 
+                    null != CurrentUser.ContactInfo && 
+                    CurrentUser.ContactInfo.IsConfirmed &&
+                    !String.IsNullOrEmpty(id) &&
+                    CurrentUser.ContactInfo.Id.CompareTo(id) == 0);
+        }
     }
 }

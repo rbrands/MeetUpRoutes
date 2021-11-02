@@ -15,21 +15,21 @@ using BlazorApp.Api.Utils;
 
 namespace BlazorApp.Api
 {
-    public class GetRoute
+    public class GetComment
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
-        private CosmosDBRepository<Route> _cosmosRepository;
+        private CosmosDBRepository<Comment> _cosmosRepository;
         private CosmosDBRepository<UserContactInfo> _cosmosUserRepository;
 
         private TenantSettingsRepository _tenantRepository;
         private ServerSettingsRepository _serverSettingsRepository;
-        public GetRoute(ILogger<GetRoute> logger,
+        public GetComment(ILogger<GetRoute> logger,
                         IConfiguration config,
                         ServerSettingsRepository serverSettingsRepository,
                         TenantSettingsRepository tenantRepository,
                          CosmosDBRepository<UserContactInfo> cosmosUserRepository,
-                        CosmosDBRepository<Route> cosmosRepository
+                        CosmosDBRepository<Comment> cosmosRepository
         )
         {
             _logger = logger;
@@ -40,51 +40,36 @@ namespace BlazorApp.Api
             _cosmosRepository = cosmosRepository;
         }
 
-        [FunctionName(nameof(GetRoute))]
+        [FunctionName(nameof(GetComment))]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetRoute/{id}")] HttpRequest req, string id)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetComment/{id}")] HttpRequest req, string id)
         {
             try
             {
                 CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosUserRepository);
-            
+
                 if (String.IsNullOrEmpty(id))
                 {
-                    throw new Exception("Missing id for call GetRoute()");
+                    throw new Exception("Missing id for call GetComment()");
                 }
-                Route route = await _cosmosRepository.GetItem(id);
-                if (null == route)
+                Comment comment = await _cosmosRepository.GetItem(id);
+                if (null == comment)
                 {
-                    throw new Exception($"Route with id {id} not found.");
+                    throw new Exception($"Comment with id {id} not found.");
                 }
-                ExtendedRoute extendedRoute = new ExtendedRoute(route);
-                
-                // Check if user is allowed to get this route
-                if (route.IsNonPublic)
+                ExtendedComment extendedComment = new ExtendedComment(comment);
+                UserContactInfo author = null;
+                if (!String.IsNullOrEmpty(comment.AuthorId))
                 {
-                    callingContext.AssertConfirmedAccess();
+                    author = await _cosmosUserRepository.GetItem(comment.AuthorId);
+                    extendedComment.Core.AuthorDisplayName = author?.UserNickName;
                 }
-                if (!route.IsReviewed && !callingContext.CheckAuthor(route))
-                {
-                    callingContext.AssertReviewerAuthorization();
-                }
-                UserContactInfo author = await _cosmosUserRepository.GetItem(route.AuthorId);
-                extendedRoute.AuthorDisplayName = author?.UserNickName;
                 if (callingContext.IsUserReviewer)
                 {
-                    extendedRoute.Author = author;
-                }
-                if (route.IsReviewed && !String.IsNullOrEmpty(route.ReviewerId))
-                {
-                    UserContactInfo reviewer = await _cosmosUserRepository.GetItem(route.ReviewerId);
-                    extendedRoute.ReviewerDisplayName = reviewer.UserNickName;
-                    if (callingContext.IsUserReviewer)
-                    {
-                        extendedRoute.Reviewer = reviewer;
-                    }
+                    extendedComment.Author = author;
                 }
 
-                return new OkObjectResult(extendedRoute);
+                return new OkObjectResult(extendedComment);
             }
             catch (Exception ex)
             {

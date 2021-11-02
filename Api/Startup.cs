@@ -46,6 +46,7 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton<CosmosDBRepository<MeetingPlace>>();
             builder.Services.AddSingleton<CosmosDBRepository<RoutesSettings>>();
             builder.Services.AddSingleton<CosmosDBRepository<Article>>();
+            builder.Services.AddSingleton<CosmosDBRepository<Comment>>();
             builder.Services.AddSingleton(new ServerSettingsRepository(config, cosmosClient));
             builder.Services.AddSingleton(new TenantSettingsRepository(config, cosmosClient));
             builder.Services.AddSingleton(new LinkPreviewService());

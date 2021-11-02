@@ -14,6 +14,8 @@ namespace BlazorApp.Shared
         public UserContactInfo Reviewer { get; set; }
         public string ReviewerDisplayName { get; set; }
         public DateTime LastUpdate {get;set;}
+        public IEnumerable<ExtendedComment> CommentsList { get; set; } = new List<ExtendedComment>();
+
 
         public ExtendedRoute()
         {
