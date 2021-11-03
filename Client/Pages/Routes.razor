@@ -7,6 +7,8 @@
 @inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
+<Title Value="@($"MeetUpRoutes - {AppStateStore.Tenant?.TenantName}")"></Title>
+
 <div class="jumbotron">
     <EditArticle ArticleKey="Routes"></EditArticle>
 </div>

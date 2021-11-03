@@ -1,11 +1,20 @@
 ﻿@page "/{TrackKey}/{Scope}"
+@using System.Text.RegularExpressions
 @using BlazorApp.Client.Utils
+@using BlazorApp.Client.Shared
 @using BlazorApp.Shared
+@using System.Web
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
+<Title Value="@($"MeetUpRoutes - {AppStateStore.Tenant?.TenantName}")"></Title>
+
+<Meta property="og:type" content="article" />
+<Meta property="og:title" content="@_firstRoute?.Core.Title" />
+<Meta property="og:description" content="@StripHTML(_firstRoute?.Core.Description)" />
+<Meta property="og:image" content="@_firstRoute?.Core.RouteLinkImage" />
 
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
@@ -40,6 +49,7 @@ else
     private NotificationMessage _notificationMessage;
     IEnumerable<ExtendedRoute> _routes = null;
     RouteFilter _filter = new RouteFilter();
+    ExtendedRoute _firstRoute;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,6 +71,7 @@ else
                 return;
             }
             _routes = await Api.GetRoutes(_filter);
+            _firstRoute = _routes.FirstOrDefault();
         }
         catch (Exception ex)
         {
@@ -74,6 +85,7 @@ else
         try
         {
             _routes = await Api.GetRoutes(_filter);
+            _firstRoute = _routes.FirstOrDefault();
         }
         catch (Exception ex)
         {
@@ -81,4 +93,17 @@ else
         }
     }
 
+    public string StripHTML(string HTMLText, bool decode = true)
+    {
+        if (null != HTMLText)
+        {
+            Regex reg = new Regex("<[^>]+>", RegexOptions.IgnoreCase);
+            var stripped = reg.Replace(HTMLText, "");
+            return decode ? HttpUtility.HtmlDecode(stripped) : stripped;
+        }
+        else
+        {
+            return null;
+        }
+    }
 }
