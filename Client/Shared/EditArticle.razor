@@ -60,7 +60,15 @@ else
         AppStateStore.OnChange += ReadArticle;
         if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
         {
-            _article = await Api.GetArticle(ArticleKey);
+            if (AppStateStore.ArticleCache.ContainsKey(ArticleKey))
+            {
+                _article = AppStateStore.ArticleCache[ArticleKey];
+            }
+            else
+            {
+                _article = await Api.GetArticle(ArticleKey);
+                AppStateStore.ArticleCache[ArticleKey] = _article;
+            }
         }
     }
 
@@ -84,7 +92,15 @@ else
     {
         if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
         {
-            _article = await Api.GetArticle(ArticleKey);
+            if (AppStateStore.ArticleCache.ContainsKey(ArticleKey))
+            {
+                _article = AppStateStore.ArticleCache[ArticleKey];
+            }
+            else
+            {
+                _article = await Api.GetArticle(ArticleKey);
+                AppStateStore.ArticleCache[ArticleKey] = _article;
+            }
             StateHasChanged();
         }
     }

@@ -20,6 +20,7 @@ namespace BlazorApp.Client.Utils
         public Boolean TenantsAlreadyRead { get; set; } = false;
         public Boolean SettingsAlreadyRead { get; set; } = false;
         public RoutesSettings Settings {get; set;} = new RoutesSettings();
+        public IDictionary<string, Article> ArticleCache { get; set; } = new Dictionary<string, Article>();
 
         public TenantSettings Tenant
         {
