@@ -90,6 +90,8 @@
     public IEnumerable<TagSet> TagSets { get; set; } = new List<TagSet>();
     [Parameter]
     public EventCallback OnChangeCallback { get; set; }
+    [Parameter]
+    public string TagByName { get; set; }
 
     private string[] BadgeClasses =
 {
@@ -106,11 +108,15 @@
     {
         return BadgeClasses[(int)color];
     }
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        if (!String.IsNullOrEmpty(TagByName))
+        {
+            await SelectTagByLabel(TagByName);
+        }
         CheckAvailableTags();
     }
-    private async Task SelectTag(TagSet tagSet, Tag tag)
+    private async Task SelectTag(TagSet tagSet, Tag tag, Boolean withReload = true)
     {
         RouteTag routeTag = FindRouteTagInFilter(tag);
         if (null == routeTag)
@@ -140,7 +146,29 @@
             Filter.Tags.Add(filterRouteTag);
         }
         filterRouteTag.Add(routeTag);
-        await OnChangeCallback.InvokeAsync();
+        if (withReload)
+        {
+            await OnChangeCallback.InvokeAsync();
+        }
+    }
+    private async Task SelectTagByLabel(string label)
+    {
+        TagSet foundTagSet = null;
+        Tag foundTag = null;
+        string labelToCompare = label.ToLowerInvariant();
+        foreach(TagSet tagSet in TagSets)
+        {
+            foundTag = tagSet.Tags.FirstOrDefault(t => t.Label.ToLowerInvariant().CompareTo(labelToCompare) == 0);
+            if (null != foundTag)
+            {
+                foundTagSet = tagSet;
+                break;
+            }
+        }
+        if (null != foundTag)
+        {
+            await SelectTag(foundTagSet, foundTag, true);
+        }
     }
     private async Task SelectMyRoutes()
     {

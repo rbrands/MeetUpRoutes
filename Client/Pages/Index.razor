@@ -1,5 +1,6 @@
 ﻿@page "/"
 @page "/{TrackKey}"
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
 @using BlazorApp.Shared
 @using BlazorApp.Client.Utils
 @inject AppState AppStateStore
@@ -7,6 +8,7 @@
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
+<Title Value="@($"MeetUpRoutes - {AppStateStore.Tenant?.TenantName}")"></Title>
 
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
@@ -19,43 +21,43 @@
                 <img src="@AppStateStore.Settings?.LogoLink" class="img-fluid" />
             </div>
         }
-    <div class="col">
-        @if (!AppStateStore.TenantsAlreadyRead)
-        {
-            <p><em>Einstellungen werden gelesen...</em></p>
-        }
-        else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
-        {
-            <p>
-                Zunächst musst du einen Club auswählen, um die Routen zu sehen.
-            </p>
-            <p class="container">
-                @foreach (TenantSettings tenant in AppStateStore.Tenants)
-                {
-                    if (tenant.TracksEnabled && tenant.TrackKey.CompareTo("demo") != 0)
+        <div class="col">
+            @if (!AppStateStore.TenantsAlreadyRead)
+            {
+                <p><em>Einstellungen werden gelesen...</em></p>
+            }
+            else if (String.IsNullOrEmpty(AppStateStore.TrackKey))
+            {
+                <p>
+                    Zunächst musst du einen Club auswählen, um die Routen zu sehen.
+                </p>
+                <p class="container">
+                    @foreach (TenantSettings tenant in AppStateStore.Tenants)
                     {
-                        <div class="row">
-                            <div class="col-sm-12 col-md-6 col-lg-4">
-                                <button type="button" class="btn btn-lg btn-block btn-outline-info btn-social" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
+                        if (tenant.TracksEnabled && tenant.TrackKey.CompareTo("demo") != 0)
+                        {
+                            <div class="row">
+                                <div class="col-sm-12 col-md-6 col-lg-4">
+                                    <button type="button" class="btn btn-lg btn-block btn-outline-info btn-social" @onclick="@(() => ShowRoutes(tenant.TrackKey))">@tenant.TenantName</button>
+                                </div>
                             </div>
-                        </div>
+                        }
                     }
+                </p>
+            }
+            else
+            {
+                <p>
+                    <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/routes") title="Routen">Zu den Routen</a>
+                </p>
+            }
+            <p>
+                @if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
+                {
+                    <EditArticle ArticleKey="Start"></EditArticle>
                 }
             </p>
-        }
-        else
-        {
-            <p>
-                <a class="btn btn-primary" href=@($"/{AppStateStore.TrackKey}/routes") title="Routen">Zu den Routen</a>
-            </p>
-        }
-        <p>
-            @if (!String.IsNullOrEmpty(AppStateStore.TrackKey))
-            {
-                <EditArticle ArticleKey="Start"></EditArticle>
-            }
-        </p>
-    </div>
+        </div>
     </div>
 </div>
 

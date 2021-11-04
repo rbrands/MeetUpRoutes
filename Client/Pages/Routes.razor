@@ -1,10 +1,13 @@
 ﻿@page "/{TrackKey}/routes"
+@page "/{TrackKey}/routes/{TagName}"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
+
+<Title Value="@($"MeetUpRoutes - {AppStateStore.Tenant?.TenantName}")"></Title>
 
 <div class="jumbotron">
     <EditArticle ArticleKey="Routes"></EditArticle>
@@ -31,7 +34,7 @@ else
         <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><span class="oi oi-reload"></span></button>
     </p>
     <div class="row @_searchCollapse">
-        <ComposeFilter Filter="@_filter" TagSets="@_tagSets" OnChangeCallback="Reload"></ComposeFilter>
+        <ComposeFilter Filter="@_filter" TagSets="@_tagSets" OnChangeCallback="Reload" TagByName="@TagName"></ComposeFilter>
     </div>
     <div class="row">
         @foreach (ExtendedRoute route in _routes)
@@ -46,6 +49,8 @@ else
 @code {
     [Parameter]
     public string TrackKey { get; set; }
+    [Parameter]
+    public string TagName { get; set; }
     private NotificationMessage _notificationMessage;
     IEnumerable<ExtendedRoute> _routes = null;
     RouteFilter _filter = new RouteFilter();
@@ -62,6 +67,11 @@ else
                 NavigationManager.NavigateTo("/");
                 return;
             }
+            _tagSets = await Api.GetTagSets();
+            if (!String.IsNullOrEmpty(TagName))
+            {
+                ToggleSearchCollapse();
+            }
             _routes = await Api.GetRoutes(_filter);
         }
         catch (Exception ex)
@@ -71,13 +81,9 @@ else
         }
     }
 
-    private async Task ToggleSearchCollapse()
+    private void ToggleSearchCollapse()
     {
         _searchCollapse = String.IsNullOrEmpty(_searchCollapse) ? "collapse" : String.Empty;
-        if (String.IsNullOrEmpty(_searchCollapse))
-        {
-            _tagSets = await Api.GetTagSets();
-        }
     }
     private async Task Reload()
     {
