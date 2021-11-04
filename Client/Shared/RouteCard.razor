@@ -170,7 +170,7 @@
         }
         RouteItem.Core.IsReviewed = true;
         await Api.WriteRoute(RouteItem.Core);
-        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes", true);
+        await OnReload.InvokeAsync();
     }
     protected async Task AddRidingComment()
     {
