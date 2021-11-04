@@ -83,6 +83,10 @@
                     @if (AppStateStore.IsUserConfirmed)
                     {
                     <div class="btn-group mr-2" role="group" aria-label="Ändern">
+                        @if (!RouteItem.Core.IsReviewed && AppStateStore.IsUserReviewer)
+                        {
+                            <button class="btn btn-sm btn-outline-secondary" title="Freigeben" @onclick="@(() => ApproveItem())"><span class="oi oi-check"></span></button>
+                        }
                         <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(RouteItem.Core.Id))" hidden="@HideAuthoring"><span class="oi oi-pencil"></span></button>
                         <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem())" hidden="@HideAuthoring"><span class="oi oi-trash"></span></button>
                         <button class="btn btn-sm btn-outline-secondary" title="Kommentieren" @onclick="@(() => ToggleCommentInput())"><span class="oi oi-comment-square"></span></button>
@@ -155,6 +159,17 @@
             return;
         }
         await Api.DeleteRoute(RouteItem.Core);
+        NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes", true);
+    }
+    protected async Task ApproveItem()
+    {
+        ModalResult result = await Confirm.ShowDialog(Modal, "Route freigeben?", "Soll die Route freigegeben werden?");
+        if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+        {
+            return;
+        }
+        RouteItem.Core.IsReviewed = true;
+        await Api.WriteRoute(RouteItem.Core);
         NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes", true);
     }
     protected async Task AddRidingComment()
