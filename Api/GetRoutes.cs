@@ -63,7 +63,7 @@ namespace BlazorApp.Api
                 }
 
                 IEnumerable<Route> routes = null;
-                if (_callingContext.IsUserConfirmed)
+                if (_callingContext.IsUserConfirmed || _callingContext.ValidKeyWordInHeader)
                 {
                     // Get routes for review (if requested those) or only already reviewed or authored by calling user
                     if (filter.ForReview)
