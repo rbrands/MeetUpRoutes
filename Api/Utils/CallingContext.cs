@@ -117,7 +117,11 @@ namespace BlazorApp.Api.Utils
 
             string key = callingContext.TenantSettings.TrackKey + "-" + callingContext.User.Principal.GetUserKey();
             callingContext.User.ContactInfo = await userRepository.GetItemByKey(key);
-
+            if (null == callingContext.User.ContactInfo)
+            {
+                callingContext.User.ContactInfo = new UserContactInfo();
+                callingContext.User.ContactInfo.Id = String.Empty;
+            }
             return callingContext;
         }
 

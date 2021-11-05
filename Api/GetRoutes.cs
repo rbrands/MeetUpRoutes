@@ -83,11 +83,11 @@ namespace BlazorApp.Api
                         {
                             if (!filter.OnlyOwn)
                             { 
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || _callingContext.CheckAuthor(r)));
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0));
                             }
                             else
                             {
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && _callingContext.CheckAuthor(r));
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0);
                             }
                         }
                         else 
@@ -98,7 +98,7 @@ namespace BlazorApp.Api
                             }
                             else
                             {
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && _callingContext.CheckAuthor(r));
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0);
                             }
                         }
                     }
