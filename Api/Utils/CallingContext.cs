@@ -15,6 +15,8 @@ namespace BlazorApp.Api.Utils
         private User _user;
         private TenantSettings _tenantSettings;
         private ServerSettings _serverSettings;
+        private const string HEADER_KEYWORD = "x-meetup-keyword";
+        private Boolean _validKeyWordInHeader = false;
 
         public User User
         {
@@ -31,6 +33,18 @@ namespace BlazorApp.Api.Utils
         { 
             get { return _serverSettings; }
             set { _serverSettings = value; }
+        }
+
+        public Boolean ValidKeyWordInHeader
+        {
+            get
+            {
+                return _validKeyWordInHeader;
+            }
+            set
+            {
+                _validKeyWordInHeader = value;
+            }
         }
 
         public Boolean IsUserConfirmed
@@ -95,6 +109,11 @@ namespace BlazorApp.Api.Utils
             callingContext.User.Principal = Utils.UserDetails.GetClientPrincipal(req);
             callingContext.TenantSettings = await GetTenantSettings(req, tenantRepository);
             callingContext.ServerSettings = await serverSettingsRepository.GetServerSettings(callingContext.TenantSettings);
+            string keyWord = req.Headers[HEADER_KEYWORD];
+            if (!String.IsNullOrEmpty(keyWord))
+            {
+                callingContext.ValidKeyWordInHeader = callingContext.ServerSettings.IsUser(keyWord);
+            }
 
             string key = callingContext.TenantSettings.TrackKey + "-" + callingContext.User.Principal.GetUserKey();
             callingContext.User.ContactInfo = await userRepository.GetItemByKey(key);
