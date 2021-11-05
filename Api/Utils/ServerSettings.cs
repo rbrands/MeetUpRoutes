@@ -31,7 +31,7 @@ namespace BlazorApp.Api.Utils
         /// <returns></returns>
         public bool IsUser(string keyword)
         {
-            return this.UserKeyword.Equals(keyword) || this.AdminKeyword.Equals(keyword);
+            return this.UserKeyword.CompareTo(keyword) == 0 || this.AdminKeyword.CompareTo(keyword) == 0;
         }
     }
 }
