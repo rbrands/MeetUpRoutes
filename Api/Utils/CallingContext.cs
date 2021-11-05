@@ -187,6 +187,7 @@ namespace BlazorApp.Api.Utils
                          && null != _user.Principal
                          && _user.IsAuthenticated
                          && _user.ContactInfo.IsConfirmed
+                         && !String.IsNullOrEmpty(_user.ContactInfo.Id)
                          && (_user.ContactInfo.Id.CompareTo(authorId) == 0)
                      );
         }

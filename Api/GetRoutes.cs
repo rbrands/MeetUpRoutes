@@ -83,7 +83,7 @@ namespace BlazorApp.Api
                         {
                             if (!filter.OnlyOwn)
                             { 
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || true));
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || _callingContext.CheckAuthor(r)));
                             }
                             else
                             {
