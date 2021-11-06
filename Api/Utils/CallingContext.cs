@@ -166,6 +166,13 @@ namespace BlazorApp.Api.Utils
                 throw new UnauthorizedAccessException($"User {_user.Principal.UserDetails} is austhenticated but not confirmed");
             }
         }
+        public void AssertConfirmedOrValidKeyWordAccess()
+        {
+            if (!ValidKeyWordInHeader && !IsUserConfirmed)
+            { 
+                throw new UnauthorizedAccessException($"User not authorized");
+            }
+        }
         public void AssertReviewerAuthorization()
         {
             if (!IsUserReviewer)

@@ -44,7 +44,7 @@ namespace BlazorApp.Api
             try
             {
                 CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantSettingsRepository, _serverSettingsRepository, _cosmosUserRepository);
-                callingContext.AssertConfirmedAccess();
+                callingContext.AssertConfirmedOrValidKeyWordAccess();
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 Comment comment = JsonConvert.DeserializeObject<Comment>(requestBody);
@@ -52,7 +52,10 @@ namespace BlazorApp.Api
                 comment.Tenant = callingContext.TenantSettings.TrackKey;
                 // Set create date and author
                 comment.CommentDate = DateTime.UtcNow;
-                comment.AuthorId = callingContext.User?.ContactInfo?.Id;
+                if (!String.IsNullOrEmpty(callingContext.User?.ContactInfo?.Id))
+                { 
+                    comment.AuthorId = callingContext.User?.ContactInfo?.Id;
+                }
                 Comment updatedComment = await _cosmosRepository.UpsertItem(comment);
 
                 return new OkObjectResult(updatedComment);
