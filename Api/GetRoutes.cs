@@ -176,6 +176,7 @@ namespace BlazorApp.Api
                             extendedRoute.Reviewer = reviewer;
                         }
                     }
+                    extendedRoute.LastUpdate = r.Date;
                     // Get all comments
                     IEnumerable<Comment> comments = await _cosmosCommentRepository.GetItems(c => c.ReferenceId.CompareTo(extendedRoute.Core.Id) == 0);
                     extendedRoute.CommentsList = (await ExpandCommentList(comments)).OrderByDescending(c => c.Core.CommentDate);
@@ -184,7 +185,6 @@ namespace BlazorApp.Api
                     {
                         extendedRoute.LastUpdate = newestComment.Core.CommentDate;
                     }
-                    extendedRoute.LastUpdate = r.Date;
                     extendedRoutes.Add(extendedRoute);
                 }
 
