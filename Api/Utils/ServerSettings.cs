@@ -22,7 +22,7 @@ namespace BlazorApp.Api.Utils
         /// <returns></returns>
         public bool IsAdmin(string keyword)
         {
-            return AdminKeyword.Equals(keyword);
+            return AdminKeyword.CompareTo(keyword) == 0;
         }
         /// <summary>
         /// Checks if the given keyword matches the user keyword or the admin keyword

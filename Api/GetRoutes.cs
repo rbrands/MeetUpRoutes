@@ -63,7 +63,7 @@ namespace BlazorApp.Api
                 }
 
                 IEnumerable<Route> routes = null;
-                if (_callingContext.IsUserConfirmed)
+                if (_callingContext.IsUserConfirmed || _callingContext.ValidKeyWordInHeader)
                 {
                     // Get routes for review (if requested those) or only already reviewed or authored by calling user
                     if (filter.ForReview)
@@ -83,11 +83,11 @@ namespace BlazorApp.Api
                         {
                             if (!filter.OnlyOwn)
                             { 
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0));
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0));
                             }
                             else
                             {
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0);
                             }
                         }
                         else 
@@ -98,7 +98,7 @@ namespace BlazorApp.Api
                             }
                             else
                             {
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0);
                             }
                         }
                     }
@@ -176,6 +176,7 @@ namespace BlazorApp.Api
                             extendedRoute.Reviewer = reviewer;
                         }
                     }
+                    extendedRoute.LastUpdate = r.Date;
                     // Get all comments
                     IEnumerable<Comment> comments = await _cosmosCommentRepository.GetItems(c => c.ReferenceId.CompareTo(extendedRoute.Core.Id) == 0);
                     extendedRoute.CommentsList = (await ExpandCommentList(comments)).OrderByDescending(c => c.Core.CommentDate);
@@ -184,7 +185,6 @@ namespace BlazorApp.Api
                     {
                         extendedRoute.LastUpdate = newestComment.Core.CommentDate;
                     }
-                    extendedRoute.LastUpdate = r.Date;
                     extendedRoutes.Add(extendedRoute);
                 }
 

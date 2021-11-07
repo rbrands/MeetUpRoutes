@@ -15,6 +15,8 @@ namespace BlazorApp.Api.Utils
         private User _user;
         private TenantSettings _tenantSettings;
         private ServerSettings _serverSettings;
+        private const string HEADER_KEYWORD = "x-meetup-keyword";
+        private Boolean _validKeyWordInHeader = false;
 
         public User User
         {
@@ -31,6 +33,18 @@ namespace BlazorApp.Api.Utils
         { 
             get { return _serverSettings; }
             set { _serverSettings = value; }
+        }
+
+        public Boolean ValidKeyWordInHeader
+        {
+            get
+            {
+                return _validKeyWordInHeader;
+            }
+            set
+            {
+                _validKeyWordInHeader = value;
+            }
         }
 
         public Boolean IsUserConfirmed
@@ -95,10 +109,19 @@ namespace BlazorApp.Api.Utils
             callingContext.User.Principal = Utils.UserDetails.GetClientPrincipal(req);
             callingContext.TenantSettings = await GetTenantSettings(req, tenantRepository);
             callingContext.ServerSettings = await serverSettingsRepository.GetServerSettings(callingContext.TenantSettings);
+            string keyWord = req.Headers[HEADER_KEYWORD];
+            if (!String.IsNullOrEmpty(keyWord))
+            {
+                callingContext.ValidKeyWordInHeader = callingContext.ServerSettings.IsUser(keyWord);
+            }
 
             string key = callingContext.TenantSettings.TrackKey + "-" + callingContext.User.Principal.GetUserKey();
             callingContext.User.ContactInfo = await userRepository.GetItemByKey(key);
-
+            if (null == callingContext.User.ContactInfo)
+            {
+                callingContext.User.ContactInfo = new UserContactInfo();
+                callingContext.User.ContactInfo.Id = String.Empty;
+            }
             return callingContext;
         }
 
@@ -143,6 +166,13 @@ namespace BlazorApp.Api.Utils
                 throw new UnauthorizedAccessException($"User {_user.Principal.UserDetails} is austhenticated but not confirmed");
             }
         }
+        public void AssertConfirmedOrValidKeyWordAccess()
+        {
+            if (!ValidKeyWordInHeader && !IsUserConfirmed)
+            { 
+                throw new UnauthorizedAccessException($"User not authorized");
+            }
+        }
         public void AssertReviewerAuthorization()
         {
             if (!IsUserReviewer)
@@ -157,6 +187,7 @@ namespace BlazorApp.Api.Utils
                          && null != _user.Principal
                          && _user.IsAuthenticated
                          && _user.ContactInfo.IsConfirmed
+                         && !String.IsNullOrEmpty(_user.ContactInfo.Id)
                          && (_user.ContactInfo.Id.CompareTo(authorId) == 0)
                      );
         }
@@ -168,6 +199,7 @@ namespace BlazorApp.Api.Utils
                          && null != _user.Principal
                          && _user.IsAuthenticated
                          && _user.ContactInfo.IsConfirmed
+                         && !String.IsNullOrEmpty(_user.ContactInfo.Id)
                          && (_user.ContactInfo.Id.CompareTo(authorId) == 0)
                      );
         }
