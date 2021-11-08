@@ -58,8 +58,9 @@
                 </em>
             </small>
             @if (RouteItem.CommentsList.Count() > 0)
-            { 
-                <ul class="list-unstyled overflow-auto" style="max-height: 160px"> 
+            {
+                <hr />
+                <ul class="list-unstyled overflow-auto" style="max-height: 160px">
                     @foreach (ExtendedComment comment in RouteItem.CommentsList)
                     {
                         <li>
