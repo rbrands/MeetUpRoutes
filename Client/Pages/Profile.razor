@@ -27,7 +27,7 @@
         <label for="title">Namenskürzel</label>
         <InputText id="nickName" aria-describedby="nickNameHelp" class="form-control" @bind-Value="_userContactInfo.UserNickName" placeholder="Namenskürzel" title="Namenskürzel" />
         <small id="nickNameHelp" class="form-text text-muted">
-            Bitte hier deinen Namen oder Namenskürzel angeben, wie er als Autor:in von Touren und Kommentaren angezeigt werden soll.
+            Bitte hier deinen Namen oder Namenskürzel angeben, wie er als Autor:in von Routen und Kommentaren angezeigt werden soll.
         </small>
     </div>
 
@@ -35,7 +35,7 @@
         <label for="mail">Mail</label>
         <InputText id="mail" aria-describedby="mailHelp" class="form-control" @bind-Value="_userContactInfo.UserMail" placeholder="Dein Mail-Adresse" title="Mail" />
         <small id="mailHelp" class="form-text text-muted">
-            Bitte hier deine E-Mail-Adresse eingeben. Diese wird nicht öffentlich geteilt, sondern wird nur benötigt, falls es Rückfragen zu deinen Touren gibt.
+            Bitte hier deine E-Mail-Adresse eingeben. Diese wird nicht öffentlich geteilt, sondern wird nur benötigt, falls es Rückfragen zu deinen Routen gibt.
         </small>
     </div>
 
@@ -67,12 +67,12 @@
                 }
                 else
                 {
-                    <text>Du hast noch keine Autor:innen-Berechtigung, d.h. du kannst noch keine Touren erstellen.</text>
+                    <text>Du hast noch keine Autor:innen-Berechtigung, d.h. du kannst noch keine Routen erstellen.</text>
                 }
             </li>
             @if (_userContactInfo.IsReviewer)
             {
-                <li>Dein Account hat Review-Berechtigung, d.h. du kannst Touren von Gästen, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
+                <li>Dein Account hat Review-Berechtigung, d.h. du kannst Routen von Gästen, die noch keine Autor:innen-Berechtigung haben, sehen und freigeben.</li>
             }
             <AuthorizeView Roles="@AppStateStore.Tenant.AdminRole">
                 <Authorized Context="authorizeContext">

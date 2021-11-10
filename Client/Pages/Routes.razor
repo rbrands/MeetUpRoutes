@@ -89,7 +89,12 @@ else
     {
         try
         {
+            _notificationMessage.Hide();
             _routes = await Api.GetRoutes(_filter);
+            if (_routes.Count() == 0)
+            {
+                _notificationMessage.ShowWarning("Keine Route mit den Suchkriterien gefunden. Bitte ändere deinen Suchfilter.");
+            }
         }
         catch (Exception ex)
         {

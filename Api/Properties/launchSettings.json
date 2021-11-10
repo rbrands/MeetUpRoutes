@@ -5,8 +5,8 @@
       "commandLineArgs": "start --cors *",
       "environmentVariables": {
         "COSMOS_DB_DATABASE": "website",
-        "COSMOS_DB_CONTAINER": "meetups",
-        "COSMOS_DB_CONNECTION_STRING": "AccountEndpoint=https://rbrandscosmosdb-v3.documents.azure.com:443/;AccountKey="
+        "COSMOS_DB_CONTAINER": "meetups"
+        // "COSMOS_DB_CONNECTION_STRING": "AccountEndpoint=https://rbrandscosmosdb-v3.documents.azure.com:443/;AccountKey="
       }
     }
   }
