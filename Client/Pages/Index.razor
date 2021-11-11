@@ -141,8 +141,8 @@
         }
         try
         {
-            bool validTrackKey = await ClubCheck.SetClub(TrackKey);
-            if (await ClubCheck.SetClub(TrackKey))
+            bool validTrackKey = await ClubCheck.SetClub(AppStateStore.TrackKey);
+            if (await ClubCheck.SetClub(AppStateStore.TrackKey))
             {
                 _userInfo = AppStateStore.CurrentUser.ContactInfo;
             }
