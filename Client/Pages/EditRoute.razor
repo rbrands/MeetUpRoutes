@@ -323,6 +323,7 @@
             _formIsDisabled = true;
             StateHasChanged();
             _routeToEdit.Core.Description = StripEmptyHtml(await _htmlDescription.GetHTML());
+            _routeToEdit.Core.Title = _routeToEdit.Core.Title.Trim();
             await Api.WriteRoute(_routeToEdit.Core);
             NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/routes");
         }
