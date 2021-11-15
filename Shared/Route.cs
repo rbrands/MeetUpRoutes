@@ -126,7 +126,7 @@ namespace BlazorApp.Shared
                             break;
                     }
                 }
-                urlFriendlyTitle = sb.ToString();
+                urlFriendlyTitle = sb.ToString().Trim('-');
             }
             return urlFriendlyTitle;
         }
