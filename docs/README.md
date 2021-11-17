@@ -17,3 +17,7 @@ Basis für den Zugriff auf die Routen und die Erstellung der Routen ist das folg
 ## Tags
 Weiteres Basisfeature von MeetUpRoutes ist die Vergabe von "<em>Tags</em>" zur Kategorisierung von Routen. Die Tags können flexibel von Club-Administrator:innen definiert werden. Dabei kann festgelegt werden, ob Tags aus einer Kategorie zwingend ausgewählt werden müssen oder optional sind. Außerdem können die Tags definiert werden, die nur mit "Reviewer"-Berechtigung vergeben werden können.
 Die Tags können dann für eine Suche nach Routen verwendet werden.
+
+# Weitere Informationen
+
+- [Zur Technik](<technology>)

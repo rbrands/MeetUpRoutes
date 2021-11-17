@@ -1,0 +1,9 @@
+# Zur Technik
+
+MeetUpRoutes ist eine Web-Anwendung, allerdings in einer besonderen "Spielart": Es handelt sich um eine sog. ["Single-Page Application" (SPA)](https://de.wikipedia.org/wiki/Single-Page-Webanwendung), die zunächst vom Server runter geladen wird (daher kommt die Meldung "Momentchen" zu Beginn) und danach im Browser lokal auf dem Handy/Rechner ausgeführt wird. Dadurch fühlt sie sich eher wie eine App als eine Web-Anwendung an. Die Daten werden dann immer jeweils vom Server aktualisiert. Außerdem wird hier der sog. [WebAssembly Standard](https://de.wikipedia.org/wiki/WebAssembly) genutzt, dadurch wird es möglich, dass das auf allen modernen Browsern funktioniert. 
+
+Für die Entwicklung von SPAs verwendet man üblicherweise etablierte Frameworks wie [Angular](https://de.wikipedia.org/wiki/Angular) oder [React](https://de.wikipedia.org/wiki/React). Für den MeetUpPlanner wurde allerdings das relativ neue [ASP.NET Core Blazor](https://docs.microsoft.com/de-de/aspnet/core/blazor) verwendet.
+
+Auf der Serverseite wurde die Business-Logik "serverless" mit [Azure Functions](https://docs.microsoft.com/de-de/azure/azure-functions/) umgesetzt. Als Datenbank wird die No-SQL Datenbank [Cosmos DB](https://docs.microsoft.com/de-de/azure/cosmos-db/). Für weitere Einzelheiten siehe das GitHub Repository. Für diese Art von Applikationen bietet Azure neuerdings die [Azure Static Web Apps](https://docs.microsoft.com/en-us/azure/static-web-apps/overview) als Hosting-Lösung, die hier verwendet wird.
+
+![Architektur](https://am3pap005files.storage.live.com/y4myecbctAePWrsKPUukIWY5ev-0JEzqfMTKMdWHz-mBfrcgIxF81ZEE7KuM2aXAqUFYTy_NxiRnYAtK3vuQ1oqcmf9Tl3YqepVO3-SAbEy67T0MIVEqn6zRxkkCRgNvR7ubzSzVTL6f5JgWj7lSkRwhnxWe3iD9BTYKdCblNN-Rr2lkfz3MNJLiGcWjLuohfB-?width=1337&height=911&cropmode=none)
