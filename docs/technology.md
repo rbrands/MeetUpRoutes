@@ -6,4 +6,4 @@ Für die Entwicklung von SPAs verwendet man üblicherweise etablierte Frameworks
 
 Auf der Serverseite wurde die Business-Logik "serverless" mit [Azure Functions](https://docs.microsoft.com/de-de/azure/azure-functions/) umgesetzt. Als Datenbank wird die No-SQL Datenbank [Cosmos DB](https://docs.microsoft.com/de-de/azure/cosmos-db/). Für weitere Einzelheiten siehe das GitHub Repository. Für diese Art von Applikationen bietet Azure neuerdings die [Azure Static Web Apps](https://docs.microsoft.com/en-us/azure/static-web-apps/overview) als Hosting-Lösung, die hier verwendet wird.
 
-![Architektur](https://am3pap005files.storage.live.com/y4myecbctAePWrsKPUukIWY5ev-0JEzqfMTKMdWHz-mBfrcgIxF81ZEE7KuM2aXAqUFYTy_NxiRnYAtK3vuQ1oqcmf9Tl3YqepVO3-SAbEy67T0MIVEqn6zRxkkCRgNvR7ubzSzVTL6f5JgWj7lSkRwhnxWe3iD9BTYKdCblNN-Rr2lkfz3MNJLiGcWjLuohfB-?width=1337&height=911&cropmode=none)
+![Architektur](https://am3pap005files.storage.live.com/y4mRWnYoeqg9tVlCmLsjLwH654D50fovFBPCZJcAVQetscLfw3XKjoGM3df06lZFcZ6hz4ovZg0itfZYFTFHt4Zvf6UY0xmK6NvQTZkNX1DKaPhXhMktMYgsD8dS8h-Kk7eMvuipeEY1BCpBNPNeLh5HeaxWx7ei8JRjyur3a8ILhrzuLTL9Th8rtdlttm9fvli?width=1355&height=911&cropmode=none)

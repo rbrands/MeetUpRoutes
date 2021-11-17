@@ -3,7 +3,7 @@
 Starting from [template](https://github.com/staticwebdev/blazor-starter/generate) for an [Blazor WebAssembly](https://docs.microsoft.com/aspnet/core/blazor/?view=aspnetcore-3.1#blazor-webassembly) client application, a C# [Azure Functions](https://docs.microsoft.com/azure/azure-functions/functions-overview) and a C# class library with shared code.
 The application is intended to be used together with MeetUpPlanner for gathering routes for roadbiking and gravel-biking.
 
-![MeetUpRoutes Archtecture](https://am3pap005files.storage.live.com/y4myecbctAePWrsKPUukIWY5ev-0JEzqfMTKMdWHz-mBfrcgIxF81ZEE7KuM2aXAqUFYTy_NxiRnYAtK3vuQ1oqcmf9Tl3YqepVO3-SAbEy67T0MIVEqn6zRxkkCRgNvR7ubzSzVTL6f5JgWj7lSkRwhnxWe3iD9BTYKdCblNN-Rr2lkfz3MNJLiGcWjLuohfB-?width=1337&height=911&cropmode=none)
+![MeetUpRoutes Archtecture](https://am3pap005files.storage.live.com/y4mRWnYoeqg9tVlCmLsjLwH654D50fovFBPCZJcAVQetscLfw3XKjoGM3df06lZFcZ6hz4ovZg0itfZYFTFHt4Zvf6UY0xmK6NvQTZkNX1DKaPhXhMktMYgsD8dS8h-Kk7eMvuipeEY1BCpBNPNeLh5HeaxWx7ei8JRjyur3a8ILhrzuLTL9Th8rtdlttm9fvli?width=1355&height=911&cropmode=none)
 
 ## Getting Started
 
