@@ -91,6 +91,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "WriteRoute failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

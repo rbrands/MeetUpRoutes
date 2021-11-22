@@ -56,6 +56,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetTagSets failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

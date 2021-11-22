@@ -88,6 +88,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetRoute failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }
