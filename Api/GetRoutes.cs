@@ -62,6 +62,7 @@ namespace BlazorApp.Api
                     {
                         _callingContext.AssertReviewerAuthorization();
                     }
+                    _logger.LogInformation("Filter scope {scope}, ", filter.Scope);
 
                     IEnumerable<Route> routes = null;
                     if (_callingContext.IsUserConfirmed || _callingContext.ValidKeyWordInHeader)
