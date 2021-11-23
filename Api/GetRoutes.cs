@@ -55,13 +55,32 @@ namespace BlazorApp.Api
             {
                 _callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosUserRepository);
                 _logger.LogInformation("GetRoutes for tenant >{tenant}< and user >{user}<", _callingContext.TenantSettings.TenantName, _callingContext.User.ContactInfo.UserName);
+                if (_callingContext.ValidKeyWordInHeader)
+                {
+                    _logger.LogInformation("GetRoutes called from MeetUpPlanner.");
+                }
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 RouteFilter filter = JsonConvert.DeserializeObject<RouteFilter>(requestBody);
                 if (filter.ForReview)
                 {
                     _callingContext.AssertReviewerAuthorization();
                 }
-                _logger.LogInformation("GetRoutes with filter scope: {scope}", filter.Scope);
+                if (!String.IsNullOrEmpty(filter.Scope))
+                { 
+                    _logger.LogInformation("GetRoutes with filter scope: {scope}", filter.Scope);
+                }
+                StringBuilder tagsBuilder = new StringBuilder();
+                foreach (IList<RouteTag> tagList in filter.Tags)
+                {
+                    foreach (RouteTag tag in tagList)
+                    {
+                        tagsBuilder.Append(tag.TagLabel).Append(" - ");
+                    }
+                }
+                if (tagsBuilder.Length > 0)
+                { 
+                    _logger.LogInformation("GetRoutes with tags filter: {tagsfilter}", tagsBuilder.ToString());
+                }
 
                 IEnumerable<Route> routes = null;
                 if (_callingContext.IsUserConfirmed || _callingContext.ValidKeyWordInHeader)
