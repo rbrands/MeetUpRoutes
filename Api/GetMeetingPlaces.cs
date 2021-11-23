@@ -70,6 +70,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetMeetingPlaces failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

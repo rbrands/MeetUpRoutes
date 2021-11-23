@@ -59,6 +59,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetRoutesSettings failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

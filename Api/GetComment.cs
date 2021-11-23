@@ -73,6 +73,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetComment failed");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

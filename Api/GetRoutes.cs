@@ -54,145 +54,143 @@ namespace BlazorApp.Api
             try
             {
                 _callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosUserRepository);
-                using (_logger.BeginScope("GetRoutes for tenant {tenant} and user {user}", _callingContext.TenantSettings.TenantKey, _callingContext.User.ContactInfo.UserName))
+                _logger.LogInformation("GetRoutes for tenant {tenant} and user {user}", _callingContext.TenantSettings.TenantKey, _callingContext.User.ContactInfo.UserName);
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                RouteFilter filter = JsonConvert.DeserializeObject<RouteFilter>(requestBody);
+                if (filter.ForReview)
                 {
-                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    RouteFilter filter = JsonConvert.DeserializeObject<RouteFilter>(requestBody);
+                    _callingContext.AssertReviewerAuthorization();
+                }
+                _logger.LogInformation("GetRoutes with filter scope: {scope}", filter.Scope);
+
+                IEnumerable<Route> routes = null;
+                if (_callingContext.IsUserConfirmed || _callingContext.ValidKeyWordInHeader)
+                {
+                    // Get routes for review (if requested those) or only already reviewed or authored by calling user
                     if (filter.ForReview)
                     {
-                        _callingContext.AssertReviewerAuthorization();
-                    }
-                    _logger.LogInformation("Filter scope: {scope}", filter.Scope);
-
-                    IEnumerable<Route> routes = null;
-                    if (_callingContext.IsUserConfirmed || _callingContext.ValidKeyWordInHeader)
+                        if (!filter.OnlyOwn)
+                        { 
+                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed);
+                        }
+                        else
+                        {
+                            routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed && _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                        }
+                    } 
+                    else 
                     {
-                        // Get routes for review (if requested those) or only already reviewed or authored by calling user
-                        if (filter.ForReview)
+                        if (!_callingContext.IsUserReviewer)
                         {
                             if (!filter.OnlyOwn)
                             { 
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed);
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0));
                             }
                             else
                             {
-                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsReviewed && _callingContext.User.ContactInfo.Id.CompareTo(r.AuthorId) == 0);
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0);
                             }
-                        } 
+                        }
                         else 
                         {
-                            if (!_callingContext.IsUserReviewer)
-                            {
-                                if (!filter.OnlyOwn)
-                                { 
-                                    routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && (r.IsReviewed || r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0));
-                                }
-                                else
-                                {
-                                    routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0);
-                                }
+                            if (!filter.OnlyOwn)
+                            { 
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0);
                             }
-                            else 
+                            else
                             {
-                                if (!filter.OnlyOwn)
-                                { 
-                                    routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0);
-                                }
-                                else
-                                {
-                                    routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0);
-                                }
+                                routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && r.AuthorId.CompareTo(_callingContext.User.ContactInfo.Id) == 0);
                             }
                         }
                     }
-                    else
-                    {
-                        // Get only public and reviewed routes
-                        routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsNonPublic && r.IsReviewed);
-                    }
+                }
+                else
+                {
+                    // Get only public and reviewed routes
+                    routes = await _cosmosRepository.GetItems(r => r.Tenant.CompareTo(_callingContext.TenantSettings.TrackKey) == 0 && !r.IsNonPublic && r.IsReviewed);
+                }
 
-                    List<ExtendedRoute> extendedRoutes = new List<ExtendedRoute>();
-                    string scopeToCompare = null;
-                    if (null != filter.Scope)
+                List<ExtendedRoute> extendedRoutes = new List<ExtendedRoute>();
+                string scopeToCompare = null;
+                if (null != filter.Scope)
+                {
+                    scopeToCompare = filter.Scope.ToLowerInvariant();
+;                }
+                foreach (Route r in routes)
+                {
+                    // Check filter
+                    Boolean checksPassed = true;
+                    foreach(IList<RouteTag> routeTagList in filter.Tags)
                     {
-                        scopeToCompare = filter.Scope.ToLowerInvariant();
-    ;                }
-                    foreach (Route r in routes)
-                    {
-                        // Check filter
-                        Boolean checksPassed = true;
-                        foreach(IList<RouteTag> routeTagList in filter.Tags)
+                        if (routeTagList.Count == 0)
                         {
-                            if (routeTagList.Count == 0)
+                            continue;
+                        }
+                        checksPassed = false;
+                        foreach(RouteTag rt in routeTagList)
+                        {
+                            RouteTag foundRouteTag = r.RouteTags.FirstOrDefault(x => x.TagId.CompareTo(rt.TagId) == 0);
+                            if (null != foundRouteTag)
                             {
-                                continue;
-                            }
-                            checksPassed = false;
-                            foreach(RouteTag rt in routeTagList)
-                            {
-                                RouteTag foundRouteTag = r.RouteTags.FirstOrDefault(x => x.TagId.CompareTo(rt.TagId) == 0);
-                                if (null != foundRouteTag)
-                                {
-                                    checksPassed = true;
-                                    break;
-                                }
-                            }
-                            if (!checksPassed)
-                            {
+                                checksPassed = true;
                                 break;
                             }
                         }
                         if (!checksPassed)
                         {
-                            continue;
+                            break;
                         }
-                        if (filter.OnlyForMembers && !r.IsNonPublic)
-                        {
-                            continue;
-                        }
-                        // Check if scoped route is requested
-                        if (!String.IsNullOrEmpty(scopeToCompare)) 
-                        {
-                            if (String.IsNullOrEmpty(r.Scope) || r.Scope.ToLowerInvariant().CompareTo(scopeToCompare) != 0)
-                            {
-                                continue;
-                            }
-                        }
-                        // Build ExtendedRoute
-                        ExtendedRoute extendedRoute = new ExtendedRoute(r);
-                        if (!String.IsNullOrEmpty(r.AuthorId))
-                        { 
-                            UserContactInfo author = await _cosmosUserRepository.GetItem(r.AuthorId);
-                            extendedRoute.AuthorDisplayName = author?.UserNickName;
-                            if (_callingContext.IsUserReviewer)
-                            {
-                                extendedRoute.Author = author;
-                            }
-                        }
-                        if (r.IsReviewed && !String.IsNullOrEmpty(r.ReviewerId))
-                        {
-                            UserContactInfo reviewer = await _cosmosUserRepository.GetItem(r.ReviewerId);
-                            extendedRoute.ReviewerDisplayName = reviewer?.UserNickName;
-                            if (_callingContext.IsUserReviewer)
-                            {
-                                extendedRoute.Reviewer = reviewer;
-                            }
-                        }
-                        extendedRoute.LastUpdate = r.Date;
-                        // Get all comments
-                        IEnumerable<Comment> comments = await _cosmosCommentRepository.GetItems(c => c.ReferenceId.CompareTo(extendedRoute.Core.Id) == 0);
-                        extendedRoute.CommentsList = (await ExpandCommentList(comments)).OrderByDescending(c => c.Core.CommentDate);
-                        ExtendedComment newestComment = extendedRoute.CommentsList.FirstOrDefault();
-                        if (null != newestComment && newestComment.Core.CommentDate.CompareTo(extendedRoute.LastUpdate) > 0)
-                        {
-                            extendedRoute.LastUpdate = newestComment.Core.CommentDate;
-                        }
-                        extendedRoutes.Add(extendedRoute);
                     }
-
-                    // return ordered descending by date and max Constants.MAX_ROUTES_COUNT items of the list.
-                    return new OkObjectResult(extendedRoutes.OrderByDescending(r => r.LastUpdate).Take(Constants.MAX_ROUTES_COUNT));
+                    if (!checksPassed)
+                    {
+                        continue;
+                    }
+                    if (filter.OnlyForMembers && !r.IsNonPublic)
+                    {
+                        continue;
+                    }
+                    // Check if scoped route is requested
+                    if (!String.IsNullOrEmpty(scopeToCompare)) 
+                    {
+                        if (String.IsNullOrEmpty(r.Scope) || r.Scope.ToLowerInvariant().CompareTo(scopeToCompare) != 0)
+                        {
+                            continue;
+                        }
+                    }
+                    // Build ExtendedRoute
+                    ExtendedRoute extendedRoute = new ExtendedRoute(r);
+                    if (!String.IsNullOrEmpty(r.AuthorId))
+                    { 
+                        UserContactInfo author = await _cosmosUserRepository.GetItem(r.AuthorId);
+                        extendedRoute.AuthorDisplayName = author?.UserNickName;
+                        if (_callingContext.IsUserReviewer)
+                        {
+                            extendedRoute.Author = author;
+                        }
+                    }
+                    if (r.IsReviewed && !String.IsNullOrEmpty(r.ReviewerId))
+                    {
+                        UserContactInfo reviewer = await _cosmosUserRepository.GetItem(r.ReviewerId);
+                        extendedRoute.ReviewerDisplayName = reviewer?.UserNickName;
+                        if (_callingContext.IsUserReviewer)
+                        {
+                            extendedRoute.Reviewer = reviewer;
+                        }
+                    }
+                    extendedRoute.LastUpdate = r.Date;
+                    // Get all comments
+                    IEnumerable<Comment> comments = await _cosmosCommentRepository.GetItems(c => c.ReferenceId.CompareTo(extendedRoute.Core.Id) == 0);
+                    extendedRoute.CommentsList = (await ExpandCommentList(comments)).OrderByDescending(c => c.Core.CommentDate);
+                    ExtendedComment newestComment = extendedRoute.CommentsList.FirstOrDefault();
+                    if (null != newestComment && newestComment.Core.CommentDate.CompareTo(extendedRoute.LastUpdate) > 0)
+                    {
+                        extendedRoute.LastUpdate = newestComment.Core.CommentDate;
+                    }
+                    extendedRoutes.Add(extendedRoute);
                 }
+
+                // return ordered descending by date and max Constants.MAX_ROUTES_COUNT items of the list.
+                return new OkObjectResult(extendedRoutes.OrderByDescending(r => r.LastUpdate).Take(Constants.MAX_ROUTES_COUNT));
             }
             catch (Exception ex)
             {

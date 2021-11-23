@@ -75,6 +75,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "WriteUser failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

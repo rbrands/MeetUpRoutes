@@ -44,6 +44,7 @@ namespace BlazorApp.Api
             try
             {
                 CallingContext callingContext = await CallingContext.CreateCallingContext(req, _tenantSettingsRepository, _serverSettingsRepository, _cosmosUserRepository);
+                _logger.LogInformation("WriteRoute for tenant {tenant} and user {user}", callingContext.TenantSettings.TenantKey, callingContext.User.ContactInfo.UserName);
                 callingContext.AssertConfirmedAccess();
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
