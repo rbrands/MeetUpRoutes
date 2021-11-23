@@ -52,7 +52,7 @@ namespace BlazorApp.Api
                 {
                     throw new Exception("Missing key for call GetArticle()");
                 }
-                _logger.LogInformation($"GetArticle(key = {key})");
+                _logger.LogInformation("GetArticle(key = {key})", key);
                 string dbKey = $"{callingContext.TenantSettings.TrackKey}-{key}";
                 Article article = await _cosmosRepository.GetItemByKey(dbKey);
                 if (null == article)

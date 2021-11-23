@@ -54,7 +54,7 @@ namespace BlazorApp.Api
             try
             {
                 _callingContext = await CallingContext.CreateCallingContext(req, _tenantRepository, _serverSettingsRepository, _cosmosUserRepository);
-                _logger.LogInformation("GetRoutes for tenant {tenant} and user {user}", _callingContext.TenantSettings.TenantKey, _callingContext.User.ContactInfo.UserName);
+                _logger.LogInformation("GetRoutes for tenant >{tenant}< and user >{user}<", _callingContext.TenantSettings.TenantName, _callingContext.User.ContactInfo.UserName);
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 RouteFilter filter = JsonConvert.DeserializeObject<RouteFilter>(requestBody);
                 if (filter.ForReview)
