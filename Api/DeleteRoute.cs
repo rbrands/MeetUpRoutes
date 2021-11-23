@@ -71,7 +71,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, "DeleteRoute failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }
