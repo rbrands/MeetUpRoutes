@@ -41,6 +41,10 @@
       "allowedRoles": [ "admin", "tenantadmin" ]
     },
     {
+      "route": "/api/DeleteUser",
+      "allowedRoles": [ "admin", "tenantadmin" ]
+    },
+    {
       "route": "/api/WriteTagSet",
       "allowedRoles": [ "admin", "tenantadmin" ]
     },

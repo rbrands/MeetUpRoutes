@@ -54,6 +54,12 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<UserContactInfo>();
         }
+        public async Task DeleteUser(UserContactInfo user)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<UserContactInfo>($"/api/DeleteUser", user);
+            response.EnsureSuccessStatusCode();
+        }
         public async Task<TagSet> WriteTagSet(TagSet tagSet)
         {
             this.PrepareHttpClient();

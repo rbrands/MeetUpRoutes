@@ -39,6 +39,7 @@
                         <tr>
                             <td>
                                 <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditMember(member.Id))"><span class="oi oi-pencil"></span></button>
+                                <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(member))"><span class="oi oi-trash"></span></button>
                             </td>
                             <td>@member.UserName</td>
                             <td>@member.UserNickName</td>
@@ -67,6 +68,9 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     [Parameter]
     public string TrackKey { get; set; }
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+
 
 
     private NotificationMessage _notificationMessage;
@@ -98,6 +102,17 @@
     protected void EditMember(string id)
     {
         NavigationManager.NavigateTo($"/{AppStateStore.TrackKey}/editmember/{id}");
+    }
+
+    protected async Task DeleteItem(UserContactInfo user)
+    {
+        ModalResult result = await Confirm.ShowDialog(Modal, "User löschen?", "Soll die Benutzer:in wirklich gelöscht werden?");
+        if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+        {
+            return;
+        }
+        await Api.DeleteUser(user);
+        _members = await Api.GetUsers();
     }
 
 
