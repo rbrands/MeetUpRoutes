@@ -53,7 +53,8 @@
 	//      "mounts": [ "source=${env:HOME}${env:USERPROFILE}/.aspnet/https,target=/home/vscode/.aspnet/https,type=bind" ],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "./postCreateCommand.sh", 
+	// "postCreateCommand": "dotnet dev-certs https --trust && npm install -g @azure/static-web-apps-cli && dotnet nuget add source https://nuget.pkg.github.com/rbrands/index.json -n github -u rbrands -p ${env:NUGETPASSWORD} --store-password-in-clear-text", 
+	"postCreateCommand": "bash ./.devcontainer/postCreateCommand.sh", 
 
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
