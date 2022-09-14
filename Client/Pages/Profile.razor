@@ -7,7 +7,9 @@
 @inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
-<Title Value="@($"MeetUpRoutes - {AppStateStore.Tenant?.TenantName}")"></Title>
+<PageTitle> 
+    MeetUpRoutes - @AppStateStore.Tenant?.TenantName
+</PageTitle>
 
 <h3>Dein Profil</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
