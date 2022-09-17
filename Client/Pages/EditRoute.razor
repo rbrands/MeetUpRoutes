@@ -49,140 +49,141 @@
                 {@((MarkupString)_routeToEdit.Core.Description)}
             </EditorContent>
         </BlazoredTextEditor>
-        <div class="form-group">
-            <label>Tags zuweisen</label>
-            <small id="tagHelp" class="form-text text-muted">
-                Durch anclicken auf "Tags" in "Verfügbare Tags" auswählen oder in "Zugewiesene Tags" abwählen.
-            </small>
-            <div class="row">
-                <AssignTags RouteItem="@_routeToEdit" TagSets="@_tagSets"></AssignTags>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="level">Umfang</label>
-            <InputText id="level" aria-describedby="levelHelp" class="form-control" @bind-Value="_routeToEdit.Core.LevelDescription" autocomplete="on" placeholder="km / Hm" />
-            <small id="levelHelp" class="form-text text-muted">
-                Länge der Route (zumindest ungefähr) und möglichst Höhenmeter oder auch ungefähre Fahrtzeit.
-            </small>
-        </div>
-        <div class="form-group">
-            <label for="SelectMeetingPlace">Auswahl Standard-Startort</label>
-            <select class="form-control" @onchange="@((ChangeEventArgs e) => OnMeetingPlaceChanged(e.Value.ToString()))">
-                <option value=""></option>
-                @foreach (MeetingPlace place in _meetingPlaces)
-                {
-                    <option value="@place.Id">@place.Title</option>
-                }
-            </select>
-            <small id="standardPlaceHelp" class="form-text text-muted">
-                Hier sind die Standard-Treffpunkte zur Auswahl.
-            </small>
-        </div>
-        <div class="form-group">
-            <label for="place">Startort</label>
-            <InputText id="place" aria-describedby="placeHelp" class="form-control" @bind-Value="_routeToEdit.Core.Place" autocomplete="on" placeholder="Typischer Startpunkt der Tour" />
-            <small id="placeHelp" class="form-text text-muted">
-                Optional: Typischer Treffpunkt der Gruppe für die Route. Eingabe nicht zwingend notwendig aber praktisch, wenn im MeetUpPlanner mit dieser Route Ausfahrten angelegt werden sollen.
-            </small>
-        </div>
-        <div class="form-group">
-            <label for="link">Link zum Startort</label>
-            <InputText id="directionsLink" aria-describedby="directionsLinkHelp" class="form-control" @bind-Value="_routeToEdit.Core.DirectionsLink" placeholder="URL" title="Link zum Startort" />
-            <small id="directionsLinkHelp" class="form-text text-muted">
-                Optional: Link zum Startort, z.B. Google Maps, Bing usw.
-            </small>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group col-md-10">
-                <InputText id="link" aria-describedby="linkHelp" class="form-control" @bind-Value="_routeToEdit.Core.RouteLink" placeholder="Link zu weiterer Streckeninfo" title="Link zu weiterer Streckeninfo" />
-                <small id="linkHelp" class="form-text text-muted">
-                    Optional: Link zu weiteren Strecken-Infos, z.B. Komoot, Strava usw.
-                </small>
-            </div>
-            <div class="form-group col-md-2">
-                <div class="form-check">
-                    <button id="btnLinkPreviewEnabled" class="btn btn-primary" type="button" @onclick="@(() => ToggleLinkPreview())">Preview An/Aus</button>
-                </div>
-            </div>
-        </div>
-        @if (_linkPreviewEnabled)
-        {
-            <div class="form-row">
-                <div class="form-group col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
-                    <img src="@_routeToEdit.Core.RouteLinkImage" class="img-fluid" />
-                </div>
-            </div>
-        }
-        <div class="form-group">
-            <label for="linkTitle">Link-Bezeichnung</label>
-            <InputText id="linkTitle" aria-describedby="linkTitleHelp" class="form-control" @bind-Value="_routeToEdit.Core.RouteLinkTitle" placeholder="Kurze Überschrift zum Link" title="Bezeichnung des Links zur weiterern Routeninfo" />
-            <small id="linkTitleHelp" class="form-text text-muted">
-                Optional: Kurze Bezeichnung zu dem Link oben, falls der Standardtext "Route auf Komoot" oder "Weitere Info ..." nicht passt.
-            </small>
-        </div>
-
-        <div class="form-group">
-            <label for="gpx">GPX-Track</label>
-            <InputText id="gpx" aria-describedby="gpxHelp" class="form-control" @bind-Value="_routeToEdit.Core.GpxLink" placeholder="Link zu GPX-Track" />
-            <small id="gpxHelp" class="form-text text-muted">
-                Optional: Link zu einer GPX-Datei der Route
-            </small>
-        </div>
-        <div class="form-group">
-            <label for="strava">Strava</label>
-            <InputText id="strava" aria-describedby="stravaHelp" class="form-control" @bind-Value="_routeToEdit.Core.StravaLink" placeholder="Link zu Strava" />
-            <small id="gpxHelp" class="form-text text-muted">
-                Optional: Link zu Strava
-            </small>
-        </div>
-        <div class="form-group">
-            <div class="form-check">
-                <InputCheckbox id="public" aria-describedby="crossHelp" class="form-check-input" @bind-Value="_routeToEdit.Core.IsNonPublic" />
-                <label for="public" class="form-checklabel">
-                    Route nur für Mitglieder?
-                </label>
-            </div>
-            <small id="crossHelp" class="form-text text-muted">
-                Soll die Route nicht öffentlich sichtbar sein sondern nur für Mitglieder?
-            </small>
-        </div>
-        @if (AppStateStore.IsUserReviewer)
-        {
-            <div class="form-group">
-                <div class="form-check">
-                    <InputCheckbox id="reviewed" aria-describedby="reviewedHelp" class="form-check-input" @bind-Value="_routeToEdit.Core.IsReviewed" />
-                    <label for="reviewed" class="form-checklabel">
-                        Route als "gereviewed" freigeben?
-                    </label>
-                </div>
-                <small id="reviewedHelp" class="form-text text-muted">
-                    Wird die Route als "gereviewed" markiert, kann sie von allen Benutzer:innen/Mitgliedern gesehen werden.
-                </small>
-            </div>
-        }
-        <div class="form-group">
-            <label for="guestScope">"Scope" für externen Link</label>
-            <InputText id="guestScope" aria-describedby="guestScopeHelp" class="form-control" @bind-Value="_routeToEdit.Core.Scope" autocomplete="on" placeholder="Kürzel, das für externe Links verwendet wird." />
-            <small id="guestScopeHelp" class="form-text text-muted">
-                Über den "Scope" können Routen zusammen gefasst werden und sind dann über einen Link der Form ".../routes/scope" erreichbar.
-            </small>
-        </div>
-        <div class="form-group">
-            <label for="photos">Fotos</label>
-            <InputText id="photos" aria-describedby="photosHelp" class="form-control" @bind-Value="_routeToEdit.Core.PhotosLink" autocomplete="on" placeholder="Link zu Fotos" />
-            <small id="photosHelp" class="form-text text-muted">
-                Optional: Link zu Fotos zu dieser Route
-            </small>
-        </div>
-        <div class="form-group">
-            <label for="photos">Video</label>
-            <InputText id="video" aria-describedby="videoHelp" class="form-control" @bind-Value="_routeToEdit.Core.VideoLink" autocomplete="on" placeholder="Link zu Video" />
-            <small id="videoHelp" class="form-text text-muted">
-                Optional: Link zu einem Video zu dieer Route
-            </small>
+    </div>
+    <div class="form-group">
+        <label>Tags zuweisen</label>
+        <small id="tagHelp" class="form-text text-muted">
+            Durch anclicken auf "Tags" in "Verfügbare Tags" auswählen oder in "Zugewiesene Tags" abwählen.
+        </small>
+        <div class="row">
+            <AssignTags RouteItem="@_routeToEdit" TagSets="@_tagSets"></AssignTags>
         </div>
     </div>
+    <div class="form-group">
+        <label for="level">Umfang</label>
+        <InputText id="level" aria-describedby="levelHelp" class="form-control" @bind-Value="_routeToEdit.Core.LevelDescription" autocomplete="on" placeholder="km / Hm" />
+        <small id="levelHelp" class="form-text text-muted">
+            Länge der Route (zumindest ungefähr) und möglichst Höhenmeter oder auch ungefähre Fahrtzeit.
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="SelectMeetingPlace">Auswahl Standard-Startort</label>
+        <select class="form-control" @onchange="@((ChangeEventArgs e) => OnMeetingPlaceChanged(e.Value.ToString()))">
+            <option value=""></option>
+            @foreach (MeetingPlace place in _meetingPlaces)
+            {
+                <option value="@place.Id">@place.Title</option>
+            }
+        </select>
+        <small id="standardPlaceHelp" class="form-text text-muted">
+            Hier sind die Standard-Treffpunkte zur Auswahl.
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="place">Startort</label>
+        <InputText id="place" aria-describedby="placeHelp" class="form-control" @bind-Value="_routeToEdit.Core.Place" autocomplete="on" placeholder="Typischer Startpunkt der Tour" />
+        <small id="placeHelp" class="form-text text-muted">
+            Optional: Typischer Treffpunkt der Gruppe für die Route. Eingabe nicht zwingend notwendig aber praktisch, wenn im MeetUpPlanner mit dieser Route Ausfahrten angelegt werden sollen.
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="link">Link zum Startort</label>
+        <InputText id="directionsLink" aria-describedby="directionsLinkHelp" class="form-control" @bind-Value="_routeToEdit.Core.DirectionsLink" placeholder="URL" title="Link zum Startort" />
+        <small id="directionsLinkHelp" class="form-text text-muted">
+            Optional: Link zum Startort, z.B. Google Maps, Bing usw.
+        </small>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-10">
+            <InputText id="link" aria-describedby="linkHelp" class="form-control" @bind-Value="_routeToEdit.Core.RouteLink" placeholder="Link zu weiterer Streckeninfo" title="Link zu weiterer Streckeninfo" />
+            <small id="linkHelp" class="form-text text-muted">
+                Optional: Link zu weiteren Strecken-Infos, z.B. Komoot, Strava usw.
+            </small>
+        </div>
+        <div class="form-group col-md-2">
+            <div class="form-check">
+                <button id="btnLinkPreviewEnabled" class="btn btn-primary" type="button" @onclick="@(() => ToggleLinkPreview())">Preview An/Aus</button>
+            </div>
+        </div>
+    </div>
+    @if (_linkPreviewEnabled)
+    {
+        <div class="form-row">
+            <div class="form-group col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                <img src="@_routeToEdit.Core.RouteLinkImage" class="img-fluid" />
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <label for="linkTitle">Link-Bezeichnung</label>
+        <InputText id="linkTitle" aria-describedby="linkTitleHelp" class="form-control" @bind-Value="_routeToEdit.Core.RouteLinkTitle" placeholder="Kurze Überschrift zum Link" title="Bezeichnung des Links zur weiterern Routeninfo" />
+        <small id="linkTitleHelp" class="form-text text-muted">
+            Optional: Kurze Bezeichnung zu dem Link oben, falls der Standardtext "Route auf Komoot" oder "Weitere Info ..." nicht passt.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="gpx">GPX-Track</label>
+        <InputText id="gpx" aria-describedby="gpxHelp" class="form-control" @bind-Value="_routeToEdit.Core.GpxLink" placeholder="Link zu GPX-Track" />
+        <small id="gpxHelp" class="form-text text-muted">
+            Optional: Link zu einer GPX-Datei der Route
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="strava">Strava</label>
+        <InputText id="strava" aria-describedby="stravaHelp" class="form-control" @bind-Value="_routeToEdit.Core.StravaLink" placeholder="Link zu Strava" />
+        <small id="gpxHelp" class="form-text text-muted">
+            Optional: Link zu Strava
+        </small>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="public" aria-describedby="crossHelp" class="form-check-input" @bind-Value="_routeToEdit.Core.IsNonPublic" />
+            <label for="public" class="form-checklabel">
+                Route nur für Mitglieder?
+            </label>
+        </div>
+        <small id="crossHelp" class="form-text text-muted">
+            Soll die Route nicht öffentlich sichtbar sein sondern nur für Mitglieder?
+        </small>
+    </div>
+    @if (AppStateStore.IsUserReviewer)
+    {
+        <div class="form-group">
+            <div class="form-check">
+                <InputCheckbox id="reviewed" aria-describedby="reviewedHelp" class="form-check-input" @bind-Value="_routeToEdit.Core.IsReviewed" />
+                <label for="reviewed" class="form-checklabel">
+                    Route als "gereviewed" freigeben?
+                </label>
+            </div>
+            <small id="reviewedHelp" class="form-text text-muted">
+                Wird die Route als "gereviewed" markiert, kann sie von allen Benutzer:innen/Mitgliedern gesehen werden.
+            </small>
+        </div>
+    }
+    <div class="form-group">
+        <label for="guestScope">"Scope" für externen Link</label>
+        <InputText id="guestScope" aria-describedby="guestScopeHelp" class="form-control" @bind-Value="_routeToEdit.Core.Scope" autocomplete="on" placeholder="Kürzel, das für externe Links verwendet wird." />
+        <small id="guestScopeHelp" class="form-text text-muted">
+            Über den "Scope" können Routen zusammen gefasst werden und sind dann über einen Link der Form ".../routes/scope" erreichbar.
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="photos">Fotos</label>
+        <InputText id="photos" aria-describedby="photosHelp" class="form-control" @bind-Value="_routeToEdit.Core.PhotosLink" autocomplete="on" placeholder="Link zu Fotos" />
+        <small id="photosHelp" class="form-text text-muted">
+            Optional: Link zu Fotos zu dieser Route
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="photos">Video</label>
+        <InputText id="video" aria-describedby="videoHelp" class="form-control" @bind-Value="_routeToEdit.Core.VideoLink" autocomplete="on" placeholder="Link zu Video" />
+        <small id="videoHelp" class="form-text text-muted">
+            Optional: Link zu einem Video zu dieer Route
+        </small>
+    </div>
+  
 
     <ValidationSummary />
     <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
