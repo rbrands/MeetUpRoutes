@@ -25,7 +25,7 @@ namespace BlazorApp.Api
         private TenantSettingsRepository _tenantRepository;
         private ServerSettingsRepository _serverSettingsRepository;
 
-        public GetUsers(ILogger<GetUser> logger,
+        public GetUsers(ILogger<GetUsers> logger,
                         IConfiguration config,
                         ServerSettingsRepository serverSettingsRepository,
                         TenantSettingsRepository tenantRepository,

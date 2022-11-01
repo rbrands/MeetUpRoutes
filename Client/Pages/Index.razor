@@ -1,6 +1,5 @@
 ﻿@page "/"
 @page "/{TrackKey}"
-@using Microsoft.AspNetCore.Components.Web.Extensions.Head
 @using BlazorApp.Shared
 @using BlazorApp.Client.Utils
 @inject AppState AppStateStore
@@ -8,7 +7,9 @@
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
-<Title Value="@($"MeetUpRoutes - {AppStateStore.Tenant?.TenantName}")"></Title>
+<PageTitle> 
+    MeetUpRoutes - @AppStateStore.Tenant?.TenantName
+</PageTitle>
 
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 

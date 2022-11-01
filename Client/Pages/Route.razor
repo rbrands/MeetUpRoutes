@@ -9,12 +9,16 @@
 @inject ClubCheck ClubCheck
 @inject NavigationManager NavigationManager
 
-<Title Value="@($"MeetUpRoutes - {AppStateStore.Tenant?.TenantName}")"></Title>
+<PageTitle> 
+    MeetUpRoutes - @AppStateStore.Tenant?.TenantName
+</PageTitle>
 
-<Meta property="og:type" content="article" />
-<Meta property="og:title" content="@_firstRoute?.Core.Title" />
-<Meta property="og:description" content="@StripHTML(_firstRoute?.Core.Description)" />
-<Meta property="og:image" content="@_firstRoute?.Core.RouteLinkImage" />
+<HeadContent>
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="@_firstRoute?.Core.Title" />
+    <meta property="og:description" content="@StripHTML(_firstRoute?.Core.Description)" />
+    <meta property="og:image" content="@_firstRoute?.Core.RouteLinkImage" />
+</HeadContent>
 
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
