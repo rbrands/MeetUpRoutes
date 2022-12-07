@@ -42,6 +42,7 @@
             @if (!String.IsNullOrEmpty(RouteItem.Core.Scope))
             {
                 <text>&nbsp;</text><a href="/@AppStateStore.TrackKey/@RouteItem.Core.Scope"><span class="oi oi-link-intact"></span></a>
+                <CopyToClipboardButton Text="@GetScopeLink()" WithLabel="false"></CopyToClipboardButton>
             }
         </h5>
         <p class="card-text">
@@ -198,4 +199,9 @@
     {
         _enableCommentInput = false;
     }
+    private string GetScopeLink()
+    {
+        return $"{NavigationManager.BaseUri}{AppStateStore.TrackKey}/{RouteItem.Core.Scope}";
+    }
+
 }

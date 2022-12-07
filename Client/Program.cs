@@ -20,6 +20,7 @@ namespace BlazorApp.Client
             var baseAddress = builder.Configuration["BaseAddress"] ?? builder.HostEnvironment.BaseAddress;
             builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
             builder.Services.AddScoped<BackendApiRepository>();
+            builder.Services.AddScoped<ClipboardService>();
             builder.Services.AddSingleton<AppState>();
             builder.Services.AddScoped<ClubCheck>();
             builder.Services.AddBlazoredModal();
