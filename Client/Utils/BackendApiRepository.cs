@@ -162,10 +162,10 @@ namespace BlazorApp.Client.Utils
             return await response.Content.ReadFromJsonAsync<UserContactInfo>();
         }
 
-        public async Task<IEnumerable<UserContactInfo>> GetUsers()
+        public async Task<IQueryable<UserContactInfo>> GetUsers()
         {
             this.PrepareHttpClient();
-            return await _http.GetFromJsonAsync<IEnumerable<UserContactInfo>>($"/api/GetUsers");
+            return (await _http.GetFromJsonAsync<IEnumerable<UserContactInfo>>($"/api/GetUsers")).AsQueryable();
         }
         public async Task<IEnumerable<TagSet>> GetTagSets()
         {

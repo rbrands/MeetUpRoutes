@@ -18,6 +18,32 @@
         }
         else
         {
+            <div class="grid" tabindex="-1">
+                <QuickGrid Items="@_members" Virtualize="true" Class="table table-sm table-striped table-bordered">
+                    <TemplateColumn Title="Aktion" Class="action" Context="member">
+                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditMember(member.Id))"><i class="oi oi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(member))"><i class="oi oi-trash"></i></button>
+                    </TemplateColumn>
+                    <PropertyColumn Title="Name" Property="@(m => m.UserName)" Sortable="true" Class="name">
+                    </PropertyColumn>
+                    <PropertyColumn Title="Namenskürzel" Property="@(m => m.UserNickName)" Sortable="true" Class="nickname">
+                    </PropertyColumn>
+                    <PropertyColumn Title="Mail" Property="@(m => m.UserMail)" Sortable="true" Class="mail">
+                    </PropertyColumn>
+                    <PropertyColumn Title="Schlüsselwort" Property="@(m => m.RegistrationCode)" Sortable="false">
+                    </PropertyColumn>
+                    <PropertyColumn Title="Änderungsdatum" Property="@(m => m.LastModified.ToLocalTime())" Sortable="true">
+                    </PropertyColumn>
+                    <PropertyColumn Title="Bestätigt?" Property="@(m => m.IsConfirmed)" Sortable="true">
+                    </PropertyColumn>
+                    <PropertyColumn Title="Autor?" Property="@(m => m.IsAuthor)" Sortable="true">
+                    </PropertyColumn>
+                    <PropertyColumn Title="Reviewer?" Property="@(m => m.IsReviewer)" Sortable="true">
+                    </PropertyColumn>
+                    <PropertyColumn Title="Identifier" Property="@(m => m.UserKey)" Sortable="false" Class="identifier">
+                    </PropertyColumn>
+                </QuickGrid>
+            </div>
             <table class="table table-sm table-striped table-bordered">
                 <thead class="thead-dark">
                     <tr>
@@ -74,7 +100,8 @@
 
 
     private NotificationMessage _notificationMessage;
-    IEnumerable<UserContactInfo> _members = null;
+    private IQueryable<UserContactInfo> _members = null;
+
 
     protected override async Task OnInitializedAsync()
     {
