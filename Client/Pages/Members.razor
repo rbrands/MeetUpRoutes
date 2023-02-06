@@ -44,43 +44,6 @@
                     </PropertyColumn>
                 </QuickGrid>
             </div>
-            <table class="table table-sm table-striped table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Aktion</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Namenskürzel</th>
-                        <th scope="col">Mail</th>
-                        <th scope="col">Schlüsselwort</th>
-                        <th scope="col">Änderungsdatum</th>
-                        <th scope="col">Bestätigt?</th>
-                        <th scope="col">Autor?</th>
-                        <th scope="col">Reviewer?</th>
-                        <th scope="col">Identifier</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (UserContactInfo member in _members)
-                    {
-                        <tr>
-                            <td>
-                                <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditMember(member.Id))"><span class="oi oi-pencil"></span></button>
-                                <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(member))"><span class="oi oi-trash"></span></button>
-                            </td>
-                            <td>@member.UserName</td>
-                            <td>@member.UserNickName</td>
-                            <td>@member.UserMail</td>
-                            <td>@member.RegistrationCode</td>
-                            <td>@member.LastModified.ToLocalTime()</td>
-                            <td>@member.IsConfirmed</td>
-                            <td>@member.IsAuthor</td>
-                            <td>@member.IsReviewer</td>
-                            <td>@member.UserKey</td>
-                        </tr>
-                    }
-                </tbody>
-
-            </table>
         }
     </Authorized>
     <NotAuthorized>
