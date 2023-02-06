@@ -138,6 +138,13 @@
         </small>
     </div>
     <div class="form-group">
+        <label for="bergfest">Bergfest</label>
+        <InputText id="bergfest" aria-describedby="bergfestHelp" class="form-control" @bind-Value="_routeToEdit.Core.BergfestLink" placeholder="Link zu Bergfest-Sammlung" />
+        <small id="bergfestHelp" class="form-text text-muted">
+            Optional: Link zu einer "Bergfest"-Sammlung
+        </small>
+    </div>
+    <div class="form-group">
         <div class="form-check">
             <InputCheckbox id="public" aria-describedby="crossHelp" class="form-check-input" @bind-Value="_routeToEdit.Core.IsNonPublic" />
             <label for="public" class="form-checklabel">
